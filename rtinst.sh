@@ -30,6 +30,10 @@ if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ]
     RELNO=14
 fi
 
+if [ "$FULLREL" = "Ubuntu 13.10" ]
+  then
+    RELNO=13
+fi
 
 
 # prepare system
@@ -37,6 +41,11 @@ sudo apt-get update && sudo apt-get -y upgrade
 sudo apt-get clean && sudo apt-get autoclean
 
 sudo apt-get -y install autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config php5 php5-cli php5-dev php5-fpm php5-curl php5-geoip php5-mcrypt php5-xmlrpc pkg-config python-scgi screen subversion texinfo unrar-free unzip zlib1g-dev libcurl4-openssl-dev mediainfo
+
+if [ $RELNO = 13 ]
+  then
+    sudo apt-get -y install php5-json
+fi
 
 # install ftp
 sudo apt-get -y install vsftpd
@@ -134,7 +143,7 @@ sudo htpasswd -c -b /var/www/rutorrent/.htpasswd $LOGNAME $WEBPASS
 
 sudo openssl req -x509 -nodes -days 365 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt
 
-if [ $RELNO = 14 ]
+if [ $RELNO = 14 ] | [ $RELNO = 13 ]
   then
     sudo cp /usr/share/nginx/html/* /var/www
 fi
