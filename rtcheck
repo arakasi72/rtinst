@@ -1,0 +1,21 @@
+#!/bin/bash
+# rTorrent Auto Restart
+
+PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+FILE="$HOME/rtorrent/.session/rtorrent.lock"
+
+service_running(){
+pgrep -fx -u $LOGNAME $1 > /dev/null
+}
+
+
+for arg do
+if ! ( service_running $arg )  
+  then
+    if [[ $arg = "rtorrent" && -a $FILE ]] 
+      then
+        rm -f $FILE
+    fi
+    screen -d -m -S $arg $arg
+fi
+done
