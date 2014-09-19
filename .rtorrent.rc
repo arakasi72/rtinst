@@ -1,0 +1,53 @@
+#This s an example resource file for rTorrent. Copy to
+# ~/.rtorrent.rc and enable/modify the options as needed. Remember to
+# uncomment the options you wish to enable.
+# BitTorrent
+max_downloads_global = 0
+max_uploads_global = 0
+min_peers = 30 
+max_peers = 150 
+min_peers_seed = -1 
+max_peers_seed = -1
+
+max_uploads = 150
+
+download_rate = 0
+upload_rate = 0
+
+# Directories
+directory = /home/<user name>/rtorrent/downloads
+
+session = /home/<user name>/rtorrent/.session
+
+schedule = watch_directory,5,5,load_start=/home/<user name>/rtorrent/watch/*.torrent
+
+
+
+# Networking
+port_range = 50000-52999 
+# network.scgi.open_port = localhost:5000
+network.scgi.open_port = 127.0.0.1:5000
+# scgi_port = 127.0.0.1:5000
+network.http.ssl_verify_peer.set=0
+port_random = yes
+use_udp_trackers = yes 
+encryption = allow_incoming,enable_retry,prefer_plaintext
+network.max_open_files.set = 1024 
+network.max_open_sockets.set = 1536 
+network.http.max_open.set = 48 
+network.send_buffer.size.set = 4M 
+network.receive_buffer.size.set = 4M
+dht = disable
+peer_exchange = no
+
+
+# Memory Settings
+check_hash = no
+# hash_read_ahead = 30
+# hash_interval = 5
+# hash_max_tries = 5
+pieces.preload.type.set = 1
+max_memory_usage = 3500M
+
+# The following line initialises rutorrent plugins without needing to open the web interface
+execute = {sh,-c,/usr/bin/php /var/www/rutorrent/php/initplugins.php <user name> &}
