@@ -3,7 +3,23 @@
 FULLREL=$(cat /etc/issue.net)
 SERVERIP=$(ip a s eth0 | awk '/inet / {print$2}' | cut -d/ -f1)
 RELNO=0
+WEBPASS=''
+PASS1=''
+PASS2=''
 
+While $WEBPASS=''
+  do
+   read -p "Please enter password for rutorrent" PASS1
+   read -p "Please re-enter password" PASS2
+   if [ $PASS1 = $PASS2 ]
+     then
+       WEBPASS=$PASS1
+   fi
+  done
+  
+  echo "$WEBPASS"
+  exit
+  
 if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ]
   then
     RELNO=14
@@ -111,7 +127,7 @@ sudo apt-get -y install ffmpeg
 
 # install nginx
 sudo apt-get -y install nginx-full apache2-utils
-sudo htpasswd -c -b /var/www/rutorrent/.htpasswd $LOGNAME london
+sudo htpasswd -c -b /var/www/rutorrent/.htpasswd $LOGNAME $WEBPASS
 
 sudo openssl req -x509 -nodes -days 365 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt
 
