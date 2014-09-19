@@ -8,25 +8,29 @@ PASS1=''
 PASS2=''
 
 while [ -z "$WEBPASS" ]
-  do
-   read -p "Please enter password for rutorrent " PASS1
-   read -p "Please re-enter password " PASS2
+    do
+   echo "Please enter password for rutorrent "
+   stty -echo
+   read PASS1
+   stty echo
+   echo "Please re-enter password "
+   stty -echo
+   read PASS2
+   stty echo
    if [ "$PASS1" = "$PASS2" ]
      then
        WEBPASS="$PASS1"
+     else
+       echo "Entries do not match please try again"
    fi
   done
-
-
   
 if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ]
   then
     RELNO=14
 fi
 
-# echo "$FULLREL"
-# echo "$RELNO"
-# echo "$SERVERIP"
+
 
 # prepare system
 sudo apt-get update && sudo apt-get -y upgrade
