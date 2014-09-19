@@ -108,3 +108,21 @@ if [ $RELNO = 14 ]
     sudo apt-get update
 fi
 sudo apt-get -y install ffmpeg
+
+# install nginx
+sudo apt-get -y install nginx-full apache2-utils
+sudo htpasswd -c /var/www/rutorrent/.htpasswd $LOGNAME london
+
+sudo openssl req -x509 -nodes -days 365 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt
+
+if [ $RELNO = 14 ]
+  then
+    sudo cp /usr/share/nginx/html/* /var/www
+fi
+
+sudo mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
+cd ~
+wget https://raw.githubusercontent.com/arakasi72/rtinst/master/nginxsite
+sudo mv ~/nginxsite /etc/nginx/sites-available/default
+sudo perl -pi -e "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
+sudo service nginx restart && sudo service php5-fpm restart
