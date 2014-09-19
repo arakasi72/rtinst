@@ -40,13 +40,13 @@ cd ~ && mkdir rtorrent && cd rtorrent
 mkdir .session downloads watch
 
 cd ~
-wget https://github.com/arakasi72/rtinst/blob/master/.rtorrent.rc
+wget https://raw.githubusercontent.com/arakasi72/rtinst/master/.rtorrent.rc
 perl -pi -e "s/<user name>/$LOGNAME/g" ~/.rtorrent.rc
 
 # install rutorrent
 cd ~
-wget https://github.com/arakasi72/rtinst/blob/master/ru.config
-wget https://github.com/arakasi72/rtinst/blob/master/ru.ini
+wget https://raw.githubusercontent.com/arakasi72/rtinst/master/ru.config
+wget https://raw.githubusercontent.com/arakasi72/rtinst/master/ru.ini
 sudo mkdir /var/www && cd /var/www
 
 sudo mkdir svn
