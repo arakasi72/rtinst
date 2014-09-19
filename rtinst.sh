@@ -126,3 +126,9 @@ wget https://raw.githubusercontent.com/arakasi72/rtinst/master/nginxsite
 sudo mv ~/nginxsite /etc/nginx/sites-available/default
 sudo perl -pi -e "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
 sudo service nginx restart && sudo service php5-fpm restart
+
+# install rtorrent and irssi start, stop, restart script
+cd ~
+wget https://raw.githubusercontent.com/arakasi72/rtinst/master/rt
+sudo mv rt /usr/local/bin/rt
+sudo chmod 755 /usr/local/bin/rt
