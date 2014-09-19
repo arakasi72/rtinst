@@ -1,14 +1,30 @@
 #!/bin/bash
 
-# Ubuntu14
-# prepare system
-# sudo apt-get update && sudo apt-get -y upgrade
-# sudo apt-get clean && sudo apt-get autoclean
+FULLREL=$(cat /etc/issue.net)
+SERVERIP=$(ip a s eth0 | awk '/inet / {print$2}' | cut -d/ -f1)
+RELNO=0
 
-# sudo apt-get -y install autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config php5 php5-cli php5-dev php5-fpm php5-curl php5-geoip php5-mcrypt php5-xmlrpc pkg-config python-scgi screen subversion texinfo unrar-free unzip zlib1g-dev libcurl4-openssl-dev mediainfo
+if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ]
+  then
+    RELNO=14
+fi
+
+# echo "$FULLREL"
+# echo "$RELNO"
+# echo "$SERVERIP"
+
+# prepare system
+sudo apt-get update && sudo apt-get -y upgrade
+sudo apt-get clean && sudo apt-get autoclean
+
+sudo apt-get -y install autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config php5 php5-cli php5-dev php5-fpm php5-curl php5-geoip php5-mcrypt php5-xmlrpc pkg-config python-scgi screen subversion texinfo unrar-free unzip zlib1g-dev libcurl4-openssl-dev mediainfo
 
 # install ftp
+sudo apt-get -y install vsftpd
 
+sudo openssl req -x509 -nodes -days 365 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem
+
+sudo service vsftpd restart
 
 # install rtorrent
 cd ~
@@ -66,6 +82,9 @@ cd rutorrent/plugins
 sudo mkdir conf
 sudo mv ~/ru.ini conf/plugins.ini
 
-sudo apt-add-repository -y ppa:jon-severinsson/ffmpeg
-sudo apt-get update
+if [ $RELNO = 14 ]
+  then
+    sudo apt-add-repository -y ppa:jon-severinsson/ffmpeg
+    sudo apt-get update
+fi
 sudo apt-get -y install ffmpeg
