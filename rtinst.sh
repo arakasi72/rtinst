@@ -64,10 +64,12 @@ fi
 
 sudo apt-get -y install vsftpd
 
+sudo perl -pi -e "s/anonymous_enable=YES/anonymous_enable=NO/g" /etc/vsftpd.conf
+sudo perl -pi -e "s/#local_enable=YES/local_enable=YES/g" /etc/vsftpd.conf
 sudo perl -pi -e "s/#write_enable=YES/write_enable=YES/g" /etc/vsftpd.conf
 sudo perl -pi -e "s/#local_umask=022/local_umask=022/g" /etc/vsftpd.conf
-sudo perl -pi -e "s/rsa_cert_file/#rsa_cert_file/g" /etc/vsftpd.conf
-sudo perl -pi -e "s/rsa_private_key_file=\/etc\/ssl\/private\/ssl-cert-snakeoil\.key/rsa_cert_file=\/etc\/ssl\/private\/vsftpd\.pem/g" /etc/vsftpd.conf
+sudo perl -pi -e "s/rsa_private_key_file/#rsa_private_key_file/g" /etc/vsftpd.conf
+sudo perl -pi -e "s/rsa_cert_file=\/etc\/ssl\/private\/ssl-cert-snakeoil\.pem/rsa_cert_file=\/etc\/ssl\/private\/vsftpd\.pem/g" /etc/vsftpd.conf
 
 echo "chroot_local_user=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo "allow_writeable_chroot=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
