@@ -35,6 +35,11 @@ if [ "$FULLREL" = "Ubuntu 13.10" ]
     RELNO=13
 fi
 
+if [ "$FULLREL" = "Ubuntu 12.04.4 LTS" ]
+  then
+    RELNO=12
+fi
+
 
 # prepare system
 sudo apt-get update && sudo apt-get -y upgrade
@@ -48,14 +53,22 @@ if [ $RELNO = 13 ]
 fi
 
 # install ftp
-sudo apt-get -y install vsftpd
-if [ $RELNO = 14 ]
+
+if [ $RELNO = 12 ]
   then
-    sudo perl -pi -e "s/#write_enable=YES/write_enable=YES/g" /etc/vsftpd.conf
-    sudo perl -pi -e "s/#local_umask=022/local_umask=022/g" /etc/vsftpd.conf
-    sudo perl -pi -e "s/rsa_cert_file/#rsa_cert_file/g" /etc/vsftpd.conf
-    sudo perl -pi -e "s/rsa_private_key_file=\/etc\/ssl\/private\/ssl-cert-snakeoil\.key/rsa_cert_file=\/etc\/ssl\/private\/vsftpd\.pem/g" /etc/vsftpd.conf
+    sudo apt-get -y install python-software-properties
+    sudo add-apt-repository -y ppa:thefrontiergroup/vsftpd
+    sudo apt-get update
 fi
+
+
+sudo apt-get -y install vsftpd
+
+sudo perl -pi -e "s/#write_enable=YES/write_enable=YES/g" /etc/vsftpd.conf
+sudo perl -pi -e "s/#local_umask=022/local_umask=022/g" /etc/vsftpd.conf
+sudo perl -pi -e "s/rsa_cert_file/#rsa_cert_file/g" /etc/vsftpd.conf
+sudo perl -pi -e "s/rsa_private_key_file=\/etc\/ssl\/private\/ssl-cert-snakeoil\.key/rsa_cert_file=\/etc\/ssl\/private\/vsftpd\.pem/g" /etc/vsftpd.conf
+
 echo "chroot_local_user=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo "allow_writeable_chroot=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo "ssl_enable=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
@@ -148,11 +161,22 @@ if [ $RELNO = 14 ] | [ $RELNO = 13 ]
     sudo cp /usr/share/nginx/html/* /var/www
 fi
 
+if [ $RELNO = 12 ]
+  then
+    sudo cp /usr/share/nginx/www/* /var/www
+fi
+
 sudo mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
 cd ~
 wget https://raw.githubusercontent.com/arakasi72/rtinst/master/nginxsite
 sudo mv ~/nginxsite /etc/nginx/sites-available/default
 sudo perl -pi -e "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
+
+if [ $RELNO = 12 ]
+  then
+    sudo perl -pi -e "s/fastcgi_pass unix\:\/var\/run\/php5-fpm\.sock/fastcgi_pass 127\.0\.0\.1\:9000/g" /etc/nginx/sites-available/default
+fi
+
 sudo service nginx restart && sudo service php5-fpm restart
 
 # install rtorrent and irssi start, stop, restart script
