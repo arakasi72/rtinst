@@ -21,10 +21,27 @@ sudo apt-get -y install autoconf build-essential ca-certificates comerr-dev curl
 
 # install ftp
 sudo apt-get -y install vsftpd
+if [ $RELNO = 14 ]
+  then
+    sudo perl -pi -e "s/#write_enable=YES/write_enable=YES/g" /etc/vsftpd.conf
+    sudo perl -pi -e "s/#local_umask=022/local_umask=022/g" /etc/vsftpd.conf
+fi
+echo "ssl_enable=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
+echo "allow_anon_ssl=NO" | sudo tee -a /etc/vsftpd.conf > /dev/null
+echo "force_local_data_ssl=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
+echo "force_local_logins_ssl=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
+echo "ssl_sslv2=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
+echo "ssl_sslv3=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
+echo "ssl_tlsv1=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
+echo "require_ssl_reuse=NO" | sudo tee -a /etc/vsftpd.conf > /dev/null
+echo "listen_port=43421" | sudo tee -a /etc/vsftpd.conf > /dev/null
+echo "ssl_ciphers=HIGH" | sudo tee -a /etc/vsftpd.conf > /dev/null
 
 sudo openssl req -x509 -nodes -days 365 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem
 
 sudo service vsftpd restart
+
+exit
 
 # install rtorrent
 cd ~
