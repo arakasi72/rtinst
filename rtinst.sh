@@ -111,7 +111,7 @@ sudo apt-get -y install ffmpeg
 
 # install nginx
 sudo apt-get -y install nginx-full apache2-utils
-sudo htpasswd -c /var/www/rutorrent/.htpasswd $LOGNAME london
+sudo htpasswd -c -b /var/www/rutorrent/.htpasswd $LOGNAME london
 
 sudo openssl req -x509 -nodes -days 365 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt
 
