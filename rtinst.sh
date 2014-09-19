@@ -25,7 +25,11 @@ if [ $RELNO = 14 ]
   then
     sudo perl -pi -e "s/#write_enable=YES/write_enable=YES/g" /etc/vsftpd.conf
     sudo perl -pi -e "s/#local_umask=022/local_umask=022/g" /etc/vsftpd.conf
+    sudo perl -pi -e "s/rsa_cert_file/#rsa_cert_file/g" /etc/vsftpd.conf
+    sudo perl -pi -e "s/rsa_private_key_file=\/etc\/ssl\/private\/ssl-cert-snakeoil\.key/rsa_cert_file=\/etc\/ssl\/private\/vsftpd\.pem/g" /etc/vsftpd.conf
 fi
+echo "chroot_local_user=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
+echo "allow_writeable_chroot=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo "ssl_enable=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo "allow_anon_ssl=NO" | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo "force_local_data_ssl=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
@@ -41,7 +45,6 @@ sudo openssl req -x509 -nodes -days 365 -subj /CN=$SERVERIP -newkey rsa:2048 -ke
 
 sudo service vsftpd restart
 
-exit
 
 # install rtorrent
 cd ~
