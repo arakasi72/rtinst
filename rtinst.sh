@@ -66,6 +66,6 @@ cd rutorrent/plugins
 sudo mkdir conf
 sudo mv ~/ru.ini conf/plugins.ini
 
-sudo apt-add-repository ppa:jon-severinsson/ffmpeg
+sudo apt-add-repository -y ppa:jon-severinsson/ffmpeg
 sudo apt-get update
 sudo apt-get -y install ffmpeg
