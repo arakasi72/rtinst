@@ -181,6 +181,37 @@ fi
 
 sudo service nginx restart && sudo service php5-fpm restart
 
+# install autodl-irssi
+sudo apt-get -y install git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libxml-libxml-perl libjson-rpc-perl libarchive-zip-perl
+mkdir -p ~/.irssi/scripts/autorun
+cd ~/.irssi/scripts
+wget --no-check-certificate -O autodl-irssi.zip http://update.autodl-community.com/autodl-irssi-community.zip
+unzip -o autodl-irssi.zip
+rm autodl-irssi.zip
+cp autodl-irssi.pl autorun/
+mkdir -p ~/.autodl
+touch ~/.autodl/autodl.cfg && touch ~/.autodl/autodl2.cfg
+
+cd /var/www/rutorrent/plugins
+sudo git clone https://github.com/autodl-community/autodl-rutorrent.git autodl-irssi
+sudo touch autodl-irssi/conf.php
+
+sudo chown -R www-data:www-data autodl-irssi
+
+echo "<?php" | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
+echo | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
+echo "\$autodlPort = 38800;" | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
+echo "\$autodlPassword = \"fab7Rxtpp\";" | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
+echo | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
+echo "?>" | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
+
+cd ~/.autodl
+echo "[options]" | sudo tee -a autodl2.cfg > /dev/null
+echo "gui-server-port = 38800" | sudo tee -a autodl2.cfg > /dev/null
+echo "gui-server-password = fab7Rxtpp" | sudo tee -a autodl2.cfg > /dev/null
+
+sudo perl -pi -e "s/if \(\\$\.browser\.msie\)/if \(navigator\.appName \=\= \'Microsoft Internet Explorer\' \&\& navigator\.userAgent\.match\(\/msie 6\/i\)\)/g" /var/www/rutorrent/plugins/autodl-irssi/AutodlFilesDownloader.js
+
 # install rtorrent and irssi start, stop, restart script
 cd ~
 wget https://raw.githubusercontent.com/arakasi72/rtinst/master/rt
@@ -188,3 +219,9 @@ sudo mv rt /usr/local/bin/rt
 sudo chmod 755 /usr/local/bin/rt
 
 /usr/local/bin/rt start
+/usr/local/bin/rt -i start
+
+echo
+echo "rutorrent can be accessed at https://$SERVERIP/rutorrent"
+echo
+echo "ftp port should be set to 43421"
