@@ -7,18 +7,17 @@ WEBPASS=''
 PASS1=''
 PASS2=''
 
-While $WEBPASS=''
+while [ -z "$WEBPASS" ]
   do
-   read -p "Please enter password for rutorrent" PASS1
-   read -p "Please re-enter password" PASS2
-   if [ $PASS1 = $PASS2 ]
+   read -p "Please enter password for rutorrent " PASS1
+   read -p "Please re-enter password " PASS2
+   if [ "$PASS1" = "$PASS2" ]
      then
-       WEBPASS=$PASS1
+       WEBPASS="$PASS1"
    fi
   done
-  
-  echo "$WEBPASS"
-  exit
+
+
   
 if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ]
   then
@@ -148,3 +147,5 @@ cd ~
 wget https://raw.githubusercontent.com/arakasi72/rtinst/master/rt
 sudo mv rt /usr/local/bin/rt
 sudo chmod 755 /usr/local/bin/rt
+
+/usr/local/bin/rt start
