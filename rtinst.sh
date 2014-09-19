@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Ubuntu14
 # prepare system
 # sudo apt-get update && sudo apt-get -y upgrade
 # sudo apt-get clean && sudo apt-get autoclean
@@ -39,9 +40,13 @@ cd ~ && mkdir rtorrent && cd rtorrent
 mkdir .session downloads watch
 
 cd ~
+wget https://github.com/arakasi72/rtinst/blob/master/.rtorrent.rc
 perl -pi -e "s/<user name>/$LOGNAME/g" ~/.rtorrent.rc
 
 # install rutorrent
+cd ~
+wget https://github.com/arakasi72/rtinst/blob/master/ru.config
+wget https://github.com/arakasi72/rtinst/blob/master/ru.ini
 sudo mkdir /var/www && cd /var/www
 
 sudo mkdir svn
