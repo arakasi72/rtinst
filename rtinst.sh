@@ -248,9 +248,11 @@ sudo chmod 755 /usr/local/bin/rtcheck
 /usr/local/bin/rt start
 /usr/local/bin/rt -i start
 
+stty -echo
 (crontab -u $LOGNAME -l; echo "$cronline1" ) | crontab -u $LOGNAME -
 (crontab -u $LOGNAME -l; echo "$cronline2" ) | crontab -u $LOGNAME -
-
+stty echo
+echo "crontab entries made. rtorrent and irssi will start on boot for $LOGNAME"
 echo
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent"
 echo
