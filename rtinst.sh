@@ -6,6 +6,8 @@ RELNO=0
 WEBPASS=''
 PASS1=''
 PASS2=''
+cronline1="@reboot sleep 3; /usr/local/bin/rtcheck irssi rtorrent"
+cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 
 while [ -z "$WEBPASS" ]
     do
@@ -215,11 +217,17 @@ sudo perl -pi -e "s/if \(\\$\.browser\.msie\)/if \(navigator\.appName \=\= \'Mic
 # install rtorrent and irssi start, stop, restart script
 cd ~
 wget https://raw.githubusercontent.com/arakasi72/rtinst/master/rt
+wget https://raw.githubusercontent.com/arakasi72/rtinst/master/rtcheck
 sudo mv rt /usr/local/bin/rt
+sudo mv rt /usr/local/bin/rtcheck
 sudo chmod 755 /usr/local/bin/rt
+sudo chmod 755 /usr/local/bin/rtcheck
 
 /usr/local/bin/rt start
 /usr/local/bin/rt -i start
+
+(crontab -u $LOGNAME -l; echo "$cronline1" ) | crontab -u $LOGNAME -
+(crontab -u $LOGNAME -l; echo "$cronline2" ) | crontab -u $LOGNAME -
 
 echo
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent"
