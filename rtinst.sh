@@ -174,6 +174,14 @@ sudo htpasswd -c -b /var/www/rutorrent/.htpasswd $LOGNAME $WEBPASS
 
 sudo openssl req -x509 -nodes -days 365 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt
 
+sudo perl -pi -e "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
+sudo perl -pi -e "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
+sudo perl -pi -e "s/pid \/run\/nginx\.pid;/pid \/var\/run\/nginx\.pid;/g" /etc/nginx/nginx.conf
+sudo perl -pi -e "s/# server_tokens off;/server_tokens off;/g" /etc/nginx/nginx.conf
+sudo perl -pi -e "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/nginx/nginx.conf
+sudo perl -pi -e "s/# error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
+
+
 if [ $RELNO = 14 ] | [ $RELNO = 13 ]
   then
     sudo cp /usr/share/nginx/html/* /var/www
