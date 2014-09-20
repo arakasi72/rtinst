@@ -219,7 +219,7 @@ cd ~
 wget https://raw.githubusercontent.com/arakasi72/rtinst/master/rt
 wget https://raw.githubusercontent.com/arakasi72/rtinst/master/rtcheck
 sudo mv rt /usr/local/bin/rt
-sudo mv rt /usr/local/bin/rtcheck
+sudo mv rtcheck /usr/local/bin/rtcheck
 sudo chmod 755 /usr/local/bin/rt
 sudo chmod 755 /usr/local/bin/rtcheck
 
