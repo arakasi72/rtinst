@@ -255,4 +255,4 @@ echo "crontab entries made. rtorrent and irssi will start on boot for $LOGNAME"
 echo
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent"
 echo
-echo "ftp port should be set to 43421"
+echo "ftp client should be set to explicit ftp over tls using port  43421"
