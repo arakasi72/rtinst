@@ -247,6 +247,12 @@ sudo chmod 755 /usr/local/bin/rtcheck
 
 /usr/local/bin/rt start
 /usr/local/bin/rt -i start
+sleep 5
+screen -S irssi -p 0 -X stuff "/autodl update$(printf \\r)"
+sleep 20
+screen -S irssi -p 0 -X stuff "/quit$(printf \\r)"
+sleep 3
+/usr/local/bin/rt -i start > /dev/null
 
 (crontab -u $LOGNAME -l; echo "$cronline1" ) | crontab -u $LOGNAME -
 (crontab -u $LOGNAME -l; echo "$cronline2" ) | crontab -u $LOGNAME -
