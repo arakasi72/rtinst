@@ -9,6 +9,28 @@ PASS2=''
 cronline1="@reboot sleep 3; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 
+if [ "$LOGNAME" = "root"]
+  then
+    echo "Cannot run as root. Log into user account and run from there"
+    exit
+elif [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ]
+  then
+    RELNO=14
+elif [ "$FULLREL" = "Ubuntu 13.10" ]
+  then
+    RELNO=13
+elif [ "$FULLREL" = "Ubuntu 12.04.4 LTS" ]
+  then
+    RELNO=12
+elif [ "$FULLREL" = "Debian GNU/Linux 7" ]
+  then
+    RELNO=7
+else
+  echo "Unable to determine OS"
+  exit
+fi
+
+# get password to be used to access rutorrent
 while [ -z "$WEBPASS" ]
     do
    echo "Please enter password for rutorrent "
@@ -26,22 +48,6 @@ while [ -z "$WEBPASS" ]
        echo "Entries do not match please try again"
    fi
   done
-  
-if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ]
-  then
-    RELNO=14
-fi
-
-if [ "$FULLREL" = "Ubuntu 13.10" ]
-  then
-    RELNO=13
-fi
-
-if [ "$FULLREL" = "Ubuntu 12.04.4 LTS" ]
-  then
-    RELNO=12
-fi
-
 
 # prepare system
 sudo apt-get update && sudo apt-get -y upgrade
@@ -63,8 +69,16 @@ if [ $RELNO = 12 ]
     sudo apt-get update
 fi
 
+if [ $RELNO = 7 ]
+  then
+    echo "deb http://ftp.cyconet.org/debian wheezy-updates main non-free contrib" | sudo tee -a /etc/apt/sources.list.d/wheezy-updates.cyconet2.list > /dev/null
+    sudo aptitude update
+    sudo aptitude -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd
+  else
+    sudo apt-get -y install vsftpd
+fi
 
-sudo apt-get -y install vsftpd
+
 
 sudo perl -pi -e "s/anonymous_enable=YES/anonymous_enable=NO/g" /etc/vsftpd.conf
 sudo perl -pi -e "s/#local_enable=YES/local_enable=YES/g" /etc/vsftpd.conf
@@ -165,7 +179,7 @@ if [ $RELNO = 14 ] | [ $RELNO = 13 ]
     sudo cp /usr/share/nginx/html/* /var/www
 fi
 
-if [ $RELNO = 12 ]
+if [ $RELNO = 12 ] | [ $RELNO = 7 ]
   then
     sudo cp /usr/share/nginx/www/* /var/www
 fi
