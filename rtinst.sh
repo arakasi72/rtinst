@@ -73,7 +73,7 @@ if [ $RELNO = 7 ]
   then
     echo "deb http://ftp.cyconet.org/debian wheezy-updates main non-free contrib" | sudo tee -a /etc/apt/sources.list.d/wheezy-updates.cyconet2.list > /dev/null
     sudo aptitude update
-    sudo aptitude -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd
+    sudo aptitude -o Aptitude::Cmdline::ignore-trust-violations=true -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd
   else
     sudo apt-get -y install vsftpd
 fi
