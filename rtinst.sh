@@ -9,7 +9,7 @@ PASS2=''
 cronline1="@reboot sleep 3; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 
-if [ "$LOGNAME" = "root"]
+if [ "$LOGNAME" = "root" ]
   then
     echo "Cannot run as root. Log into user account and run from there"
     exit
@@ -135,13 +135,13 @@ cd ~ && mkdir rtorrent && cd rtorrent
 mkdir .session downloads watch
 
 cd ~
-wget https://raw.githubusercontent.com/arakasi72/rtinst/master/.rtorrent.rc
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/.rtorrent.rc
 perl -pi -e "s/<user name>/$LOGNAME/g" ~/.rtorrent.rc
 
 # install rutorrent
 cd ~
-wget https://raw.githubusercontent.com/arakasi72/rtinst/master/ru.config
-wget https://raw.githubusercontent.com/arakasi72/rtinst/master/ru.ini
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/ru.config
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/ru.ini
 sudo mkdir /var/www && cd /var/www
 
 sudo mkdir svn
@@ -186,7 +186,7 @@ fi
 
 sudo mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
 cd ~
-wget https://raw.githubusercontent.com/arakasi72/rtinst/master/nginxsite
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/nginxsite
 sudo mv ~/nginxsite /etc/nginx/sites-available/default
 sudo perl -pi -e "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
 
@@ -230,8 +230,8 @@ sudo perl -pi -e "s/if \(\\$\.browser\.msie\)/if \(navigator\.appName \=\= \'Mic
 
 # install rtorrent and irssi start, stop, restart script
 cd ~
-wget https://raw.githubusercontent.com/arakasi72/rtinst/master/rt
-wget https://raw.githubusercontent.com/arakasi72/rtinst/master/rtcheck
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rt
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtcheck
 sudo mv rt /usr/local/bin/rt
 sudo mv rtcheck /usr/local/bin/rtcheck
 sudo chmod 755 /usr/local/bin/rt
