@@ -22,6 +22,12 @@ elif [ "$FULLREL" = "Ubuntu 13.10" ]
 elif [ "$FULLREL" = "Ubuntu 12.04.4 LTS" ]
   then
     RELNO=12
+elif [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]
+  then
+    RELNO=12
+    wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list
+    sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
+    sudo mv sources.list /etc/apt/sources.list
 elif [ "$FULLREL" = "Debian GNU/Linux 7" ]
   then
     RELNO=7
