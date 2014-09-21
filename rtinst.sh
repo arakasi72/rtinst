@@ -247,10 +247,10 @@ sudo chmod 755 /usr/local/bin/rtcheck
 
 /usr/local/bin/rt start
 /usr/local/bin/rt -i start
-sleep 5
+sleep 3
 screen -S irssi -p 0 -X stuff "/autodl update$(printf \\r)"
 echo "updating autodl-irssi"
-sleep 20
+sleep 10
 echo "autodl-irssi update complete"
 screen -S irssi -p 0 -X stuff "/quit$(printf \\r)"
 sleep 3
