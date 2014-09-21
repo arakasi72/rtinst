@@ -247,14 +247,24 @@ sudo chmod 755 /usr/local/bin/rtcheck
 
 /usr/local/bin/rt start
 /usr/local/bin/rt -i start
-sleep 3
+
+sleep 2
+screen -S irssi -p 0 -X stuff "/WINDOW LOG ON ~/ir.log$(printf \\r)"
 screen -S irssi -p 0 -X stuff "/autodl update$(printf \\r)"
-echo "updating autodl-irssi"
-sleep 10
-echo "autodl-irssi update complete"
+echo -n "updating autodl-irssi"
+while ! ((tail -n1 ~/ir.log | grep -c -q "You are using the latest autodl-trackers") || (tail -n1 ~/ir.log | grep -c -q "Successfully loaded tracker files"))
+do
+sleep 1
+echo -n " ."
+done
+echo
+screen -S irssi -p 0 -X stuff "/WINDOW LOG OFF$(printf \\r)"
+sleep 1
 screen -S irssi -p 0 -X quit
-sleep 3
+sleep 2
 /usr/local/bin/rt -i start > /dev/null
+rm ~/ir.log
+echo "autodl-irssi update complete"
 
 (crontab -u $LOGNAME -l; echo "$cronline1" ) | crontab -u $LOGNAME -
 (crontab -u $LOGNAME -l; echo "$cronline2" ) | crontab -u $LOGNAME -
