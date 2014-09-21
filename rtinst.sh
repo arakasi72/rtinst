@@ -252,7 +252,7 @@ screen -S irssi -p 0 -X stuff "/autodl update$(printf \\r)"
 echo "updating autodl-irssi"
 sleep 10
 echo "autodl-irssi update complete"
-screen -S irssi -p 0 -X stuff "/quit$(printf \\r)"
+screen -S irssi -p 0 -X quit
 sleep 3
 /usr/local/bin/rt -i start > /dev/null
 
