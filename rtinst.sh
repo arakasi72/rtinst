@@ -9,6 +9,22 @@ PASS2=''
 cronline1="@reboot sleep 3; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 
+genpasswd() {
+local genln=$1
+[ -z "$genln" ] && genln=8
+tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
+}
+
+random()
+{
+    local min=$1
+    local max=$2
+    local RAND=`od -t uI -N 4 /dev/urandom | awk '{print $2}'`
+    RAND=$((RAND%((($max-$min)+1))+$min))
+    echo $RAND
+}
+
+
 if [ "$LOGNAME" = "root" ]
   then
     echo "Cannot run as root. Log into user account and run from there"
@@ -68,6 +84,8 @@ fi
 
 # install ftp
 
+ftpport=$(random 41080 48995)
+
 if [ $RELNO = 12 ]
   then
     sudo apt-get -y install python-software-properties
@@ -103,7 +121,7 @@ echo "ssl_sslv2=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo "ssl_sslv3=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo "ssl_tlsv1=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo "require_ssl_reuse=NO" | sudo tee -a /etc/vsftpd.conf > /dev/null
-echo "listen_port=43421" | sudo tee -a /etc/vsftpd.conf > /dev/null
+echo "listen_port=$ftpport" | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo "ssl_ciphers=HIGH" | sudo tee -a /etc/vsftpd.conf > /dev/null
 
 sudo openssl req -x509 -nodes -days 365 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem
@@ -279,4 +297,4 @@ echo "crontab entries made. rtorrent and irssi will start on boot for $LOGNAME"
 echo
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent"
 echo
-echo "ftp client should be set to explicit ftp over tls using port  43421"
+echo "ftp client should be set to explicit ftp over tls using port $ftpport"
