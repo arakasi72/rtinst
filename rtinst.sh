@@ -230,6 +230,10 @@ fi
 sudo service nginx restart && sudo service php5-fpm restart
 
 # install autodl-irssi
+
+adlport=$(random 36180 38995)
+adlpass=$(genpasswd $(random 12 16))
+
 sudo apt-get -y install git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libxml-libxml-perl libjson-rpc-perl libarchive-zip-perl
 mkdir -p ~/.irssi/scripts/autorun
 cd ~/.irssi/scripts
@@ -248,15 +252,15 @@ sudo chown -R www-data:www-data autodl-irssi
 
 echo "<?php" | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
 echo | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
-echo "\$autodlPort = 38800;" | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
-echo "\$autodlPassword = \"fab7Rxtpp\";" | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
+echo "\$autodlPort = $adlport;" | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
+echo "\$autodlPassword = \"$adlpass\";" | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
 echo | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
 echo "?>" | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
 
 cd ~/.autodl
 echo "[options]" | sudo tee -a autodl2.cfg > /dev/null
-echo "gui-server-port = 38800" | sudo tee -a autodl2.cfg > /dev/null
-echo "gui-server-password = fab7Rxtpp" | sudo tee -a autodl2.cfg > /dev/null
+echo "gui-server-port = $adlport" | sudo tee -a autodl2.cfg > /dev/null
+echo "gui-server-password = $adlpass" | sudo tee -a autodl2.cfg > /dev/null
 
 sudo perl -pi -e "s/if \(\\$\.browser\.msie\)/if \(navigator\.appName \=\= \'Microsoft Internet Explorer\' \&\& navigator\.userAgent\.match\(\/msie 6\/i\)\)/g" /var/www/rutorrent/plugins/autodl-irssi/AutodlFilesDownloader.js
 
@@ -295,6 +299,7 @@ echo "autodl-irssi update complete"
 echo
 echo "crontab entries made. rtorrent and irssi will start on boot for $LOGNAME"
 echo
-echo "rutorrent can be accessed at https://$SERVERIP/rutorrent"
+echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | sudo tee -a ~/rtinst.info
 echo
-echo "ftp client should be set to explicit ftp over tls using port $ftpport"
+echo "ftp client should be set to explicit ftp over tls using port $ftpport" | sudo tee -a ~/rtinst.info
+echo " The above information is stored in rtinst.info in your home directory"
