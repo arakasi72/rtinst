@@ -29,18 +29,18 @@ random()
 while getopts ":d" optname
   do
     case $optname in
-      "d" )[[ -n $OPTFLAG ]]  && useerr=1 || OPTFLAG=1 && DLFLAG=0 ;;
+      "d" ) DLFLAG=0 ;;
         * ) echo "incorrect option, only -d allowed" && exit 1 ;;
     esac
   done
 
 shift $(( $OPTIND - 1 ))
 
-if [ $useerr -eq 1 ]
-  then
-    echo "option entered multiple times, please only use -d once"
-    exit 1
-fi
+#if [ $useerr -eq 1 ]
+#  then
+#    echo "option entered multiple times, please only use -d once"
+#    exit 1
+#fi
 
 
 # Check if there is more than 0 argument
