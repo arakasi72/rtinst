@@ -29,7 +29,7 @@ if [ "$LOGNAME" = "root" ]
   then
     echo "Cannot run as root. Log into user account and run from there"
     exit
-elif [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ]
+elif [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ] || [ "$FULLREL" = "Ubuntu 14.04 LTS" ]
   then
     RELNO=14
 elif [ "$FULLREL" = "Ubuntu 13.10" ]
