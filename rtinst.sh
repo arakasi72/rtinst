@@ -29,7 +29,7 @@ random()
 while getopts ":d" optname
   do
     case $optname in
-      "d" )[[ -n $OPTFLAG ]]  && useerr=1 || OPTFLAG=1 && DLFLAG=0 ;;
+      "d" )[ -n $OPTFLAG ]  && useerr=1 || OPTFLAG=1 && DLFLAG=0 ;;
         * ) echo "incorrect option, only -d allowed" && exit 1 ;;
     esac
   done
