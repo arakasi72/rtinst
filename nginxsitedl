@@ -1,0 +1,47 @@
+server {
+        listen 80;
+        server_name <Server IP>;
+        return 301 https://$server_name$request_uri;
+}
+
+server {
+        listen 443 ssl;
+
+        server_name <Server IP>;
+        root /var/www;
+        index index.html index.php index.htm;
+
+        ssl_certificate /etc/ssl/ruweb.crt;
+        ssl_certificate_key /etc/ssl/ruweb.key;
+        ssl_session_timeout 5m;
+        
+        location / {
+               try_files $uri $uri/ =404;
+        }
+
+        location ^~ /rutorrent {
+               auth_basic "Restricted";
+               auth_basic_user_file /var/www/rutorrent/.htpasswd;
+               location ~ \.php$ {
+                        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+                        fastcgi_pass unix:/var/run/php5-fpm.sock;
+                        fastcgi_index index.php;
+                        include fastcgi_params;
+                }
+        }
+
+          location ~ ^/download/(.+?)(/.*)?$ {
+                alias /home/$1$2;
+                set $user $1;
+                if ($remote_user = '') { break; }
+                if ($user != $remote_user) { return 403; }
+                auth_basic "Restricted";
+                auth_basic_user_file /var/www/rutorrent/.htpasswd;
+                index index.html index.htm; autoindex on;
+            }
+ 
+        location ~ /\.ht {
+                deny all;
+        }
+
+}
