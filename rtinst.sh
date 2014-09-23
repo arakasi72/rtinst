@@ -36,9 +36,9 @@ while getopts ":d" optname
 
 shift $(( $OPTIND - 1 ))
 
-if [ $useerr -gt 0 ]
+if [ $useerr -eq 1 ]
   then
-    echo "option entered twice, please only use -d once"
+    echo "option entered multiple times, please only use -d once"
     exit 1
 fi
 
