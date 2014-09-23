@@ -235,7 +235,7 @@ fi
 
 sudo mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
 cd ~
-if [ $DLFLAG =0]
+if [ $DLFLAG = 0]
   then
     wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/nginxsitedl -O nginxsite
   else
@@ -322,8 +322,9 @@ echo "autodl-irssi update complete"
 echo
 echo "crontab entries made. rtorrent and irssi will start on boot for $LOGNAME"
 echo
-if [ $DLFLAG =0]
+if [ $DLFLAG = 0]
   then
+    find ~ -type d -print0 | xargs -0 chmod 755 
     echo "Access https downloads at https://$SERVERIP/download/$LOGNAME"
     echo
 fi
