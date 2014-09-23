@@ -8,6 +8,7 @@ PASS1=''
 PASS2=''
 cronline1="@reboot sleep 3; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
+DLFLAG=1
 
 genpasswd() {
 local genln=$1
@@ -24,6 +25,38 @@ random()
     echo $RAND
 }
 
+while getopts ":d" optname
+  do
+    case $optname in
+      "d" )[[ -n $OPTFLAG ]]  && useerr=1 || OPTFLAG=1 && DLFLAG=0 ;;
+        * ) echo "incorrect option, only -d allowed" && exit 1 ;;
+    esac
+  done
+
+shift $(( $OPTIND - 1 ))
+
+if [ $useerr -gt 0 ]
+  then
+    echo "option entered twice, please only use -d once"
+    exit 1
+fi
+
+
+# Check if there is more than 0 argument
+if [ $# -gt 0 ]
+  then
+    echo "No arguments allowed $1 is not a valid argument"
+    exit 1
+fi
+
+if [ $DLFLAG ]
+  then
+    echo "DL selected"
+  else
+    echo "NO DL"
+fi
+
+exit
 
 if [ "$LOGNAME" = "root" ]
   then
