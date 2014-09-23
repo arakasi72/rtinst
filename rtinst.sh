@@ -322,7 +322,11 @@ echo "autodl-irssi update complete"
 echo
 echo "crontab entries made. rtorrent and irssi will start on boot for $LOGNAME"
 echo
-[ $DLFLAG =0] && echo "Access https downloads at https://$SERVERIP/download/$LOGNAME" && echo
+if [ $DLFLAG =0]
+  then
+    echo "Access https downloads at https://$SERVERIP/download/$LOGNAME"
+    echo
+fi
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | sudo tee -a ~/rtinst.info
 echo
 echo "ftp client should be set to explicit ftp over tls using port $ftpport" | sudo tee -a ~/rtinst.info
