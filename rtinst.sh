@@ -325,7 +325,7 @@ echo
 if [ $DLFLAG = 0 ]
   then
     find ~ -type d -print0 | xargs -0 chmod 755 
-    echo "Access https downloads at https://$SERVERIP/download/$LOGNAME"
+    echo "Access https downloads at https://$SERVERIP/download/$LOGNAME" | sudo tee -a ~/rtinst.info
     echo
 fi
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | sudo tee -a ~/rtinst.info
