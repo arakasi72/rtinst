@@ -42,15 +42,6 @@ if [ $# -gt 0 ]
     exit 1
 fi
 
-if [ $DLFLAG = 0 ]
-  then
-    echo "DL selected"
-  else
-    echo "NO DL"
-fi
-
-exit
-
 if [ "$LOGNAME" = "root" ]
   then
     echo "Cannot run as root. Log into user account and run from there"
