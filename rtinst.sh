@@ -9,7 +9,6 @@ PASS2=''
 cronline1="@reboot sleep 3; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 DLFLAG=1
-useerr=0
 
 genpasswd() {
 local genln=$1
@@ -35,13 +34,6 @@ while getopts ":d" optname
   done
 
 shift $(( $OPTIND - 1 ))
-
-#if [ $useerr -eq 1 ]
-#  then
-#    echo "option entered multiple times, please only use -d once"
-#    exit 1
-#fi
-
 
 # Check if there is more than 0 argument
 if [ $# -gt 0 ]
@@ -252,7 +244,13 @@ fi
 
 sudo mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
 cd ~
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/nginxsite
+if [ $DLFLAG =0]
+  then
+    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/nginxsitedl -O nginxsite
+  else
+    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/nginxsite
+fi
+
 sudo mv ~/nginxsite /etc/nginx/sites-available/default
 sudo perl -pi -e "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
 
@@ -333,6 +331,7 @@ echo "autodl-irssi update complete"
 echo
 echo "crontab entries made. rtorrent and irssi will start on boot for $LOGNAME"
 echo
+[ $DLFLAG =0] && echo "Access https downloads at https://$SERVERIP/download/$LOGNAME" && echo
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | sudo tee -a ~/rtinst.info
 echo
 echo "ftp client should be set to explicit ftp over tls using port $ftpport" | sudo tee -a ~/rtinst.info
