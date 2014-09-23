@@ -50,7 +50,7 @@ if [ $# -gt 0 ]
     exit 1
 fi
 
-if [ $DLFLAG ]
+if [ $DLFLAG = 0 ]
   then
     echo "DL selected"
   else
