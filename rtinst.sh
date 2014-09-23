@@ -25,6 +25,8 @@ random()
     echo $RAND
 }
 
+cd ~
+
 while getopts ":d" optname
   do
     case $optname in
