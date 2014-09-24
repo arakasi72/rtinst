@@ -143,7 +143,7 @@ echo "require_ssl_reuse=NO" | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo "listen_port=$ftpport" | sudo tee -a /etc/vsftpd.conf > /dev/null
 echo "ssl_ciphers=HIGH" | sudo tee -a /etc/vsftpd.conf > /dev/null
 
-sudo openssl req -x509 -nodes -days 365 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem
+sudo openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem
 
 sudo service vsftpd restart
 
@@ -216,7 +216,7 @@ sudo apt-get -y install ffmpeg
 sudo apt-get -y install nginx-full apache2-utils
 sudo htpasswd -c -b /var/www/rutorrent/.htpasswd $LOGNAME $WEBPASS
 
-sudo openssl req -x509 -nodes -days 365 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt
+sudo openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt
 
 sudo perl -pi -e "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
 sudo perl -pi -e "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
