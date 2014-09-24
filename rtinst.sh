@@ -337,4 +337,5 @@ echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | sudo tee -a ~/
 echo
 echo "ftp client should be set to explicit ftp over tls using port $ftpport" | sudo tee -a ~/rtinst.info
 echo
-echo "The above information is stored in rtinst.info in your home directory. To see contents enter: cat ~/rtinst.info"
+echo "The above information is stored in rtinst.info in your home directory."
+echo "To see contents enter: cat ~/rtinst.info"
