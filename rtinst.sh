@@ -191,10 +191,6 @@ wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/m
 sudo mkdir /var/www
 cd /var/www
 
-sudo wget http://dl.bintray.com/novik65/generic/rutorrent-3.6.tar.gz
-sudo wget http://dl.bintray.com/novik65/generic/plugins-3.6.tar.gz
-
-sudo mkdir svn
 sudo svn checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent
 sudo svn checkout http://rutorrent.googlecode.com/svn/trunk/plugins
 sudo rm -r rutorrent/plugins
