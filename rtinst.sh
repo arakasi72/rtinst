@@ -174,7 +174,9 @@ make -j2
 sudo make install
 sudo ldconfig
 
-cd ~ && mkdir rtorrent && cd rtorrent
+cd ~
+mkdir rtorrent
+cd rtorrent
 mkdir .session downloads watch
 
 cd ~
@@ -185,10 +187,10 @@ perl -pi -e "s/<user name>/$LOGNAME/g" ~/.rtorrent.rc
 cd ~
 wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/ru.config
 wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/ru.ini
+
 sudo mkdir /var/www
 cd /var/www
 
-sudo mkdir svn
 sudo svn checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent
 sudo svn checkout http://rutorrent.googlecode.com/svn/trunk/plugins
 sudo rm -r rutorrent/plugins
@@ -334,4 +336,6 @@ fi
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | sudo tee -a ~/rtinst.info
 echo
 echo "ftp client should be set to explicit ftp over tls using port $ftpport" | sudo tee -a ~/rtinst.info
-echo " The above information is stored in rtinst.info in your home directory"
+echo
+echo "The above information is stored in rtinst.info in your home directory."
+echo "To see contents enter: cat ~/rtinst.info"
