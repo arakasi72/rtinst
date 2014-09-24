@@ -174,7 +174,9 @@ make -j2
 sudo make install
 sudo ldconfig
 
-cd ~ && mkdir rtorrent && cd rtorrent
+cd ~
+mkdir rtorrent
+cd rtorrent
 mkdir .session downloads watch
 
 cd ~
@@ -185,14 +187,21 @@ perl -pi -e "s/<user name>/$LOGNAME/g" ~/.rtorrent.rc
 cd ~
 wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/ru.config
 wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/ru.ini
+
 sudo mkdir /var/www
 cd /var/www
 
-sudo mkdir svn
-sudo svn checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent
-sudo svn checkout http://rutorrent.googlecode.com/svn/trunk/plugins
+sudo wget http://dl.bintray.com/novik65/generic/rutorrent-3.6.tar.gz
+sudo wget http://dl.bintray.com/novik65/generic/plugins-3.6.tar.gz
+
+sudo tar -zxf rutorrent-3.6.tar.gz
+sudo tar -zxf plugins-3.6.tar.gz
+
 sudo rm -r rutorrent/plugins
 sudo mv plugins rutorrent
+
+sudo rm rutorrent-3.6.tar.gz
+sudo rm rutorrent-3.6.tar.gz
 
 sudo chown www-data:www-data /var/www
 sudo chown -R www-data:www-data rutorrent
