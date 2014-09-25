@@ -87,3 +87,5 @@ echo
 echo "$libvers/$rtvers installed"
 echo
 echo "Confirm at https://$SERVERIP/rutorrent"
+echo
+echo "Your .rtorrent.rc file, and download, watch, and .session directories have not been altered in any way"
