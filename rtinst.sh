@@ -322,8 +322,8 @@ sleep 2
 rm ~/ir.log
 echo "autodl-irssi update complete"
 
-(crontab -u $LOGNAME -l; echo "$cronline1" ) | crontab -u $LOGNAME -
-(crontab -u $LOGNAME -l; echo "$cronline2" ) | crontab -u $LOGNAME -
+(crontab -l; echo "$cronline1" ) | crontab
+(crontab -l; echo "$cronline2" ) | crontab
 echo
 echo "crontab entries made. rtorrent and irssi will start on boot for $LOGNAME"
 echo
