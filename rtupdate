@@ -39,7 +39,7 @@ while true
 
 if ( installed rtorrent )
   then
-    echo "rtorrent detected"
+    sudo echo "rtorrent detected"
     echo
   else
     echo "rtorrent NOT installed"
