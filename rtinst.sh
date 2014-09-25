@@ -292,14 +292,19 @@ echo "gui-server-password = $adlpass" | sudo tee -a autodl2.cfg > /dev/null
 
 sudo perl -pi -e "s/if \(\\$\.browser\.msie\)/if \(navigator\.appName \=\= \'Microsoft Internet Explorer\' \&\& navigator\.userAgent\.match\(\/msie 6\/i\)\)/g" /var/www/rutorrent/plugins/autodl-irssi/AutodlFilesDownloader.js
 
-# install rtorrent and irssi start, stop, restart script
+# install rtorrent and irssi start, stop, restart script, and upgrade/downgrade script
 cd ~
 wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rt
 wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtcheck
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtupdate
+
 sudo mv rt /usr/local/bin/rt
 sudo mv rtcheck /usr/local/bin/rtcheck
+sudo mv rtupdate /usr/local/bin/rtupdate
+
 sudo chmod 755 /usr/local/bin/rt
 sudo chmod 755 /usr/local/bin/rtcheck
+sudo chmod 755 /usr/local/bin/rtupdate
 
 /usr/local/bin/rt start
 /usr/local/bin/rt -i start
@@ -322,8 +327,8 @@ sleep 2
 rm ~/ir.log
 echo "autodl-irssi update complete"
 
-(crontab -u $LOGNAME -l; echo "$cronline1" ) | crontab -u $LOGNAME -
-(crontab -u $LOGNAME -l; echo "$cronline2" ) | crontab -u $LOGNAME -
+(crontab -l; echo "$cronline1" ) | crontab
+(crontab -l; echo "$cronline2" ) | crontab
 echo
 echo "crontab entries made. rtorrent and irssi will start on boot for $LOGNAME"
 echo
