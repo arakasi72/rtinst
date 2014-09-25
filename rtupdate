@@ -1,0 +1,25 @@
+#!/bin/bash
+PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+
+crontab -l | perl -nle 's/^([^#@])/# $1/;print' | crontab
+rt stop
+cd source
+#svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc
+curl http://libtorrent.rakshasa.no/downloads/libtorrent-0.13.3.tar.gz | tar xz
+curl http://libtorrent.rakshasa.no/downloads/rtorrent-0.9.3.tar.gz | tar xz
+
+cd ~/source/libtorrent-0.13.3
+./autogen.sh
+./configure --prefix=/usr
+make -j2
+sudo make install
+
+cd ~/source/rtorrent-0.9.3
+./autogen.sh
+./configure --prefix=/usr --with-xmlrpc-c
+make -j2
+sudo make install
+sudo ldconfig
+
+rt start
+crontab -l | perl -nle 's/^#\s*([0-9*])/$1/;print' | crontab
