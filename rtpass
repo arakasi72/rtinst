@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo -u www-data rtsetpass $LOGNAME
+sudo rtsetpass $LOGNAME
