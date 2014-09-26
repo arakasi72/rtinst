@@ -17,3 +17,5 @@ if [ "$(ps --no-heading -o %c $PARENT)" = "rtpass" ]
         htpasswd /var/www/rutorrent/.htpasswd "$user"
     fi
   else
+    echo "Error: Can only be run from rtpass script"
+fi
