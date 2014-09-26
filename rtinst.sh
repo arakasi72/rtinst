@@ -337,6 +337,7 @@ if [ $DLFLAG = 0 ]
     echo
 fi
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | sudo tee -a ~/rtinst.info
+echo "to change rutorrent password enter: rtpass" | sudo tee -a ~/rtinst.info
 echo
 echo "ftp client should be set to explicit ftp over tls using port $ftpport" | sudo tee -a ~/rtinst.info
 echo
