@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ ! -z "$1" ]; then
+        echo "ALL ALL = NOPASSWD: /usr/local/bin/rtsetpass" >> $1
+else
+        export EDITOR=$0
+        visudo
+fi

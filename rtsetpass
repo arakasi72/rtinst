@@ -1,0 +1,33 @@
+#!/bin/bash
+parent_pid() {
+    # Look up the parent of the given PID.
+    pid=${1:-$$}
+    stat=($(</proc/${pid}/stat))
+    echo ${stat[3]}
+}
+
+
+user=$1
+PARENT=$(parent_pid $PPID)
+echo "On Ubuntu systems 13.10 and later, verify existing password"
+echo "Debian and older Ubuntu releases just enter the new password"
+if [ "$(ps --no-heading -o %c $PARENT)" = "rtpass" ]
+  then
+    htpasswd -v /var/www/rutorrent/.htpasswd "$user" 2> /dev/null
+    exitcond=$?
+    if [ $exitcond = 0 ]
+      then
+        htpasswd /var/www/rutorrent/.htpasswd "$user"
+    elif [ $exitcond = 2 ] && [ -n "$(grep $user /var/www/rutorrent/.htpasswd)" ]
+      then
+         htpasswd /var/www/rutorrent/.htpasswd "$user"
+    elif [ $exitcond = 3 ]
+      then
+        echo "Incorrect password"
+    elif [ ! -n  "$(grep $user /var/www/rutorrent/.htpasswd)" ]
+      then
+        echo "Invalid user, contact your sysadmin for help"
+    fi
+  else
+    echo "Error: Can only be run from rtpass script"
+fi

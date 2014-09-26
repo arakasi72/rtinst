@@ -2,6 +2,7 @@
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 chkans=0
 SERVERIP=$(ip a s eth0 | awk '/inet / {print$2}' | cut -d/ -f1)
+RTFILE=/usr/local/bin/rt
 
 installed() {
 hash $1 2>/dev/null
@@ -54,6 +55,11 @@ confirm_answer
 done
 echo
 echo "Installing $libvers/$rtvers"
+
+if ! [ -x $RTFILE ]
+then
+sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rt -O /usr/local/bin/rt && sudo chmod 755 /usr/local/bin/rt
+fi
 
 
 crontab -l | perl -nle 's/^([^#@])/# $1/;print' | crontab
