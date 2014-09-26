@@ -55,6 +55,12 @@ done
 echo
 echo "Installing $libvers/$rtvers"
 
+FILE=/usr/local/bin/rt
+if ! [ -x $FILE ]
+then
+sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rt -O /usr/local/bin/rt && sudo chmod 755 /usr/local/bin/rt
+fi
+
 
 crontab -l | perl -nle 's/^([^#@])/# $1/;print' | crontab
 rt stop
