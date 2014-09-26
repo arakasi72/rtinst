@@ -1,0 +1,7 @@
+#!/bin/bash
+user=$1
+htpasswd -v /var/www/rutorrent/.htpasswd "$user"
+if [ $? = 0 ]
+then
+htpasswd /var/www/rutorrent/.htpasswd "$user"
+fi
