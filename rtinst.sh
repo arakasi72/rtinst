@@ -292,19 +292,17 @@ echo "gui-server-password = $adlpass" | sudo tee -a autodl2.cfg > /dev/null
 
 sudo perl -pi -e "s/if \(\\$\.browser\.msie\)/if \(navigator\.appName \=\= \'Microsoft Internet Explorer\' \&\& navigator\.userAgent\.match\(\/msie 6\/i\)\)/g" /var/www/rutorrent/plugins/autodl-irssi/AutodlFilesDownloader.js
 
-# install rtorrent and irssi start, stop, restart script, and upgrade/downgrade script
+# install rtorrent and irssi start, stop, restart script, rtpass, and upgrade/downgrade script
 cd ~
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rt
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtcheck
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtupdate
+sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rt -O /usr/local/bin/rt && sudo chmod 755 /usr/local/bin/rt
+sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtcheck -O /usr/local/bin/rtcheck && sudo chmod 755 /usr/local/bin/rtcheck
+sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtupdate -O /usr/local/bin/rtupdate && sudo chmod 755 /usr/local/bin/rtupdate
+sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/edit_su -O /usr/local/bin/edit_su && sudo chmod 755 /usr/local/bin/edit_su
+sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/rtpass -O /usr/local/bin/rtpass && sudo chmod 755 /usr/local/bin/rtpass
+sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/rtsetpass -O /usr/local/bin/rtsetpass && sudo chmod 755 /usr/local/bin/rtsetpass
 
-sudo mv rt /usr/local/bin/rt
-sudo mv rtcheck /usr/local/bin/rtcheck
-sudo mv rtupdate /usr/local/bin/rtupdate
-
-sudo chmod 755 /usr/local/bin/rt
-sudo chmod 755 /usr/local/bin/rtcheck
-sudo chmod 755 /usr/local/bin/rtupdate
+sudo edit_su
+sudo rm /usr/local/bin/edit_su
 
 /usr/local/bin/rt start
 /usr/local/bin/rt -i start
