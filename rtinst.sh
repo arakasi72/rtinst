@@ -297,9 +297,9 @@ cd ~
 sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rt -O /usr/local/bin/rt && sudo chmod 755 /usr/local/bin/rt
 sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtcheck -O /usr/local/bin/rtcheck && sudo chmod 755 /usr/local/bin/rtcheck
 sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtupdate -O /usr/local/bin/rtupdate && sudo chmod 755 /usr/local/bin/rtupdate
-sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/edit_su -O /usr/local/bin/edit_su && sudo chmod 755 /usr/local/bin/edit_su
-sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/rtpass -O /usr/local/bin/rtpass && sudo chmod 755 /usr/local/bin/rtpass
-sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/rtsetpass -O /usr/local/bin/rtsetpass && sudo chmod 755 /usr/local/bin/rtsetpass
+sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/edit_su -O /usr/local/bin/edit_su && sudo chmod 755 /usr/local/bin/edit_su
+sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtpass -O /usr/local/bin/rtpass && sudo chmod 755 /usr/local/bin/rtpass
+sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtsetpass -O /usr/local/bin/rtsetpass && sudo chmod 755 /usr/local/bin/rtsetpass
 
 sudo edit_su
 sudo rm /usr/local/bin/edit_su
