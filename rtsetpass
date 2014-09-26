@@ -1,7 +1,19 @@
 #!/bin/bash
+parent_pid() {
+    # Look up the parent of the given PID.
+    pid=${1:-$$}
+    stat=($(</proc/${pid}/stat))
+    echo ${stat[3]}
+}
+
+
 user=$1
-htpasswd -v /var/www/rutorrent/.htpasswd "$user"
-if [ $? = 0 ]
-then
-htpasswd /var/www/rutorrent/.htpasswd "$user"
-fi
+PARENT=$(parent_pid $PPID)
+if [ "$(ps --no-heading -o %c $PARENT)" = "rtpass" ]
+  then
+    htpasswd -v /var/www/rutorrent/.htpasswd "$user"
+    if [ $? = 0 ]
+      then
+        htpasswd /var/www/rutorrent/.htpasswd "$user"
+    fi
+  else
