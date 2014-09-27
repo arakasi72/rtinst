@@ -25,7 +25,19 @@ random()
     echo $RAND
 }
 
-cd ~
+if [ $SUDO_USER ]
+  then
+    user=$SUDO_USER
+	home="/home/$user"
+  else
+    echo "Script must be run using sudo"
+	exit 1
+fi
+
+if [ $user = root ]
+  then
+    echo "Script cannot be run by root" && exit 1
+fi
 
 while getopts ":d" optname
   do
@@ -44,11 +56,7 @@ if [ $# -gt 0 ]
     exit 1
 fi
 
-if [ "$LOGNAME" = "root" ]
-  then
-    echo "Cannot run as root. Log into user account and run from there"
-    exit
-elif [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ] || [ "$FULLREL" = "Ubuntu 14.04 LTS" ]
+if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ] || [ "$FULLREL" = "Ubuntu 14.04 LTS" ]
   then
     RELNO=14
 elif [ "$FULLREL" = "Ubuntu 13.10" ]
@@ -61,8 +69,8 @@ elif [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]
   then
     RELNO=12
     wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list
-    sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
-    sudo mv sources.list /etc/apt/sources.list
+    cp /etc/apt/sources.list /etc/apt/sources.list.bak
+    mv sources.list /etc/apt/sources.list
 elif [ "$FULLREL" = "Debian GNU/Linux 7" ]
   then
     RELNO=7
@@ -72,14 +80,16 @@ else
 fi
 
 # prepare system
-sudo apt-get update && sudo apt-get -y upgrade
-sudo apt-get clean && sudo apt-get autoclean
+cd $home
 
-sudo apt-get -y install autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config php5 php5-cli php5-dev php5-fpm php5-curl php5-geoip php5-mcrypt php5-xmlrpc pkg-config python-scgi screen subversion texinfo unrar-free unzip zlib1g-dev libcurl4-openssl-dev mediainfo
+apt-get update && apt-get -y upgrade
+apt-get clean && apt-get autoclean
+
+apt-get -y install autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config php5 php5-cli php5-dev php5-fpm php5-curl php5-geoip php5-mcrypt php5-xmlrpc pkg-config python-scgi screen subversion texinfo unrar-free unzip zlib1g-dev libcurl4-openssl-dev mediainfo
 
 if [ $RELNO = 13 ]
   then
-    sudo apt-get -y install php5-json
+    apt-get -y install php5-json
 fi
 
 # install ftp
@@ -88,49 +98,49 @@ ftpport=$(random 41005 48995)
 
 if [ $RELNO = 12 ]
   then
-    sudo apt-get -y install python-software-properties
-    sudo add-apt-repository -y ppa:thefrontiergroup/vsftpd
-    sudo apt-get update
+    apt-get -y install python-software-properties
+    add-apt-repository -y ppa:thefrontiergroup/vsftpd
+    apt-get update
 fi
 
 if [ $RELNO = 7 ]
   then
-    echo "deb http://ftp.cyconet.org/debian wheezy-updates main non-free contrib" | sudo tee -a /etc/apt/sources.list.d/wheezy-updates.cyconet2.list > /dev/null
-    sudo aptitude update
-    sudo aptitude -o Aptitude::Cmdline::ignore-trust-violations=true -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd
+    echo "deb http://ftp.cyconet.org/debian wheezy-updates main non-free contrib" | tee -a /etc/apt/sources.list.d/wheezy-updates.cyconet2.list > /dev/null
+    aptitude update
+    aptitude -o Aptitude::Cmdline::ignore-trust-violations=true -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd
   else
-    sudo apt-get -y install vsftpd
+    apt-get -y install vsftpd
 fi
 
 
 
-sudo perl -pi -e "s/anonymous_enable=YES/anonymous_enable=NO/g" /etc/vsftpd.conf
-sudo perl -pi -e "s/#local_enable=YES/local_enable=YES/g" /etc/vsftpd.conf
-sudo perl -pi -e "s/#write_enable=YES/write_enable=YES/g" /etc/vsftpd.conf
-sudo perl -pi -e "s/#local_umask=022/local_umask=022/g" /etc/vsftpd.conf
-sudo perl -pi -e "s/rsa_private_key_file/#rsa_private_key_file/g" /etc/vsftpd.conf
-sudo perl -pi -e "s/rsa_cert_file=\/etc\/ssl\/certs\/ssl-cert-snakeoil\.pem/rsa_cert_file=\/etc\/ssl\/private\/vsftpd\.pem/g" /etc/vsftpd.conf
+perl -pi -e "s/anonymous_enable=YES/anonymous_enable=NO/g" /etc/vsftpd.conf
+perl -pi -e "s/#local_enable=YES/local_enable=YES/g" /etc/vsftpd.conf
+perl -pi -e "s/#write_enable=YES/write_enable=YES/g" /etc/vsftpd.conf
+perl -pi -e "s/#local_umask=022/local_umask=022/g" /etc/vsftpd.conf
+perl -pi -e "s/rsa_private_key_file/#rsa_private_key_file/g" /etc/vsftpd.conf
+perl -pi -e "s/rsa_cert_file=\/etc\/ssl\/certs\/ssl-cert-snakeoil\.pem/rsa_cert_file=\/etc\/ssl\/private\/vsftpd\.pem/g" /etc/vsftpd.conf
 
-echo "chroot_local_user=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
-echo "allow_writeable_chroot=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
-echo "ssl_enable=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
-echo "allow_anon_ssl=NO" | sudo tee -a /etc/vsftpd.conf > /dev/null
-echo "force_local_data_ssl=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
-echo "force_local_logins_ssl=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
-echo "ssl_sslv2=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
-echo "ssl_sslv3=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
-echo "ssl_tlsv1=YES" | sudo tee -a /etc/vsftpd.conf > /dev/null
-echo "require_ssl_reuse=NO" | sudo tee -a /etc/vsftpd.conf > /dev/null
-echo "listen_port=$ftpport" | sudo tee -a /etc/vsftpd.conf > /dev/null
-echo "ssl_ciphers=HIGH" | sudo tee -a /etc/vsftpd.conf > /dev/null
+echo "chroot_local_user=YES" | tee -a /etc/vsftpd.conf > /dev/null
+echo "allow_writeable_chroot=YES" | tee -a /etc/vsftpd.conf > /dev/null
+echo "ssl_enable=YES" | tee -a /etc/vsftpd.conf > /dev/null
+echo "allow_anon_ssl=NO" | tee -a /etc/vsftpd.conf > /dev/null
+echo "force_local_data_ssl=YES" | tee -a /etc/vsftpd.conf > /dev/null
+echo "force_local_logins_ssl=YES" | tee -a /etc/vsftpd.conf > /dev/null
+echo "ssl_sslv2=YES" | tee -a /etc/vsftpd.conf > /dev/null
+echo "ssl_sslv3=YES" | tee -a /etc/vsftpd.conf > /dev/null
+echo "ssl_tlsv1=YES" | tee -a /etc/vsftpd.conf > /dev/null
+echo "require_ssl_reuse=NO" | tee -a /etc/vsftpd.conf > /dev/null
+echo "listen_port=$ftpport" | tee -a /etc/vsftpd.conf > /dev/null
+echo "ssl_ciphers=HIGH" | tee -a /etc/vsftpd.conf > /dev/null
 
-sudo openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem
+openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem
 
-sudo service vsftpd restart
+service vsftpd restart
 
 
 # install rtorrent
-cd ~
+cd $home
 mkdir source
 cd source
 svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc
@@ -140,203 +150,203 @@ curl http://libtorrent.rakshasa.no/downloads/rtorrent-0.9.4.tar.gz | tar xz
 cd xmlrpc
 ./configure --prefix=/usr --enable-libxml2-backend --disable-libwww-client --disable-wininet-client --disable-abyss-server --disable-cgi-server
 make
-sudo make install
+make install
 
 cd ../libtorrent-0.13.4
 ./autogen.sh
 ./configure --prefix=/usr
 make -j2
-sudo make install
+make install
 
 cd ../rtorrent-0.9.4
 ./autogen.sh
 ./configure --prefix=/usr --with-xmlrpc-c
 make -j2
-sudo make install
-sudo ldconfig
+make install
+ldconfig
 
-cd ~
+cd $home
 mkdir rtorrent
 cd rtorrent
 mkdir .session downloads watch
 
-cd ~
+cd $home
 wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/.rtorrent.rc
-perl -pi -e "s/<user name>/$LOGNAME/g" ~/.rtorrent.rc
+perl -pi -e "s/<user name>/$user/g" $home/.rtorrent.rc
 
 # install rutorrent
-cd ~
+cd $home
 wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/ru.config
 wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/ru.ini
 
-sudo mkdir /var/www
+mkdir /var/www
 cd /var/www
 
-sudo svn checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent
-sudo svn checkout http://rutorrent.googlecode.com/svn/trunk/plugins
-sudo rm -r rutorrent/plugins
-sudo mv plugins rutorrent
+svn checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent
+svn checkout http://rutorrent.googlecode.com/svn/trunk/plugins
+rm -r rutorrent/plugins
+mv plugins rutorrent
 
-sudo rm rutorrent/conf/config.php
-sudo mv ~/ru.config /var/www/rutorrent/conf/config.php
-sudo mkdir /var/www/rutorrent/conf/users/$LOGNAME
-sudo mkdir /var/www/rutorrent/conf/users/$LOGNAME/plugins
+rm rutorrent/conf/config.php
+mv $home/ru.config /var/www/rutorrent/conf/config.php
+mkdir /var/www/rutorrent/conf/users/$user
+mkdir /var/www/rutorrent/conf/users/$user/plugins
 
-echo "<?php" | sudo tee /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
-echo | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
-echo "\$scgi_port = 5000;" | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
-echo "\$XMLRPCMountPoint = \"/RPC2\";" | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
-echo | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
-echo "?>" | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
+echo "<?php" | tee /var/www/rutorrent/conf/users/$user/config.php > /dev/null
+echo | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
+echo "\$scgi_port = 5000;" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
+echo "\$XMLRPCMountPoint = \"/RPC2\";" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
+echo | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
+echo "?>" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 
 cd rutorrent/plugins
-sudo mkdir conf
-sudo mv ~/ru.ini conf/plugins.ini
+mkdir conf
+mv $home/ru.ini conf/plugins.ini
 
 if [ $RELNO = 14 ]
   then
-    sudo apt-add-repository -y ppa:jon-severinsson/ffmpeg
-    sudo apt-get update
+    apt-add-repository -y ppa:jon-severinsson/ffmpeg
+    apt-get update
 fi
-sudo apt-get -y install ffmpeg
+apt-get -y install ffmpeg
 
 # install nginx
-sudo apt-get -y install nginx-full apache2-utils
+apt-get -y install nginx-full apache2-utils
 WEBPASS=$(genpasswd)
-sudo htpasswd -c -b /var/www/rutorrent/.htpasswd $LOGNAME $WEBPASS
+htpasswd -c -b /var/www/rutorrent/.htpasswd $user $WEBPASS
 
-sudo openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt
+openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt
 
-sudo perl -pi -e "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
-sudo perl -pi -e "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
-sudo perl -pi -e "s/pid \/run\/nginx\.pid;/pid \/var\/run\/nginx\.pid;/g" /etc/nginx/nginx.conf
-sudo perl -pi -e "s/# server_tokens off;/server_tokens off;/g" /etc/nginx/nginx.conf
-sudo perl -pi -e "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/nginx/nginx.conf
-sudo perl -pi -e "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
+perl -pi -e "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
+perl -pi -e "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
+perl -pi -e "s/pid \/run\/nginx\.pid;/pid \/var\/run\/nginx\.pid;/g" /etc/nginx/nginx.conf
+perl -pi -e "s/# server_tokens off;/server_tokens off;/g" /etc/nginx/nginx.conf
+perl -pi -e "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/nginx/nginx.conf
+perl -pi -e "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
 
 
 if [ $RELNO = 14 ] | [ $RELNO = 13 ]
   then
-    sudo cp /usr/share/nginx/html/* /var/www
+    cp /usr/share/nginx/html/* /var/www
 fi
 
 if [ $RELNO = 12 ] | [ $RELNO = 7 ]
   then
-    sudo cp /usr/share/nginx/www/* /var/www
+    cp /usr/share/nginx/www/* /var/www
 fi
 
-sudo mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
-cd ~
+mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
+cd $home
 wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/nginxsitedl
 wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/nginxsite
 
-sudo mv ~/nginxsite /etc/nginx/sites-available/default
-sudo mv ~/nginxsitedl /etc/nginx/conf.d/rtdload
+mv $home/nginxsite /etc/nginx/sites-available/default
+mv $home/nginxsitedl /etc/nginx/conf.d/rtdload
 
 if [ $DLFLAG = 0 ]
   then
-    sudo perl -pi -e "s/#include \/etc\/nginx\/conf\.d\/rtdload;/include \/etc\/nginx\/conf\.d\/rtdload;/g" /etc/nginx/sites-available/default
+    perl -pi -e "s/#include \/etc\/nginx\/conf\.d\/rtdload;/include \/etc\/nginx\/conf\.d\/rtdload;/g" /etc/nginx/sites-available/default
 fi
 
-sudo mv ~/nginxsite /etc/nginx/sites-available/default
-sudo perl -pi -e "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
+perl -pi -e "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
 
 if [ $RELNO = 12 ]
   then
-    sudo perl -pi -e "s/fastcgi_pass unix\:\/var\/run\/php5-fpm\.sock/fastcgi_pass 127\.0\.0\.1\:9000/g" /etc/nginx/sites-available/default
+    perl -pi -e "s/fastcgi_pass unix\:\/var\/run\/php5-fpm\.sock/fastcgi_pass 127\.0\.0\.1\:9000/g" /etc/nginx/sites-available/default
 fi
 
-sudo service nginx restart && sudo service php5-fpm restart
+service nginx restart && service php5-fpm restart
 
 # install autodl-irssi
 
 adlport=$(random 36001 36100)
 adlpass=$(genpasswd $(random 12 16))
 
-sudo apt-get -y install git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libxml-libxml-perl libjson-rpc-perl libarchive-zip-perl
-mkdir -p ~/.irssi/scripts/autorun
-cd ~/.irssi/scripts
+apt-get -y install git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libxml-libxml-perl libjson-rpc-perl libarchive-zip-perl
+mkdir -p $home/.irssi/scripts/autorun
+cd $home/.irssi/scripts
 wget --no-check-certificate -O autodl-irssi.zip http://update.autodl-community.com/autodl-irssi-community.zip
 unzip -o autodl-irssi.zip
 rm autodl-irssi.zip
 cp autodl-irssi.pl autorun/
-mkdir -p ~/.autodl
-touch ~/.autodl/autodl.cfg && touch ~/.autodl/autodl2.cfg
+mkdir -p $home/.autodl
+touch $home/.autodl/autodl.cfg && touch $home/.autodl/autodl2.cfg
 
 cd /var/www/rutorrent/plugins
-sudo git clone https://github.com/autodl-community/autodl-rutorrent.git autodl-irssi
+git clone https://github.com/autodl-community/autodl-rutorrent.git autodl-irssi
 
-sudo mkdir /var/www/rutorrent/conf/users/$LOGNAME/plugins/autodl-irssi
+mkdir /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi
 
-sudo touch /var/www/rutorrent/conf/users/$LOGNAME/plugins/autodl-irssi/conf.php
+touch /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 
-echo "<?php" | sudo tee /var/www/rutorrent/conf/users/$LOGNAME/plugins/autodl-irssi/conf.php > /dev/null
-echo | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/plugins/autodl-irssi/conf.php > /dev/null
-echo "\$autodlPort = $adlport;" | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/plugins/autodl-irssi/conf.php > /dev/null
-echo "\$autodlPassword = \"$adlpass\";" | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/plugins/autodl-irssi/conf.php > /dev/null
-echo | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/plugins/autodl-irssi/conf.php > /dev/null
-echo "?>" | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/plugins/autodl-irssi/conf.php > /dev/null
+echo "<?php" | tee /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
+echo | tee -a /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
+echo "\$autodlPort = $adlport;" | tee -a /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
+echo "\$autodlPassword = \"$adlpass\";" | tee -a /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
+echo | tee -a /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
+echo "?>" | tee -a /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
 
-cd ~/.autodl
-echo "[options]" | sudo tee autodl2.cfg > /dev/null
-echo "gui-server-port = $adlport" | sudo tee -a autodl2.cfg > /dev/null
-echo "gui-server-password = $adlpass" | sudo tee -a autodl2.cfg > /dev/null
+cd $home/.autodl
+echo "[options]" | tee autodl2.cfg > /dev/null
+echo "gui-server-port = $adlport" | tee -a autodl2.cfg > /dev/null
+echo "gui-server-password = $adlpass" | tee -a autodl2.cfg > /dev/null
 
-sudo perl -pi -e "s/if \(\\$\.browser\.msie\)/if \(navigator\.appName \=\= \'Microsoft Internet Explorer\' \&\& navigator\.userAgent\.match\(\/msie 6\/i\)\)/g" /var/www/rutorrent/plugins/autodl-irssi/AutodlFilesDownloader.js
+perl -pi -e "s/if \(\\$\.browser\.msie\)/if \(navigator\.appName \=\= \'Microsoft Internet Explorer\' \&\& navigator\.userAgent\.match\(\/msie 6\/i\)\)/g" /var/www/rutorrent/plugins/autodl-irssi/AutodlFilesDownloader.js
 
 # set permissions
-sudo chown -R www-data:www-data /var/www
-sudo chmod -R 755 /var/www/rutorrent
-
+chown -R www-data:www-data /var/www
+chmod -R 755 /var/www/rutorrent
+chown -R $user $home
 # install rtorrent and irssi start, stop, restart script, rtpass, and upgrade/downgrade script
-cd ~
-sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rt -O /usr/local/bin/rt && sudo chmod 755 /usr/local/bin/rt
-sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtcheck -O /usr/local/bin/rtcheck && sudo chmod 755 /usr/local/bin/rtcheck
-sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtupdate -O /usr/local/bin/rtupdate && sudo chmod 755 /usr/local/bin/rtupdate
-sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/edit_su -O /usr/local/bin/edit_su && sudo chmod 755 /usr/local/bin/edit_su
-sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtpass -O /usr/local/bin/rtpass && sudo chmod 755 /usr/local/bin/rtpass
-sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtsetpass -O /usr/local/bin/rtsetpass && sudo chmod 755 /usr/local/bin/rtsetpass
+cd $home
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rt -O /usr/local/bin/rt && chmod 755 /usr/local/bin/rt
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtcheck -O /usr/local/bin/rtcheck && chmod 755 /usr/local/bin/rtcheck
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtupdate -O /usr/local/bin/rtupdate && chmod 755 /usr/local/bin/rtupdate
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/edit_su -O /usr/local/bin/edit_su && chmod 755 /usr/local/bin/edit_su
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtpass -O /usr/local/bin/rtpass && chmod 755 /usr/local/bin/rtpass
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtsetpass -O /usr/local/bin/rtsetpass && chmod 755 /usr/local/bin/rtsetpass
 
-sudo edit_su
-sudo rm /usr/local/bin/edit_su
+edit_su
+rm /usr/local/bin/edit_su
 
-/usr/local/bin/rt start
-/usr/local/bin/rt -i start
+sudo -u $user /usr/local/bin/rt start
+sudo -u $user /usr/local/bin/rt -i start
 
 sleep 2
-screen -S irssi -p 0 -X stuff "/WINDOW LOG ON ~/ir.log$(printf \\r)"
-screen -S irssi -p 0 -X stuff "/autodl update$(printf \\r)"
+sudo -u $user screen -S irssi -p 0 -X stuff "/WINDOW LOG ON $home/ir.log$(printf \\r)"
+sudo -u $user screen -S irssi -p 0 -X stuff "/autodl update$(printf \\r)"
 echo -n "updating autodl-irssi"
-while ! ((tail -n1 ~/ir.log | grep -c -q "You are using the latest autodl-trackers") || (tail -n1 ~/ir.log | grep -c -q "Successfully loaded tracker files"))
+while ! ((tail -n1 $home/ir.log | grep -c -q "You are using the latest autodl-trackers") || (tail -n1 $home/ir.log | grep -c -q "Successfully loaded tracker files"))
 do
 sleep 1
 echo -n " ."
 done
 echo
-screen -S irssi -p 0 -X stuff "/WINDOW LOG OFF$(printf \\r)"
+sudo -u $user screen -S irssi -p 0 -X stuff "/WINDOW LOG OFF$(printf \\r)"
 sleep 1
-screen -S irssi -p 0 -X quit
+sudo -u $user screen -S irssi -p 0 -X quit
 sleep 2
-/usr/local/bin/rt -i start > /dev/null
-rm ~/ir.log
+sudo -u $user /usr/local/bin/rt -i start > /dev/null
+rm $home/ir.log
 echo "autodl-irssi update complete"
 
-(crontab -l; echo "$cronline1" ) | crontab
-(crontab -l; echo "$cronline2" ) | crontab
+(crontab -u $user -l; echo "$cronline1" ) | crontab -u $user -
+(crontab -u $user -l; echo "$cronline2" ) | crontab -u $user -
 echo
-echo "crontab entries made. rtorrent and irssi will start on boot for $LOGNAME"
+echo "crontab entries made. rtorrent and irssi will start on boot for $user"
 echo
-echo "ftp client should be set to explicit ftp over tls using port $ftpport" | sudo tee -a ~/rtinst.info
+echo "ftp client should be set to explicit ftp over tls using port $ftpport" | tee -a $home/rtinst.info
 echo
 if [ $DLFLAG = 0 ]
   then
-    find ~ -type d -print0 | xargs -0 chmod 755 
-    echo "Access https downloads at https://$SERVERIP/download/$LOGNAME" | sudo tee -a ~/rtinst.info
+    find $home -type d -print0 | xargs -0 chmod 755 
+    echo "Access https downloads at https://$SERVERIP/download/$user" | tee -a $home/rtinst.info
     echo
 fi
-echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | sudo tee -a ~/rtinst.info
-echo "rutorrent password set to $WEBPASS" | sudo tee -a ~/rtinst.info
-echo "to change rutorrent password enter: rtpass" | sudo tee -a ~/rtinst.info
+echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | tee -a $home/rtinst.info
+echo "rutorrent password set to $WEBPASS" | tee -a $home/rtinst.info
+echo "to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
 echo
 echo "The above information is stored in rtinst.info in your home directory."
-echo "To see contents enter: cat ~/rtinst.info"
+echo "To see contents enter: cat $home/rtinst.info"
+echo "You should reboot your system now"
