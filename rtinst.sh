@@ -227,11 +227,15 @@ fi
 
 sudo mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
 cd ~
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/nginxsitedl
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/nginxsite
+
+sudo mv ~/nginxsite /etc/nginx/sites-available/default
+sudo mv ~/nginxsitedl /etc/nginx/conf.d/rtdload
+
 if [ $DLFLAG = 0 ]
   then
-    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/nginxsitedl -O nginxsite
-  else
-    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/nginxsite
+    sudo perl -pi -e "s/#include \/etc\/nginx\/conf\.d\/rtdload;/include \/etc\/nginx\/conf\.d\/rtdload;/g" /etc/nginx/sites-available/default
 fi
 
 sudo mv ~/nginxsite /etc/nginx/sites-available/default
