@@ -246,7 +246,7 @@ sudo service nginx restart && sudo service php5-fpm restart
 
 # install autodl-irssi
 
-adlport=$(random 36001 38999)
+adlport=$(random 36001 36100)
 adlpass=$(genpasswd $(random 12 16))
 
 sudo apt-get -y install git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libxml-libxml-perl libjson-rpc-perl libarchive-zip-perl
