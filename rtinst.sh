@@ -71,25 +71,6 @@ else
   exit
 fi
 
-# get password to be used to access rutorrent
-#while [ -z "$WEBPASS" ]
-#    do
-#   echo "Please enter password for rutorrent "
-#   stty -echo
-#   read PASS1
-#   stty echo
-#   echo "Please re-enter password "
-#   stty -echo
-#   read PASS2
-#   stty echo
-#   if [ "$PASS1" = "$PASS2" ]
-#     then
-#       WEBPASS="$PASS1"
-#     else
-#       echo "Entries do not match please try again"
-#   fi
-#  done
-
 # prepare system
 sudo apt-get update && sudo apt-get -y upgrade
 sudo apt-get clean && sudo apt-get autoclean
