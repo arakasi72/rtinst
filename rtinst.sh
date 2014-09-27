@@ -185,7 +185,7 @@ sudo mkdir /var/www/rutorrent/conf/users/$LOGNAME/plugins
 echo "<?php" | sudo tee /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
 echo | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
 echo "\$scgi_port = 5000;" | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
-echo "\$XMLRPCMountPoint = \"\/RPC2\";" | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
+echo "\$XMLRPCMountPoint = \"/RPC2\";" | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
 echo | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
 echo "?>" | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
 
