@@ -8,6 +8,9 @@ parent_pid() {
 
 user=$1
 PARENT=$(parent_pid $PPID)
+
+echo "Set rutorrent web interface password for $user"
+
 if ! [ "$(ps --no-heading -o %c $PARENT)" = "rtpass" ]
   then
     echo "Can only be run using rtpass"
