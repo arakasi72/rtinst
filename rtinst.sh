@@ -166,7 +166,7 @@ perl -pi -e "s/<user name>/$LOGNAME/g" ~/.rtorrent.rc
 
 # install rutorrent
 cd ~
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/ru.config
+wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/ru.config
 wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/ru.ini
 
 sudo mkdir /var/www
@@ -182,7 +182,12 @@ sudo mv ~/ru.config /var/www/rutorrent/conf/config.php
 sudo mkdir /var/www/rutorrent/conf/users/$LOGNAME
 sudo mkdir /var/www/rutorrent/conf/users/$LOGNAME/plugins
 
-
+echo "<?php" | sudo tee /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
+echo | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
+echo "\$scgi_port = 5000;" | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
+echo "\$XMLRPCMountPoint = \"\/RPC2\";" | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
+echo | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
+echo "?>" | sudo tee -a /var/www/rutorrent/conf/users/$LOGNAME/config.php > /dev/null
 
 cd rutorrent/plugins
 sudo mkdir conf
@@ -256,14 +261,14 @@ touch ~/.autodl/autodl.cfg && touch ~/.autodl/autodl2.cfg
 
 cd /var/www/rutorrent/plugins
 sudo git clone https://github.com/autodl-community/autodl-rutorrent.git autodl-irssi
-sudo touch autodl-irssi/conf.php
-
-echo "<?php" | sudo tee /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
-echo | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
-echo "\$autodlPort = $adlport;" | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
-echo "\$autodlPassword = \"$adlpass\";" | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
-echo | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
-echo "?>" | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
+sudo mkdir /var/www/rutorrent/conf/$LOGNAME/plugins/autodl-irssi
+sudo touch /var/www/rutorrent/conf/$LOGNAME/plugins/autodl-irssi/conf.php
+echo "<?php" | sudo tee /var/www/rutorrent/conf/$LOGNAME/plugins/autodl-irssi/conf.php > /dev/null
+echo | sudo tee -a /var/www/rutorrent/conf/$LOGNAME/plugins/autodl-irssi/conf.php > /dev/null
+echo "\$autodlPort = $adlport;" | sudo tee -a /var/www/rutorrent/conf/$LOGNAME/plugins/autodl-irssi/conf.php > /dev/null
+echo "\$autodlPassword = \"$adlpass\";" | sudo tee -a /var/www/rutorrent/conf/$LOGNAME/plugins/autodl-irssi/conf.php > /dev/null
+echo | sudo tee -a /var/www/rutorrent/conf/$LOGNAME/plugins/autodl-irssi/conf.php > /dev/null
+echo "?>" | sudo tee -a /var/www/rutorrent/conf/$LOGNAME/plugins/autodl-irssi/conf.php > /dev/null
 
 cd ~/.autodl
 echo "[options]" | sudo tee autodl2.cfg > /dev/null
