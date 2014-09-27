@@ -72,23 +72,23 @@ else
 fi
 
 # get password to be used to access rutorrent
-while [ -z "$WEBPASS" ]
-    do
-   echo "Please enter password for rutorrent "
-   stty -echo
-   read PASS1
-   stty echo
-   echo "Please re-enter password "
-   stty -echo
-   read PASS2
-   stty echo
-   if [ "$PASS1" = "$PASS2" ]
-     then
-       WEBPASS="$PASS1"
-     else
-       echo "Entries do not match please try again"
-   fi
-  done
+#while [ -z "$WEBPASS" ]
+#    do
+#   echo "Please enter password for rutorrent "
+#   stty -echo
+#   read PASS1
+#   stty echo
+#   echo "Please re-enter password "
+#   stty -echo
+#   read PASS2
+#   stty echo
+#   if [ "$PASS1" = "$PASS2" ]
+#     then
+#       WEBPASS="$PASS1"
+#     else
+#       echo "Entries do not match please try again"
+#   fi
+#  done
 
 # prepare system
 sudo apt-get update && sudo apt-get -y upgrade
@@ -216,6 +216,7 @@ sudo apt-get -y install ffmpeg
 
 # install nginx
 sudo apt-get -y install nginx-full apache2-utils
+WEBPASS=$(genpasswd)
 sudo htpasswd -c -b /var/www/rutorrent/.htpasswd $LOGNAME $WEBPASS
 
 sudo openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt
@@ -330,6 +331,8 @@ echo "autodl-irssi update complete"
 echo
 echo "crontab entries made. rtorrent and irssi will start on boot for $LOGNAME"
 echo
+echo "ftp client should be set to explicit ftp over tls using port $ftpport" | sudo tee -a ~/rtinst.info
+echo
 if [ $DLFLAG = 0 ]
   then
     find ~ -type d -print0 | xargs -0 chmod 755 
@@ -337,9 +340,8 @@ if [ $DLFLAG = 0 ]
     echo
 fi
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | sudo tee -a ~/rtinst.info
+echo "rutorrent password set to $WEBPASS" | sudo tee -a ~/rtinst.info
 echo "to change rutorrent password enter: rtpass" | sudo tee -a ~/rtinst.info
-echo
-echo "ftp client should be set to explicit ftp over tls using port $ftpport" | sudo tee -a ~/rtinst.info
 echo
 echo "The above information is stored in rtinst.info in your home directory."
 echo "To see contents enter: cat ~/rtinst.info"
