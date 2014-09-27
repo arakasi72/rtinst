@@ -177,12 +177,12 @@ sudo svn checkout http://rutorrent.googlecode.com/svn/trunk/plugins
 sudo rm -r rutorrent/plugins
 sudo mv plugins rutorrent
 
-sudo chown www-data:www-data /var/www
-sudo chown -R www-data:www-data rutorrent
-sudo chmod -R 755 rutorrent
-
 sudo rm rutorrent/conf/config.php
 sudo mv ~/ru.config /var/www/rutorrent/conf/config.php
+sudo mkdir /var/www/rutorrent/conf/users/$LOGNAME
+sudo mkdir /var/www/rutorrent/conf/users/$LOGNAME/plugins
+
+
 
 cd rutorrent/plugins
 sudo mkdir conf
@@ -258,8 +258,6 @@ cd /var/www/rutorrent/plugins
 sudo git clone https://github.com/autodl-community/autodl-rutorrent.git autodl-irssi
 sudo touch autodl-irssi/conf.php
 
-sudo chown -R www-data:www-data autodl-irssi
-
 echo "<?php" | sudo tee /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
 echo | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
 echo "\$autodlPort = $adlport;" | sudo tee -a /var/www/rutorrent/plugins/autodl-irssi/conf.php > /dev/null
@@ -273,6 +271,10 @@ echo "gui-server-port = $adlport" | sudo tee -a autodl2.cfg > /dev/null
 echo "gui-server-password = $adlpass" | sudo tee -a autodl2.cfg > /dev/null
 
 sudo perl -pi -e "s/if \(\\$\.browser\.msie\)/if \(navigator\.appName \=\= \'Microsoft Internet Explorer\' \&\& navigator\.userAgent\.match\(\/msie 6\/i\)\)/g" /var/www/rutorrent/plugins/autodl-irssi/AutodlFilesDownloader.js
+
+# set permissions
+sudo chown -R www-data:www-data /var/www
+sudo chmod -R 755 /var/www/rutorrent
 
 # install rtorrent and irssi start, stop, restart script, rtpass, and upgrade/downgrade script
 cd ~
