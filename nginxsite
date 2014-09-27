@@ -30,7 +30,7 @@ server {
                 }
         }
 
-        #include /etc/nginx/conf.d/rtdload
+        #include /etc/nginx/conf.d/rtdload;
 
         location ~ /\.ht {
                 deny all;
