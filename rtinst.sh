@@ -393,8 +393,8 @@ su $user -c '/usr/local/bin/rt start'
 su $user -c '/usr/local/bin/rt -i start'
 
 sleep 2
-su $user -c 'screen -S irssi -p 0 -X stuff "/WINDOW LOG ON $home/ir.log$(printf \\r)"'
-su $user -c 'screen -S irssi -p 0 -X stuff "/autodl update$(printf \\r)"'
+sudo -u $user screen -S irssi -p 0 -X stuff "/WINDOW LOG ON $home/ir.log$(printf \\r)"
+sudo -u $user screen -S irssi -p 0 -X stuff "/autodl update$(printf \\r)"
 echo -n "updating autodl-irssi"
 while ! ((tail -n1 $home/ir.log | grep -c -q "You are using the latest autodl-trackers") || (tail -n1 $home/ir.log | grep -c -q "Successfully loaded tracker files"))
 do
@@ -402,9 +402,9 @@ sleep 1
 echo -n " ."
 done
 echo
-su $user -c 'screen -S irssi -p 0 -X stuff "/WINDOW LOG OFF$(printf \\r)"'
+sudo -u $user screen -S irssi -p 0 -X stuff "/WINDOW LOG OFF$(printf \\r)"
 sleep 1
-su $user -c 'screen -S irssi -p 0 -X quit'
+sudo -u $user screen -S irssi -p 0 -X quit
 sleep 2
 su $user -c '/usr/local/bin/rt -i start > /dev/null'
 rm $home/ir.log
