@@ -1,5 +1,5 @@
 #!/bin/bash
-
+PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 FULLREL=$(cat /etc/issue.net)
 SERVERIP=$(ip a s eth0 | awk '/inet / {print$2}' | cut -d/ -f1)
 RELNO=0
