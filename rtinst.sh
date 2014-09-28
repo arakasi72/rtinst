@@ -389,12 +389,12 @@ wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/m
 edit_su
 rm /usr/local/bin/edit_su
 
-sudo -u $user /usr/local/bin/rt start
-sudo -u $user /usr/local/bin/rt -i start
+su $user -c '/usr/local/bin/rt start'
+su $user -c '/usr/local/bin/rt -i start'
 
 sleep 2
-sudo -u $user screen -S irssi -p 0 -X stuff "/WINDOW LOG ON $home/ir.log$(printf \\r)"
-sudo -u $user screen -S irssi -p 0 -X stuff "/autodl update$(printf \\r)"
+su $user -c 'screen -S irssi -p 0 -X stuff "/WINDOW LOG ON $home/ir.log$(printf \\r)"'
+su $user -c 'screen -S irssi -p 0 -X stuff "/autodl update$(printf \\r)"'
 echo -n "updating autodl-irssi"
 while ! ((tail -n1 $home/ir.log | grep -c -q "You are using the latest autodl-trackers") || (tail -n1 $home/ir.log | grep -c -q "Successfully loaded tracker files"))
 do
@@ -402,11 +402,11 @@ sleep 1
 echo -n " ."
 done
 echo
-sudo -u $user screen -S irssi -p 0 -X stuff "/WINDOW LOG OFF$(printf \\r)"
+su $user -c 'screen -S irssi -p 0 -X stuff "/WINDOW LOG OFF$(printf \\r)"'
 sleep 1
-sudo -u $user screen -S irssi -p 0 -X quit
+su $user -c 'screen -S irssi -p 0 -X quit'
 sleep 2
-sudo -u $user /usr/local/bin/rt -i start > /dev/null
+su $user -c '/usr/local/bin/rt -i start > /dev/null'
 rm $home/ir.log
 echo "autodl-irssi update complete"
 
