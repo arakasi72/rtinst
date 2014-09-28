@@ -6,7 +6,7 @@ RELNO=0
 WEBPASS=''
 PASS1=''
 PASS2=''
-cronline1="@reboot sleep 3; /usr/local/bin/rtcheck irssi rtorrent"
+cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 DLFLAG=1
 
