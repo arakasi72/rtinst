@@ -117,6 +117,7 @@ else
   exit 1
 fi
 
+# secure ssh
 portline=$(grep 'Port 22' /etc/ssh/sshd_config)
 if [ "$portline" = "Port 22" ]
 then
@@ -146,6 +147,8 @@ if [ -z "$allowlist" ]
         perl -pi -e "s/$allowlist/$allowlist $user/g" /etc/ssh/sshd_config
     fi
 fi
+
+service ssh restart
 
 home="/home/$user"
 
