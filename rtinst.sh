@@ -25,20 +25,28 @@ random()
     echo $RAND
 }
 
-if [ $SUDO_USER ]
+# determine system
+if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ] || [ "$FULLREL" = "Ubuntu 14.04 LTS" ]
   then
-    user=$SUDO_USER
-	home="/home/$user"
-  else
-    echo "Script must be run using sudo"
-	exit 1
+    RELNO=14
+elif [ "$FULLREL" = "Ubuntu 13.10" ]
+  then
+    RELNO=13
+elif [ "$FULLREL" = "Ubuntu 12.04.4 LTS" ]
+  then
+    RELNO=12
+elif [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]
+  then
+    RELNO=12
+elif [ "$FULLREL" = "Debian GNU/Linux 7" ]
+  then
+    RELNO=7
+else
+  echo "Unable to determine OS or OS unsupported"
+  exit
 fi
 
-if [ $user = root ]
-  then
-    echo "Script cannot be run by root" && exit 1
-fi
-
+# get options
 while getopts ":d" optname
   do
     case $optname in
@@ -56,31 +64,100 @@ if [ $# -gt 0 ]
     exit 1
 fi
 
-if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ] || [ "$FULLREL" = "Ubuntu 14.04 LTS" ]
+if [ $(logname) = 'root' ]
   then
-    RELNO=14
-elif [ "$FULLREL" = "Ubuntu 13.10" ]
+	if [ $(dpkg-query -W -f='${Status}' sudo 2>/dev/null | grep -c "ok installed") -eq 0 ];
+      then
+        echo "Installing sudo"
+        apt-get -y install sudo > /dev/null;
+    fi
+	echo "Enter the name of the user to install to"
+	echo "This will be your primary user"
+	echo "It can be an existing user or a new user"
+    echo
+	
+	confirm_name=1
+	while [ $confirm_name = 1 ]
+      do
+        read -p "Enter user name: " answer
+        addname=$answer
+        check_name=1
+        while [ $check_name = 1 ]
+          do
+            read -p "Is $addname correct? " answer
+            case $answer in [Yy]* ) confirm_name=0 && check_name=0  ;;
+                            [Nn]* ) confirm_name=1 && check_name=0  ;;
+                                * ) echo "Enter y or n";;
+            esac
+          done
+done
+
+    user=$addname
+
+     if id -u $user >/dev/null 2>&1
+	   then
+         echo "$user already exists"
+       else
+         echo "adding $user"
+		 useradd -m $user
+		 passwd $user
+     fi
+
+	 if groups $user | grep -q -E ' sudo(\s|$)'
+	   then
+         echo "$user already has sudo privileges"
+       else
+		 adduser $user sudo
+     fi
+elif [ $SUDO_USER ]
   then
-    RELNO=13
-elif [ "$FULLREL" = "Ubuntu 12.04.4 LTS" ]
-  then
-    RELNO=12
-elif [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]
-  then
-    RELNO=12
-    wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list
-    cp /etc/apt/sources.list /etc/apt/sources.list.bak
-    mv sources.list /etc/apt/sources.list
-elif [ "$FULLREL" = "Debian GNU/Linux 7" ]
-  then
-    RELNO=7
+    user=$SUDO_USER
 else
-  echo "Unable to determine OS"
-  exit
+  echo "Script must be run using sudo or root"
+  exit 1
 fi
+
+portline=$(grep 'Port 22' /etc/ssh/sshd_config)
+if [ "$portline" = "Port 22" ]
+then
+sshport=$(random 21000 29000)
+perl -pi -e "s/Port 22/Port $sshport/g" /etc/ssh/sshd_config
+fi
+
+perl -pi -e "s/X11Forwarding yes/X11Forwarding no/g" /etc/ssh/sshd_config
+perl -pi -e "s/PermitRootLogin without-password/PermitRootLogin no/g" /etc/ssh/sshd_config
+perl -pi -e "s/PermitRootLogin yes/PermitRootLogin no/g" /etc/ssh/sshd_config
+
+usedns=$(grep UseDNS /etc/ssh/sshd_config)
+if [ -z "$usedns" ]
+  then
+    echo "UseDNS no" | tee -a /etc/ssh/sshd_config > /dev/null
+  else
+   perl -pi -e "s/$usedns/UseDNS no/g" /etc/ssh/sshd_config
+fi
+
+allowlist=$(grep AllowUsers /etc/ssh/sshd_config)
+if [ -z "$allowlist" ]
+  then
+    echo "AllowUsers $user" | tee -a /etc/ssh/sshd_config > /dev/null
+  else
+    if [ "${allowlist#*$user}" = "$allowlist" ]
+      then
+        perl -pi -e "s/$allowlist/$allowlist $user/g" /etc/ssh/sshd_config
+    fi
+fi
+
+home="/home/$user"
 
 # prepare system
 cd $home
+
+if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]
+  then
+    wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list
+    cp /etc/apt/sources.list /etc/apt/sources.list.bak
+    mv sources.list /etc/apt/sources.list
+fi
 
 apt-get update && apt-get -y upgrade
 apt-get clean && apt-get autoclean
@@ -296,7 +373,7 @@ perl -pi -e "s/if \(\\$\.browser\.msie\)/if \(navigator\.appName \=\= \'Microsof
 # set permissions
 chown -R www-data:www-data /var/www
 chmod -R 755 /var/www/rutorrent
-chown -R $user $home
+chown -R $user:$user $home
 # install rtorrent and irssi start, stop, restart script, rtpass, and upgrade/downgrade script
 cd $home
 wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rt -O /usr/local/bin/rt && chmod 755 /usr/local/bin/rt
@@ -347,6 +424,12 @@ echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | tee -a $home/r
 echo "rutorrent password set to $WEBPASS" | tee -a $home/rtinst.info
 echo "to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
 echo
+if ! [ -z "$sshport" ]
+  then
+    echo "IMPORTANT: SSH Port set to $sshport - Ensure you can login before closing this session"
+	echo "ssh port changed to $sshport" | tee -a $home/rtinst.info > /dev/null
+fi
+echo
 echo "The above information is stored in rtinst.info in your home directory."
 echo "To see contents enter: cat $home/rtinst.info"
-echo "You should reboot your system now"
+chown $user rtinst.info
