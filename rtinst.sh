@@ -64,7 +64,7 @@ if [ $# -gt 0 ]
     exit 1
 fi
 
-if [ $(logname) = 'root' ]
+if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "root"; }
   then
 	if [ $(dpkg-query -W -f='${Status}' sudo 2>/dev/null | grep -c "ok installed") -eq 0 ];
       then
@@ -109,7 +109,7 @@ done
        else
 		 adduser $user sudo
      fi
-elif [ $SUDO_USER ]
+elif ! [ -z "$SUDO_USER" ]
   then
     user=$SUDO_USER
 else
