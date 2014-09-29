@@ -378,7 +378,7 @@ mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
 cd $home
 
 mv $home/rtscripts/nginxsite /etc/nginx/sites-available/default
-mv $home/rt/scripts/nginxsitedl /etc/nginx/conf.d/rtdload
+mv $home/rt/rtscripts/nginxsitedl /etc/nginx/conf.d/rtdload
 
 if [ $DLFLAG = 0 ]
   then
