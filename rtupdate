@@ -8,6 +8,37 @@ installed() {
 hash $1 2>/dev/null
 }
 
+get_scripts() {
+local script_name=$1
+local script_dest=$2
+local no_err=1
+local attempts=0
+until [ $no_err = 0 ]
+  do
+    rm -f $script_name
+    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name
+    no_err=$?
+    attempts=$(( $attempts + 1 ))
+    if [ $attempts = 20 ]
+      then
+        echo "There is a problem downloading the scripts. Please check your network or there may be an issue with the github website"
+        echo "If the Github website is down, you can try again later"
+        exit 1
+    fi
+  done
+
+if ! [ -z "$script_dest" ]
+  then
+    mv -f $script_name $script_dest
+fi
+}
+
+if [ "$LOGNAME" != "root" && ! -z "$SUDO_USER" ]
+  then
+    echo "Must be run from your primary user, with sudo"
+    exit 1
+fi
+
 ask_version() {
     while true
       do
@@ -40,7 +71,7 @@ while true
 
 if ( installed rtorrent )
   then
-    sudo echo "rtorrent detected"
+    echo "rtorrent detected"
     echo
   else
     echo "rtorrent NOT installed"
@@ -58,37 +89,38 @@ echo "Installing $libvers/$rtvers"
 
 if ! [ -x $RTFILE ]
 then
-sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rt -O /usr/local/bin/rt && sudo chmod 755 /usr/local/bin/rt
+get_scripts rt /usr/local/bin/rt
+chmod 755 /usr/local/bin/rt
 fi
 
 
-crontab -l | perl -nle 's/^([^#@])/# $1/;print' | crontab
+crontab -u $SUDO_USER -l | perl -nle 's/^([^#@])/# $1/;print' | crontab -u $SUDO_USER
 rt stop
 cd source
-#svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc
+svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc
 curl http://libtorrent.rakshasa.no/downloads/$libvers.tar.gz | tar xz
 curl http://libtorrent.rakshasa.no/downloads/$rtvers.tar.gz | tar xz
 
-#cd xmlrpc
-#./configure --prefix=/usr --enable-libxml2-backend --disable-libwww-client --disable-wininet-client --disable-abyss-server --disable-cgi-server
-#make
-#sudo make install
+cd xmlrpc
+./configure --prefix=/usr --enable-libxml2-backend --disable-libwww-client --disable-wininet-client --disable-abyss-server --disable-cgi-server
+make
+make install
 
 cd ~/source/$libvers
 ./autogen.sh
 ./configure --prefix=/usr
 make -j2
-sudo make install
+make install
 
 cd ~/source/$rtvers
 ./autogen.sh
 ./configure --prefix=/usr --with-xmlrpc-c
 make -j2
-sudo make install
-sudo ldconfig
+make install
+ldconfig
 
-rt start
-crontab -l | perl -nle 's/^#\s*([0-9*])/$1/;print' | crontab
+sudo -u $SUDO_USER rt start
+crontab -u $SUDO_USER -l | perl -nle 's/^#\s*([0-9*])/$1/;print' | crontab -u $SUDO_USER
 echo
 echo "$libvers/$rtvers installed"
 echo
