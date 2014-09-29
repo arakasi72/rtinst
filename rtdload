@@ -1,0 +1,26 @@
+#!/bin/bash
+PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+
+lineno=$(sed -n '/include \/etc\/nginx\/conf\.d\/rtdload;/=' /etc/nginx/sites-available/default)
+
+if ! [ "$LOGNAME" = "root" ]
+  then
+    echo "Must be run as root, directly or with sudo"
+    exit 1
+fi
+
+if [ "$1" = "enable" ]
+  then
+    sed -i $lineno's/.*/        include \/etc\/nginx\/conf\.d\/rtdload;/g' /etc/nginx/sites-available/default
+    service nginx reload
+    echo "http download enabled"
+
+elif [ "$1" = "disable" ]
+  then
+    sed -i $lineno's/.*/        #include \/etc\/nginx\/conf\.d\/rtdload;/g' /etc/nginx/sites-available/default
+    service nginx reload
+    echo "http download disabled"
+else
+  echo "argument must be enable or disable"
+  exit 1
+fi
