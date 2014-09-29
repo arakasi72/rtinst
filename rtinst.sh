@@ -171,7 +171,7 @@ chmod 755 /usr/local/bin/rtpass
 get_scripts rtsetpass /usr/local/bin/rtsetpass
 chmod 755 /usr/local/bin/rtsetpass
 
-get_scripts rtsetpass /usr/local/bin/rtdload
+get_scripts rtdload /usr/local/bin/rtdload
 chmod 755 /usr/local/bin/rtdload
 
 get_scripts .rtorrent.rc
