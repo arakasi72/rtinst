@@ -25,6 +25,32 @@ random()
     echo $RAND
 }
 
+get_scripts() {
+local script_name=$1
+local script_dest=$2
+local no_err=1
+local attempts=0
+until [ $no_err = 0 ]
+  do
+    rm -f $script_name
+    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/$script_name
+    no_err=$?
+    attempts=$(( $attempts + 1 ))
+    if [ $attempts = 20 ]
+      then
+        echo "There is a problem downloading the scripts. Please check your network or there may be an issue with the github website"
+        echo "If the Github website is down, you can try again later"
+        exit 1
+    fi
+  done
+
+if ! [ -z "$script_dest" ]
+  then
+    mv -f $script_name $script_dest
+fi
+}
+
+
 # determine system
 if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ] || [ "$FULLREL" = "Ubuntu 14.04 LTS" ]
   then
@@ -64,6 +90,7 @@ if [ $# -gt 0 ]
     exit 1
 fi
 
+# set and prepare user
 if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "root"; }
   then
     echo "Enter the name of the user to install to"
@@ -119,6 +146,38 @@ else
   exit 1
 fi
 
+home="/home/$user"
+
+# download rt scripts and config files
+mkdir $home/rtscripts
+cd $home/rtscripts
+
+get_scripts rt /usr/local/bin/rt
+chmod 755 /usr/local/bin/rt
+
+get_scripts rtcheck /usr/local/bin/rtcheck
+chmod 755 /usr/local/bin/rtcheck
+
+get_scripts rtupdate /usr/local/bin/rtupdate
+chmod 755 /usr/local/bin/rtupdate
+
+get_scripts edit_su /usr/local/bin/edit_su
+chmod 755 /usr/local/bin/edit_su
+
+get_scripts rtpass /usr/local/bin/rtpass
+chmod 755 /usr/local/bin/rtpass
+
+get_scripts rtsetpass /usr/local/bin/rtsetpass
+chmod 755 /usr/local/bin/rtsetpass
+
+get_scripts .rtorrent.rc
+get_scripts ru.config
+get_scripts ru.ini
+get_scripts nginxsitedl
+get_scripts nginxsite
+
+cd $home
+
 # secure ssh
 portline=$(grep 'Port 22' /etc/ssh/sshd_config)
 if [ "$portline" = "Port 22" ]
@@ -152,7 +211,7 @@ fi
 
 service ssh restart
 
-home="/home/$user"
+
 
 # prepare system
 cd $home
@@ -253,13 +312,11 @@ cd rtorrent
 mkdir .session downloads watch
 
 cd $home
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/.rtorrent.rc
+mv -f $home/rtscripts/.rtorrent.rc $home/.rtorrent.rc
 perl -pi -e "s/<user name>/$user/g" $home/.rtorrent.rc
 
 # install rutorrent
 cd $home
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/ru.config
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/ru.ini
 
 mkdir /var/www
 cd /var/www
@@ -270,7 +327,7 @@ rm -r rutorrent/plugins
 mv plugins rutorrent
 
 rm rutorrent/conf/config.php
-mv $home/ru.config /var/www/rutorrent/conf/config.php
+mv $home/rtscripts/ru.config /var/www/rutorrent/conf/config.php
 mkdir /var/www/rutorrent/conf/users/$user
 mkdir /var/www/rutorrent/conf/users/$user/plugins
 
@@ -283,7 +340,7 @@ echo "?>" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 
 cd rutorrent/plugins
 mkdir conf
-mv $home/ru.ini conf/plugins.ini
+mv $home/rtscripts/ru.ini conf/plugins.ini
 
 if [ $RELNO = 14 ]
   then
@@ -319,11 +376,9 @@ fi
 
 mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
 cd $home
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/nginxsitedl
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/nginxsite
 
-mv $home/nginxsite /etc/nginx/sites-available/default
-mv $home/nginxsitedl /etc/nginx/conf.d/rtdload
+mv $home/rtscripts/nginxsite /etc/nginx/sites-available/default
+mv $home/rt/scripts/nginxsitedl /etc/nginx/conf.d/rtdload
 
 if [ $DLFLAG = 0 ]
   then
@@ -379,14 +434,8 @@ perl -pi -e "s/if \(\\$\.browser\.msie\)/if \(navigator\.appName \=\= \'Microsof
 chown -R www-data:www-data /var/www
 chmod -R 755 /var/www/rutorrent
 chown -R $user:$user $home
-# install rtorrent and irssi start, stop, restart script, rtpass, and upgrade/downgrade script
+
 cd $home
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rt -O /usr/local/bin/rt && chmod 755 /usr/local/bin/rt
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtcheck -O /usr/local/bin/rtcheck && chmod 755 /usr/local/bin/rtcheck
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtupdate -O /usr/local/bin/rtupdate && chmod 755 /usr/local/bin/rtupdate
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/edit_su -O /usr/local/bin/edit_su && chmod 755 /usr/local/bin/edit_su
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtpass -O /usr/local/bin/rtpass && chmod 755 /usr/local/bin/rtpass
-wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtsetpass -O /usr/local/bin/rtsetpass && chmod 755 /usr/local/bin/rtsetpass
 
 edit_su
 rm /usr/local/bin/edit_su
