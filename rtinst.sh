@@ -116,12 +116,6 @@ if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "r
     
     user=$addname
     
-    if [ $(dpkg-query -W -f='${Status}' sudo 2>/dev/null | grep -c "ok installed") -eq 0 ];
-      then
-        echo "Installing sudo"
-        apt-get -y install sudo > /dev/null;
-    fi
-
     if id -u $user >/dev/null 2>&1
       then
         echo "$user already exists"
@@ -130,6 +124,13 @@ if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "r
           useradd -m $user
 	  passwd $user
     fi
+
+    if [ $(dpkg-query -W -f='${Status}' sudo 2>/dev/null | grep -c "ok installed") -eq 0 ];
+      then
+        echo "Installing sudo"
+        apt-get -y install sudo > /dev/null;
+    fi
+
 
     if groups $user | grep -q -E ' sudo(\s|$)'
       then
