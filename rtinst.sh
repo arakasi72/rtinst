@@ -440,6 +440,8 @@ cd $home
 edit_su
 rm /usr/local/bin/edit_su
 
+rm -r $home/rtscripts
+
 su $user -c '/usr/local/bin/rt start'
 su $user -c '/usr/local/bin/rt -i start'
 
