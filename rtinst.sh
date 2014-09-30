@@ -33,7 +33,7 @@ local attempts=0
 until [ $no_err = 0 ]
   do
     rm -f $script_name
-    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/$script_name
+    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name
     no_err=$?
     attempts=$(( $attempts + 1 ))
     if [ $attempts = 20 ]
