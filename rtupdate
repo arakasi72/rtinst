@@ -34,12 +34,6 @@ if ! [ -z "$script_dest" ]
 fi
 }
 
-if [ "$LOGNAME" != "root" && ! -z "$SUDO_USER" ]
-  then
-    echo "Must be run from your primary user, with sudo"
-    exit 1
-fi
-
 ask_version() {
     while true
       do
@@ -72,7 +66,7 @@ while true
 
 if ( installed rtorrent )
   then
-    echo "rtorrent detected"
+    sudo echo "rtorrent detected"
     echo
   else
     echo "rtorrent NOT installed"
@@ -90,42 +84,37 @@ echo "Installing $libvers/$rtvers"
 
 if ! [ -x $RTFILE ]
 then
-get_scripts rt /usr/local/bin/rt
-chmod 755 /usr/local/bin/rt
+sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rt -O /usr/local/bin/rt && sudo chmod 755 /usr/local/bin/rt
 fi
 
 
-crontab -u $SUDO_USER -l | perl -nle 's/^([^#@])/# $1/;print' | crontab -u $SUDO_USER
+crontab -l | perl -nle 's/^([^#@])/# $1/;print' | crontab
 rt stop
-mkdir $home/source
-cd $home/source
-svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc
+cd source
+#svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc
 curl http://libtorrent.rakshasa.no/downloads/$libvers.tar.gz | tar xz
 curl http://libtorrent.rakshasa.no/downloads/$rtvers.tar.gz | tar xz
-chown -R $SUDO_USER:$SUDO_USER source
 
-cd xmlrpc
-./configure --prefix=/usr --enable-libxml2-backend --disable-libwww-client --disable-wininet-client --disable-abyss-server --disable-cgi-server
-make
-make install
+#cd xmlrpc
+#./configure --prefix=/usr --enable-libxml2-backend --disable-libwww-client --disable-wininet-client --disable-abyss-server --disable-cgi-server
+#make
+#sudo make install
 
-cd $home/source/$libvers
+cd ~/source/$libvers
 ./autogen.sh
 ./configure --prefix=/usr
 make -j2
-make install
+sudo make install
 
-cd $home/source/$rtvers
+cd ~/source/$rtvers
 ./autogen.sh
 ./configure --prefix=/usr --with-xmlrpc-c
 make -j2
-make install
-ldconfig
+sudo make install
+sudo ldconfig
 
-cd $home
-
-sudo -u $SUDO_USER rt start
-crontab -u $SUDO_USER -l | perl -nle 's/^#\s*([0-9*])/$1/;print' | crontab -u $SUDO_USER
+rt start
+crontab -l | perl -nle 's/^#\s*([0-9*])/$1/;print' | crontab
 echo
 echo "$libvers/$rtvers installed"
 echo
