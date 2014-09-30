@@ -28,13 +28,13 @@ random()
 get_scripts() {
 local script_name=$1
 local script_dest=$2
-local no_err=1
 local attempts=0
-until [ $no_err = 0 ]
+local script_size=0
+local bindest="/usr/local/bin"
+
+while [ $script_size = 0 ]
   do
     rm -f $script_name
-    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name
-    no_err=$?
     attempts=$(( $attempts + 1 ))
     if [ $attempts = 20 ]
       then
@@ -42,14 +42,18 @@ until [ $no_err = 0 ]
         echo "If the Github website is down, you can try again later"
         exit 1
     fi
+    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name
+    script_size=$(du -b $script_name | cut -f1)
   done
 
 if ! [ -z "$script_dest" ]
   then
     mv -f $script_name $script_dest
+    if case $script_dest in *"${bindest}"*) true;; *) false;; esac; then
+      chmod 755 $script_dest
+    fi
 fi
 }
-
 
 # determine system
 if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ] || [ "$FULLREL" = "Ubuntu 14.04 LTS" ]
@@ -154,25 +158,12 @@ mkdir $home/rtscripts
 cd $home/rtscripts
 
 get_scripts rt /usr/local/bin/rt
-chmod 755 /usr/local/bin/rt
-
 get_scripts rtcheck /usr/local/bin/rtcheck
-chmod 755 /usr/local/bin/rtcheck
-
 get_scripts rtupdate /usr/local/bin/rtupdate
-chmod 755 /usr/local/bin/rtupdate
-
 get_scripts edit_su /usr/local/bin/edit_su
-chmod 755 /usr/local/bin/edit_su
-
 get_scripts rtpass /usr/local/bin/rtpass
-chmod 755 /usr/local/bin/rtpass
-
 get_scripts rtsetpass /usr/local/bin/rtsetpass
-chmod 755 /usr/local/bin/rtsetpass
-
 get_scripts rtdload /usr/local/bin/rtdload
-chmod 755 /usr/local/bin/rtdload
 
 get_scripts .rtorrent.rc
 get_scripts ru.config
