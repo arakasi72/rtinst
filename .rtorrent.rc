@@ -24,7 +24,7 @@ schedule = watch_directory,5,5,load_start=/home/<user name>/rtorrent/watch/*.tor
 
 
 # Networking
-port_range = 50000-52999 
+port_range = 51001-51250 
 # network.scgi.open_port = localhost:5000
 network.scgi.open_port = 127.0.0.1:5000
 # scgi_port = 127.0.0.1:5000
