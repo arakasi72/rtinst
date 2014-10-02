@@ -125,8 +125,7 @@ if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "r
         echo "$user already exists"
       else
         echo "adding $user"
-          useradd -m $user
-	  passwd $user
+          adduser --gecos "" $user
     fi
 
     if [ $(dpkg-query -W -f='${Status}' sudo 2>/dev/null | grep -c "ok installed") -eq 0 ];
