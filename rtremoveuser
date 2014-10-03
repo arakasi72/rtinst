@@ -28,8 +28,8 @@ elif [ "$user" = "root" ]; then
 echo "Cannot delete root" && exit 1
 elif [ -z "$user" ]; then
 echo "User entry is blank" && exit 1
-elif ! [ id -u $user >/dev/null 2>&1 ]; then
-echo "$user does not exist && exit 1
+elif ! id -u $user >/dev/null 2>&1 ; then
+echo "$user does not exist" && exit 1
 fi
 
 echo
