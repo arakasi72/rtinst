@@ -163,8 +163,8 @@ get_scripts edit_su /usr/local/bin/edit_su
 get_scripts rtpass /usr/local/bin/rtpass
 get_scripts rtsetpass /usr/local/bin/rtsetpass
 get_scripts rtdload /usr/local/bin/rtdload
-get_scripts rtadduser /usr/local/bin/rtremoveuser
-get_scripts rtremoveuser /usr/local/bin/rtadduser
+get_scripts rtadduser /usr/local/bin/rtadduser
+get_scripts rtremove /usr/local/bin/rtremove
 
 get_scripts .rtorrent.rc
 get_scripts ru.config
