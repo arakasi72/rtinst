@@ -295,7 +295,7 @@ fi
 
 if ! [ -x /usr/local/bin/rtcheck ]
   then
-    get_scripts rt /usr/local/bin/rtcheck
+    get_scripts rtcheck /usr/local/bin/rtcheck
 fi
 
 
