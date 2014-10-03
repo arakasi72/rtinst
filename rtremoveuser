@@ -1,0 +1,50 @@
+#!/bin/bash
+PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+
+if [ -z "$SUDO_USER" -a  "$LOGNAME" != "root" ]; then
+echo "Must be run from root or using sudo" && exit 1
+fi
+
+confirm_name=1
+while [ $confirm_name = 1 ]
+  do
+    read -p "Enter user to delete: " answer
+    user=$answer
+    check_name=1
+    while [ $check_name = 1 ]
+      do
+        echo "Warning if you continue you will permanently delete the user and all their data"
+        read -p "Is $user correct, y to continue, n to exit? " answer
+        case $answer in [Yy]* ) confirm_name=0 && check_name=0  ;;
+                        [Nn]* ) exit  ;;
+                            * ) echo "Enter y or n";;
+        esac
+    done
+done
+
+if [ "$user" = "$SUDO_USER" ]; then
+echo "Cannot delete yourself" && exit 1
+elif [ "$user" = "root" ]; then
+echo "Cannot delete root" && exit 1
+elif [ -z "$user" ]; then
+echo "User entry is blank" && exit 1
+elif ! [ id -u $user >/dev/null 2>&1 ]; then
+echo "$user does not exist && exit 1
+fi
+
+echo
+echo "Deleting $user"
+
+passwd -l $user
+killall -KILL -u $user
+crontab -u $user -r
+if [ -d /var/www/rutorrent/conf/users/$user ]; then
+rm -r /var/www/rutorrent/conf/users/$user
+fi
+htpasswd -D /var/www/rutorrent/.htpasswd $user
+deluser --remove-home $user
+ssh_allow=$(grep "$user" /etc/ssh/sshd_config)
+if ! [ -z "$ssh_allow" ]; then
+perl -pi -e "s/ $user//g" /etc/ssh/sshd_config
+service ssh restart
+fi
