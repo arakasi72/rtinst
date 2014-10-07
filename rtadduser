@@ -249,12 +249,12 @@ if [ "$sshaccess" = "0" ]
     fi
 
     grouplist=$(grep AllowGroups /etc/ssh/sshd_config)
-    if [ -z $grouplist ]; then
+    if [ -z "$grouplist" ]; then
       echo "AllowGroups sudo sshuser" | tee -a /etc/ssh/sshd_config > /dev/null
       service ssh restart
     fi
 
-    if [ -z $(groups $user | grep "sshuser") ]; then
+    if [ -z "$(groups $user | grep "sshuser")" ]; then
       adduser $user sshuser
     fi
 fi
