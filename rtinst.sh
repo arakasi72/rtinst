@@ -195,19 +195,23 @@ if [ -z "$usedns" ]
 fi
 
 allowlist=$(grep AllowUsers /etc/ssh/sshd_config)
-if [ -z "$allowlist" ]
+if ! [ -z "$allowlist" ]
   then
-    echo "AllowUsers $user" | tee -a /etc/ssh/sshd_config > /dev/null
-  else
-    if [ "${allowlist#*$user}" = "$allowlist" ]
-      then
-        perl -pi -e "s/$allowlist/$allowlist $user/g" /etc/ssh/sshd_config
+    for sshuser in $allowlist
+      do
+        if ! [ "$ssh_user" = "AllowUsers" ]; then
+          adduser $ssh_user sshuser
     fi
+  done
+    perl -pi -e "s/$allowlist/#$allowlist/g" /etc/ssh/sshd_config
+fi
+echo "AllowGroups sudo sshuser" | tee -a /etc/ssh/sshd_config > /dev/null
+
+if [ -z $(groups $user | grep "sshuser") ]; then
+  adduser $user sshuser
 fi
 
 service ssh restart
-
-
 
 # prepare system
 cd $home
