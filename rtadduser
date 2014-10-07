@@ -235,6 +235,7 @@ fi
 
 if [ "$sshaccess" = "0" ]
   then
+    groupadd sshuser
     allowlist=$(grep AllowUsers /etc/ssh/sshd_config)
     if ! [ -z "$allowlist" ]
      then
@@ -383,7 +384,7 @@ echo "autodl port: $adlport"
 echo "autodl pass: $adlpass"
 echo "crontab entries made, rtorrent and irssi will start on boot"
 echo
-if ! [ -z "$(grep $user /etc/ssh/sshd_config)" ]; then
+if [ "$sshaccess" = "0" ]; then
 echo "$user has SSH access on port $sshport" | tee -a $home/rtinst.info
 echo
 fi
