@@ -208,7 +208,7 @@ if ! [ -z "$allowlist" ]
 fi
 echo "AllowGroups sudo sshuser" | tee -a /etc/ssh/sshd_config > /dev/null
 
-if [ -z $(groups $user | grep "sshuser") ]; then
+if [ -z "$(groups $user | grep sshuser)" ]; then
   adduser $user sshuser
 fi
 
