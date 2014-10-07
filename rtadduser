@@ -172,15 +172,13 @@ echo "$low_count-$high_count"
 }
 
 # set and prepare user
-if ! [ -z "$SUDO_USER" ]
-  then
-    echo "Enter the name of the user to add"
-    echo "It can be an existing user or a new user"
-    echo
-  else
-    echo "Must be run with non-root user, using sudo"
-    exit 1
+if [ -z "$SUDO_USER" -a  "$LOGNAME" != "root" ]; then
+echo "Must be run from root or using sudo" && exit 1
 fi
+
+echo "Enter the name of the user to add"
+echo "It can be an existing user or a new user"
+echo
 
 confirm_name=1
 while [ $confirm_name = 1 ]
