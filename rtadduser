@@ -365,8 +365,8 @@ if [ -z  "$(crontab -u $user -l | grep "\*/10 \* \* \* \* /usr/local/bin/rtcheck
     (crontab -u $user -l; echo "$cronline2" ) | crontab -u $user -
 fi
 
-su $user -c 'rt restart'
-su $user -c 'rt -i restart'
+su $user -c '/usr/local/bin/rt restart'
+su $user -c '/usr/local/bin/rt -i restart'
 
 dload_line=$(grep "include /etc/nginx/conf.d/rtdload;" /etc/nginx/sites-available/default)
 dload_hash=$(echo $dload_line | sed 's/[^#]*//g')
