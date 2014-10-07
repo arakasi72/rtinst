@@ -248,10 +248,12 @@ if [ "$sshaccess" = "0" ]
       service ssh restart
     fi
 
-    grouplist=$(grep AllowGroups /etc/ssh/sshd_config)
-    if [ -z "$grouplist" ]; then
-      echo "AllowGroups sudo sshuser" | tee -a /etc/ssh/sshd_config > /dev/null
-      service ssh restart
+    groupslist=$(grep AllowGroups /etc/ssh/sshd_config)
+    echo $groupslist
+    if [ -z "$groupslist" ]
+      then
+        echo "AllowGroups sudo sshuser" | tee -a /etc/ssh/sshd_config > /dev/null
+        service ssh restart
     fi
 
     if [ -z "$(groups $user | grep "sshuser")" ]; then
