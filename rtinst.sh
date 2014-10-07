@@ -126,7 +126,6 @@ if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "r
       else
         echo "adding $user"
           adduser --gecos "" $user
-          adduser $user sshuser
     fi
 
     if [ $(dpkg-query -W -f='${Status}' sudo 2>/dev/null | grep -c "ok installed") -eq 0 ];
@@ -194,20 +193,17 @@ if [ -z "$usedns" ]
 fi
 
 allowlist=$(grep AllowUsers /etc/ssh/sshd_config)
-if ! [ -z "$allowlist" ]
+if [ -z "$allowlist" ]
   then
-    for sshuser in $allowlist
-      do
-        if ! [ "$ssh_user" = "AllowUsers" ]; then
-          adduser $ssh_user sshuser
+    echo "AllowUsers $user" | tee -a /etc/ssh/sshd_config > /dev/null
+  else
+    if [ "${allowlist#*$user}" = "$allowlist" ]
+      then
+        perl -pi -e "s/$allowlist/$allowlist $user/g" /etc/ssh/sshd_config
     fi
-  done
-    perl -pi -e "s/$allowlist/#$allowlist/g" /etc/ssh/sshd_config
 fi
-echo "AllowGroups sudo sshuser" | tee -a /etc/ssh/sshd_config > /dev/null
+
 service ssh restart
-
-
 
 # prepare system
 cd $home
