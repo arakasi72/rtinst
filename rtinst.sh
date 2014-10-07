@@ -204,7 +204,7 @@ if ! [ -z "$allowlist" ]
           adduser $ssh_user sshuser
     fi
   done
-    perl -pi -e "s/$allowlist/#$allowlist/g" /etc/ssh/sshd_config
+    perl -pi -e "s/$allowlist//g" /etc/ssh/sshd_config
 fi
 echo "AllowGroups sudo sshuser" | tee -a /etc/ssh/sshd_config > /dev/null
 
