@@ -194,6 +194,7 @@ if [ -z "$usedns" ]
    perl -pi -e "s/$usedns/UseDNS no/g" /etc/ssh/sshd_config
 fi
 
+groupadd sshuser
 allowlist=$(grep AllowUsers /etc/ssh/sshd_config)
 if ! [ -z "$allowlist" ]
   then
