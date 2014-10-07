@@ -198,12 +198,12 @@ groupadd sshuser
 allowlist=$(grep AllowUsers /etc/ssh/sshd_config)
 if ! [ -z "$allowlist" ]
   then
-    for sshuser in $allowlist
+    for ssh_user in $allowlist
       do
         if ! [ "$ssh_user" = "AllowUsers" ]; then
           adduser $ssh_user sshuser
-    fi
-  done
+        fi
+      done
     perl -pi -e "s/$allowlist//g" /etc/ssh/sshd_config
 fi
 echo "AllowGroups sudo sshuser" | tee -a /etc/ssh/sshd_config > /dev/null
