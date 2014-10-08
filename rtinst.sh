@@ -163,6 +163,8 @@ get_scripts edit_su /usr/local/bin/edit_su
 get_scripts rtpass /usr/local/bin/rtpass
 get_scripts rtsetpass /usr/local/bin/rtsetpass
 get_scripts rtdload /usr/local/bin/rtdload
+get_scripts rtadduser /usr/local/bin/rtadduser
+get_scripts rtremove /usr/local/bin/rtremove
 
 get_scripts .rtorrent.rc
 get_scripts ru.config
@@ -192,15 +194,22 @@ if [ -z "$usedns" ]
    perl -pi -e "s/$usedns/UseDNS no/g" /etc/ssh/sshd_config
 fi
 
+groupadd sshuser
 allowlist=$(grep AllowUsers /etc/ssh/sshd_config)
-if [ -z "$allowlist" ]
+if ! [ -z "$allowlist" ]
   then
-    echo "AllowUsers $user" | tee -a /etc/ssh/sshd_config > /dev/null
-  else
-    if [ "${allowlist#*$user}" = "$allowlist" ]
-      then
-        perl -pi -e "s/$allowlist/$allowlist $user/g" /etc/ssh/sshd_config
-    fi
+    for ssh_user in $allowlist
+      do
+        if ! [ "$ssh_user" = "AllowUsers" ]; then
+          adduser $ssh_user sshuser
+        fi
+      done
+    perl -pi -e "s/$allowlist//g" /etc/ssh/sshd_config
+fi
+echo "AllowGroups sudo sshuser" | tee -a /etc/ssh/sshd_config > /dev/null
+
+if [ -z "$(groups $user | grep sshuser)" ]; then
+  adduser $user sshuser
 fi
 
 service ssh restart
@@ -457,6 +466,10 @@ echo "autodl-irssi update complete"
 
 (crontab -u $user -l; echo "$cronline1" ) | crontab -u $user -
 (crontab -u $user -l; echo "$cronline2" ) | crontab -u $user -
+
+sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
+ftpport=$(grep 'listen_port=' /etc/vsftpd.conf | sed 's/[^0-9]*//g')
+
 echo
 echo "crontab entries made. rtorrent and irssi will start on boot for $user"
 echo
