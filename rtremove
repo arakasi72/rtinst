@@ -43,6 +43,7 @@ rm -r /var/www/rutorrent/conf/users/$user
 fi
 htpasswd -D /var/www/rutorrent/.htpasswd $user
 deluser --remove-home $user
+rm -r /var/run/screen/S-$user
 ssh_allow=$(grep "$user" /etc/ssh/sshd_config)
 if ! [ -z "$ssh_allow" ]; then
 perl -pi -e "s/ $user//g" /etc/ssh/sshd_config
