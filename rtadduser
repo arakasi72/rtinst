@@ -1,0 +1,402 @@
+#!/bin/bash
+PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+
+scgi_port_start=5000
+rpc_start=2
+rtport_start=51001
+sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
+ftpport=$(grep 'listen_port=' /etc/vsftpd.conf | sed 's/[^0-9]*//g')
+cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
+cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
+SERVERIP=$(ip a s eth0 | awk '/inet / {print$2}' | cut -d/ -f1)
+
+#get user list
+cd /var/www/rutorrent/conf/users
+user_list=*
+
+genpasswd() {
+local genln=$1
+[ -z "$genln" ] && genln=8
+tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
+}
+
+random()
+{
+    local min=$1
+    local max=$2
+    local RAND=`od -t uI -N 4 /dev/urandom | awk '{print $2}'`
+    RAND=$((RAND%((($max-$min)+1))+$min))
+    echo $RAND
+}
+
+get_scripts() {
+local script_name=$1
+local script_dest=$2
+local attempts=0
+local script_size=0
+local bindest="/usr/local/bin"
+
+while [ $script_size = 0 ]
+  do
+    rm -f $script_name
+    attempts=$(( $attempts + 1 ))
+    if [ $attempts = 20 ]
+      then
+        echo "There is a problem downloading the scripts. Please check your network or there may be an issue with the github website"
+        echo "If the Github website is down, you can try again later"
+        exit 1
+    fi
+    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name
+    script_size=$(du -b $script_name | cut -f1)
+  done
+
+if ! [ -z "$script_dest" ]
+  then
+    mv -f $script_name $script_dest
+    if case $script_dest in *"${bindest}"*) true;; *) false;; esac; then
+      chmod 755 $script_dest
+    fi
+fi
+}
+
+find_port() {
+local port_count=$1
+local port_type=$2
+local no_match=1
+
+while ! [ $no_match = 0 ]
+  do
+    if [ "$port_type" = "adl" ]
+     then
+       port_count=$(random 34000 39000)
+     else
+       port_count=$(( $port_count + 1 ))
+    fi
+
+    for i in $user_list
+      do
+        current_user=$i
+        current_port=$(grep $port_type /var/www/rutorrent/conf/users/$current_user/config.php | sed 's/[^0-9]*//g')
+        if [ "$current_port" = "$port_count" ]
+          then
+            no_match=1
+            break
+          else
+            no_match=0
+        fi
+      done
+  done
+
+echo $port_count
+}
+
+find_range() {
+local low_count=$1
+local high_count=$(( $low_count +249 ))
+local no_match=1
+local higher=0
+while ! [ $no_match = 0 ]
+  do
+    low_count=$(( $low_count + 250 ))
+    high_count=$(( $high_count + 250 ))
+    for i in $user_list
+      do
+       base_user=$i
+       base_low=$(grep "port_range =" /home/$base_user/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f1)
+       base_high=$(grep "port_range =" /home/$base_user/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f2)
+       if [ $low_count -gt $base_high ]
+         then
+            no_match=0
+            higher=0
+       elif [ $high_count -lt $base_low ]
+         then
+           no_match=0
+           higher=1
+       else
+         no_match=1
+         break
+       fi
+
+       for n in $user_list
+         do
+           compare_user=$n
+           if [ $no_match=1 ]
+             then
+               break
+           fi
+
+           if ! [ $base_user = $compare_user ]
+             then
+               compare_low=$(grep "port_range =" /home/$compare_user/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f1)
+               compare_high=$(grep "port_range =" /home/$compare_user/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f2)
+
+               if [ $higher = 0 ]
+                 then
+                   if [ $base_low -gt $compare_high ]
+                     then
+                       no_match=0
+                   elif [ $high_count -lt $compare_low ]
+                     then
+                       no_match=0
+                   elif [ $compare_low -gt $base_high ] && [ $compare_high -lt $count_low  ]
+                     then
+                     no_match=0
+                   else
+                     no_match=1
+                     break
+                   fi
+               fi
+
+               if [ $higher = 1 ]
+                 then
+                   if [ $base_high -lt $compare_low ]
+                     then
+                       no_match=0
+                   elif [ $low_count -gt $compare_high ]
+                     then
+                       no_match=0
+                   elif [ $compare_high -lt $base_low -a $compare_low -gt $count_high  ]
+                     then
+                     no_match=0
+                   else
+                     no_match=1
+                     break
+                   fi
+               fi
+           fi
+         done
+      done
+  done
+echo "$low_count-$high_count"
+
+}
+
+# set and prepare user
+if [ -z "$SUDO_USER" -a  "$LOGNAME" != "root" ]; then
+echo "Must be run from root or using sudo" && exit 1
+fi
+
+echo "Enter the name of the user to add"
+echo "It can be an existing user or a new user"
+echo
+
+confirm_name=1
+while [ $confirm_name = 1 ]
+  do
+    read -p "Enter user name: " answer
+    addname=$answer
+    check_name=1
+    if [ "$addname" = "root" ]
+      then
+        echo "Don't mess with root"
+        exit 1
+    fi
+
+    while [ $check_name = 1 ]
+      do
+        read -p "Is $addname correct? " answer
+        case $answer in [Yy]* ) confirm_name=0 && check_name=0  ;;
+                        [Nn]* ) confirm_name=1 && check_name=0  ;;
+                            * ) echo "Enter y or n";;
+        esac
+      done
+  done
+
+user=$addname
+home="/home/$user"
+if id -u $user >/dev/null 2>&1
+  then
+    echo "$user already exists"
+  else
+    echo "adding $user"
+    adduser --gecos "" $user
+fi
+
+if [ -d "/var/www/rutorrent/conf/users/$user" ]
+  then
+   echo "Will reset $user config, filters and torrents will not be deleted"
+fi
+
+check_ssh=1
+if ! [ -z "$(grep $user /etc/ssh/sshd_config)" ]
+  then
+    echo "ssh already granted"
+    check_ssh=0
+fi
+
+ while [ $check_ssh = 1 ]
+   do
+     read -p "Grant $user ssh access? " answer
+     case $answer in [Yy]* ) sshaccess=0  check_ssh=0  ;;
+                     [Nn]* ) sshaccess=1  check_ssh=0  ;;
+                         * ) echo "Enter y or n";;
+      esac
+   done
+
+if [ "$sshaccess" = "0" ]
+  then
+    groupadd sshuser
+    allowlist=$(grep AllowUsers /etc/ssh/sshd_config)
+    if ! [ -z "$allowlist" ]
+     then
+      for ssh_user in $allowlist
+        do
+          if ! [ "$ssh_user" = "AllowUsers" ]; then
+            adduser $ssh_user sshuser
+          fi
+        done
+      perl -pi -e "s/$allowlist//g" /etc/ssh/sshd_config
+      service ssh restart
+    fi
+
+    groupslist=$(grep AllowGroups /etc/ssh/sshd_config)
+    echo $groupslist
+    if [ -z "$groupslist" ]
+      then
+        echo "AllowGroups sudo sshuser" | tee -a /etc/ssh/sshd_config > /dev/null
+        service ssh restart
+    fi
+
+    if [ -z "$(groups $user | grep "sshuser")" ]; then
+      adduser $user sshuser
+    fi
+fi
+
+if [ "$user" = "$SUDO_USER" ]
+  then
+    echo "Will reset $user config, autodl filters and torrents will not be deleted"
+    get_scripts ru.config /var/www/rutorrent/conf/config.php
+fi
+
+#remove existing directory if there
+if [ -d "/var/www/rutorrent/conf/users/$user" ]; then
+rm -r /var/www/rutorrent/conf/users/$user
+fi
+
+#assign ports
+newscgi=$(find_port $scgi_port_start scgi)
+newrpc=$(find_port $rpc_start RPC)
+adlport=$(find_port $(random 34000 39000) adl)
+adlpass=$(genpasswd $(random 12 16))
+newrange=$(find_range $rtport_start)
+
+#add directories and config files
+mkdir /var/www/rutorrent/conf/users/$user
+mkdir /var/www/rutorrent/conf/users/$user/plugins
+
+if ! [ -d "$home/rtorrent" ]; then
+mkdir $home/rtorrent
+fi
+
+if ! [ -d "$home/rtorrent/.session" ]; then
+mkdir $home/rtorrent/.session
+fi
+
+if ! [ -d "$home/rtorrent/downloads" ]; then
+mkdir $home/rtorrent/downloads
+fi
+
+if ! [ -d "$home/rtorrent/watch" ]; then
+mkdir $home/rtorrent/watch
+fi
+
+WEBPASS=$(genpasswd)
+htpasswd -b /var/www/rutorrent/.htpasswd $user $WEBPASS
+
+get_scripts .rtorrent.rc $home/.rtorrent.rc
+
+if ! [ -x /usr/local/bin/rt ]
+  then
+    get_scripts rt /usr/local/bin/rt
+fi
+
+if ! [ -x /usr/local/bin/rtcheck ]
+  then
+    get_scripts rtcheck /usr/local/bin/rtcheck
+fi
+
+
+
+perl -pi -e "s/<user name>/$user/g" $home/.rtorrent.rc
+sudo perl -pi -e "s/port_range = 51001-51250/port_range = $newrange/g" $home/.rtorrent.rc
+sudo perl -pi -e "s/network\.scgi\.open_port = 127\.0\.0\.1:5000/network\.scgi\.open_port = 127\.0\.0\.1:$newscgi/g" $home/.rtorrent.rc
+
+echo "<?php" | tee /var/www/rutorrent/conf/users/$user/config.php > /dev/null
+echo | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
+echo "\$scgi_port = $newscgi;" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
+echo "\$XMLRPCMountPoint = \"/RPC$newrpc\";" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
+echo | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
+echo "?>" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
+
+#add auto-dl
+mkdir /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi
+mkdir -p $home/.irssi/scripts/autorun
+cd $home/.irssi/scripts
+wget --no-check-certificate -O autodl-irssi.zip http://update.autodl-community.com/autodl-irssi-community.zip
+unzip -o autodl-irssi.zip
+rm autodl-irssi.zip
+cp autodl-irssi.pl autorun/
+mkdir -p $home/.autodl
+touch $home/.autodl/autodl.cfg && touch $home/.autodl/autodl2.cfg
+
+echo "<?php" | tee /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
+echo | tee -a /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
+echo "\$autodlPort = $adlport;" | tee -a /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
+echo "\$autodlPassword = \"$adlpass\";" | tee -a /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
+echo | tee -a /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
+echo "?>" | tee -a /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
+
+cd $home/.autodl
+echo "[options]" | tee autodl2.cfg > /dev/null
+echo "gui-server-port = $adlport" | tee -a autodl2.cfg > /dev/null
+echo "gui-server-password = $adlpass" | tee -a autodl2.cfg > /dev/null
+
+chown -R $user:$user $home
+chown -R www-data:www-data /var/www/rutorrent
+chmod -R 755 /var/www/rutorrent
+
+if [ -z "$(crontab -u $user -l | grep "$cronline1")" ]
+  then
+    (crontab -u $user -l; echo "$cronline1" ) | crontab -u $user -
+fi
+
+if [ -z  "$(crontab -u $user -l | grep "\*/10 \* \* \* \* /usr/local/bin/rtcheck irssi rtorrent")" ]
+  then
+    (crontab -u $user -l; echo "$cronline2" ) | crontab -u $user -
+fi
+
+su $user -c '/usr/local/bin/rt restart'
+su $user -c '/usr/local/bin/rt -i restart'
+
+dload_line=$(grep "include /etc/nginx/conf.d/rtdload;" /etc/nginx/sites-available/default)
+dload_hash=$(echo $dload_line | sed 's/[^#]*//g')
+if [ ! -z "$dload_line" -a -z "$dload_hash" ]; then
+dload_flag=0
+else
+dload_flag=1
+fi
+
+echo "$user setup complete"
+echo "SCGI Port: $newscgi"
+echo "RPC Mount: $newrpc"
+echo "rtorrent port range $newrange"
+echo "autodl port: $adlport"
+echo "autodl pass: $adlpass"
+echo "crontab entries made, rtorrent and irssi will start on boot"
+echo
+if [ "$sshaccess" = "0" ]; then
+echo "$user has SSH access on port $sshport" | tee -a $home/rtinst.info
+echo
+fi
+echo "ftp client should be set to explicit ftp over tls using port $ftpport" | tee -a $home/rtinst.info
+echo
+if [ $dload_flag = 0 ]; then
+echo "https downloads can be accessed at https://$SERVERIP/download/$user" | tee -a $home/rtinst.info
+echo
+fi
+echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | tee -a $home/rtinst.info
+echo "rutorrent password set to $WEBPASS" | tee -a $home/rtinst.info
+echo "to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
+echo
+echo "The above info is stored at $home/rtinst.info"
+chown $user:$user $home/rtinst.info
