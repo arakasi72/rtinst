@@ -466,6 +466,10 @@ echo "autodl-irssi update complete"
 
 (crontab -u $user -l; echo "$cronline1" ) | crontab -u $user -
 (crontab -u $user -l; echo "$cronline2" ) | crontab -u $user -
+
+sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
+ftpport=$(grep 'listen_port=' /etc/vsftpd.conf | sed 's/[^0-9]*//g')
+
 echo
 echo "crontab entries made. rtorrent and irssi will start on boot for $user"
 echo
