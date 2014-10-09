@@ -353,8 +353,7 @@ mv plugins rutorrent
 
 rm rutorrent/conf/config.php
 mv $home/rtscripts/ru.config /var/www/rutorrent/conf/config.php
-mkdir /var/www/rutorrent/conf/users/$user
-mkdir /var/www/rutorrent/conf/users/$user/plugins
+mkdir -p /var/www/rutorrent/conf/users/$user/plugins
 
 echo "<?php" | tee /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 echo | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
@@ -363,9 +362,8 @@ echo "\$XMLRPCMountPoint = \"/RPC2\";" | tee -a /var/www/rutorrent/conf/users/$u
 echo | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 echo "?>" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 
-cd rutorrent/plugins
-mkdir conf
-mv $home/rtscripts/ru.ini conf/plugins.ini
+mkdir rutorrent/plugins/conf
+mv $home/rtscripts/ru.ini /var/www/rutorrent/plugins/conf/plugins.ini
 
 if [ $RELNO = 14 ]
   then
@@ -375,6 +373,7 @@ fi
 apt-get -y install ffmpeg
 
 # install nginx
+cd $home
 apt-get -y install nginx-full apache2-utils
 WEBPASS=$(genpasswd)
 htpasswd -c -b /var/www/rutorrent/.htpasswd $user $WEBPASS
@@ -400,7 +399,6 @@ if [ $RELNO = 12 ] || [ $RELNO = 7 ]
 fi
 
 mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
-cd $home
 
 mv $home/rtscripts/nginxsite /etc/nginx/sites-available/default
 mv $home/rtscripts/nginxsitedl /etc/nginx/conf.d/rtdload
@@ -488,8 +486,13 @@ su $user -c '/usr/local/bin/rt -i start > /dev/null'
 rm $home/ir.log
 echo "autodl-irssi update complete"
 
-(crontab -u $user -l; echo "$cronline1" ) | crontab -u $user -
-(crontab -u $user -l; echo "$cronline2" ) | crontab -u $user -
+if [ -z "$(crontab -u $user -l | grep "$cronline1")" ]; then
+    (crontab -u $user -l; echo "$cronline1" ) | crontab -u $user -
+fi
+
+if [ -z  "$(crontab -u $user -l | grep "\*/10 \* \* \* \* /usr/local/bin/rtcheck irssi rtorrent")" ]; then
+    (crontab -u $user -l; echo "$cronline2" ) | crontab -u $user -
+fi
 
 sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
 ftpport=$(grep 'listen_port=' /etc/vsftpd.conf | sed 's/[^0-9]*//g')
