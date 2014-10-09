@@ -389,12 +389,12 @@ perl -pi -e "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /et
 perl -pi -e "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
 
 
-if [ $RELNO = 14 ] | [ $RELNO = 13 ]
+if [ $RELNO = 14 ] || [ $RELNO = 13 ]
   then
     cp /usr/share/nginx/html/* /var/www
 fi
 
-if [ $RELNO = 12 ] | [ $RELNO = 7 ]
+if [ $RELNO = 12 ] || [ $RELNO = 7 ]
   then
     cp /usr/share/nginx/www/* /var/www
 fi
@@ -467,8 +467,8 @@ rm /usr/local/bin/edit_su
 
 rm -r $home/rtscripts
 
-su $user -c '/usr/local/bin/rt start'
-su $user -c '/usr/local/bin/rt -i start'
+su $user -c '/usr/local/bin/rt restart'
+su $user -c '/usr/local/bin/rt -i restart'
 
 sleep 2
 sudo -u $user screen -S irssi -p 0 -X stuff "/WINDOW LOG ON $home/ir.log$(printf \\r)"
