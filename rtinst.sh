@@ -260,21 +260,45 @@ perl -pi -e "s/anonymous_enable=YES/anonymous_enable=NO/g" /etc/vsftpd.conf
 perl -pi -e "s/#local_enable=YES/local_enable=YES/g" /etc/vsftpd.conf
 perl -pi -e "s/#write_enable=YES/write_enable=YES/g" /etc/vsftpd.conf
 perl -pi -e "s/#local_umask=022/local_umask=022/g" /etc/vsftpd.conf
-perl -pi -e "s/rsa_private_key_file/#rsa_private_key_file/g" /etc/vsftpd.conf
+perl -pi -e "s/^rsa_private_key_file/#rsa_private_key_file/g" /etc/vsftpd.conf
 perl -pi -e "s/rsa_cert_file=\/etc\/ssl\/certs\/ssl-cert-snakeoil\.pem/rsa_cert_file=\/etc\/ssl\/private\/vsftpd\.pem/g" /etc/vsftpd.conf
 
+if [ -z "$(grep chroot_local_user /etc/vsftpd.conf | grep -v "#")" ]; then
 echo "chroot_local_user=YES" | tee -a /etc/vsftpd.conf > /dev/null
+fi
+if [ -z "$(grep allow_writeable_chroot /etc/vsftpd.conf)" ]; then
 echo "allow_writeable_chroot=YES" | tee -a /etc/vsftpd.conf > /dev/null
+fi
+if [ -z "$(grep ssl_enable /etc/vsftpd.conf)" ]; then
 echo "ssl_enable=YES" | tee -a /etc/vsftpd.conf > /dev/null
+fi
+if [ -z "$(grep allow_anon_ssl /etc/vsftpd.conf)" ]; then
 echo "allow_anon_ssl=NO" | tee -a /etc/vsftpd.conf > /dev/null
+fi
+if [ -z "$(grep force_local_data_ssl /etc/vsftpd.conf)" ]; then
 echo "force_local_data_ssl=YES" | tee -a /etc/vsftpd.conf > /dev/null
+fi
+if [ -z "$(grep force_local_logins_ssl /etc/vsftpd.conf)" ]; then
 echo "force_local_logins_ssl=YES" | tee -a /etc/vsftpd.conf > /dev/null
+fi
+if [ -z "$(grep ssl_sslv2 /etc/vsftpd.conf)" ]; then
 echo "ssl_sslv2=YES" | tee -a /etc/vsftpd.conf > /dev/null
+fi
+if [ -z "$(grep ssl_sslv3 /etc/vsftpd.conf)" ]; then
 echo "ssl_sslv3=YES" | tee -a /etc/vsftpd.conf > /dev/null
+fi
+if [ -z "$(grep ssl_tlsv1 /etc/vsftpd.conf)" ]; then
 echo "ssl_tlsv1=YES" | tee -a /etc/vsftpd.conf > /dev/null
+fi
+if [ -z "$(grep require_ssl_reuse /etc/vsftpd.conf)" ]; then
 echo "require_ssl_reuse=NO" | tee -a /etc/vsftpd.conf > /dev/null
+fi
+if [ -z "$(grep listen_port /etc/vsftpd.conf)" ]; then
 echo "listen_port=$ftpport" | tee -a /etc/vsftpd.conf > /dev/null
+fi
+if [ -z "$(grep ssl_ciphers /etc/vsftpd.conf)" ]; then
 echo "ssl_ciphers=HIGH" | tee -a /etc/vsftpd.conf > /dev/null
+fi
 
 openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem
 
