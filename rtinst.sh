@@ -154,6 +154,19 @@ if [ $(dpkg-query -W -f='${Status}' sudo 2>/dev/null | grep -c "ok installed") -
     apt-get -y install sudo > /dev/null;
 fi
 
+if [ $(dpkg-query -W -f='${Status}' aptitude 2>/dev/null | grep -c "ok installed") -eq 0 ];
+  then
+    echo "Installing aptitude"
+    apt-get -y install aptitude > /dev/null;
+fi
+
+if [ $(dpkg-query -W -f='${Status}' nano 2>/dev/null | grep -c "ok installed") -eq 0 ];
+  then
+    echo "Installing nano"
+    apt-get -y install nano > /dev/null;
+fi
+
+
 if groups $user | grep -q -E ' sudo(\s|$)'
   then
     echo "$user already has sudo privileges"
