@@ -128,6 +128,16 @@ if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "r
           adduser --gecos "" $user
     fi
 
+    if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]
+      then
+        wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list
+        cp /etc/apt/sources.list /etc/apt/sources.list.bak
+        mv sources.list /etc/apt/sources.list
+    fi
+
+    apt-get update && apt-get -y upgrade
+    apt-get clean && apt-get autoclean
+
     if [ $(dpkg-query -W -f='${Status}' sudo 2>/dev/null | grep -c "ok installed") -eq 0 ];
       then
         echo "Installing sudo"
@@ -145,6 +155,15 @@ if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "r
 elif ! [ -z "$SUDO_USER" ]
   then
     user=$SUDO_USER
+    if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]
+      then
+        wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list
+        cp /etc/apt/sources.list /etc/apt/sources.list.bak
+        mv sources.list /etc/apt/sources.list
+    fi
+
+    apt-get update && apt-get -y upgrade
+    apt-get clean && apt-get autoclean
 else
   echo "Script must be run using sudo or root"
   exit 1
@@ -216,16 +235,6 @@ service ssh restart
 
 # prepare system
 cd $home
-
-if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]
-  then
-    wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list
-    cp /etc/apt/sources.list /etc/apt/sources.list.bak
-    mv sources.list /etc/apt/sources.list
-fi
-
-apt-get update && apt-get -y upgrade
-apt-get clean && apt-get autoclean
 
 apt-get -y install autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config php5 php5-cli php5-dev php5-fpm php5-curl php5-geoip php5-mcrypt php5-xmlrpc pkg-config python-scgi screen subversion texinfo unrar-free unzip zlib1g-dev libcurl4-openssl-dev mediainfo
 
