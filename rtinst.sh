@@ -128,48 +128,38 @@ if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "r
           adduser --gecos "" $user
     fi
 
-    if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]
-      then
-        wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list
-        cp /etc/apt/sources.list /etc/apt/sources.list.bak
-        mv sources.list /etc/apt/sources.list
-    fi
-
-    apt-get update && apt-get -y upgrade
-    apt-get clean && apt-get autoclean
-
-    if [ $(dpkg-query -W -f='${Status}' sudo 2>/dev/null | grep -c "ok installed") -eq 0 ];
-      then
-        echo "Installing sudo"
-        apt-get -y install sudo > /dev/null;
-    fi
-
-
-    if groups $user | grep -q -E ' sudo(\s|$)'
-      then
-        echo "$user already has sudo privileges"
-      else
-        adduser $user sudo
-    fi
-
 elif ! [ -z "$SUDO_USER" ]
   then
     user=$SUDO_USER
-    if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]
-      then
-        wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list
-        cp /etc/apt/sources.list /etc/apt/sources.list.bak
-        mv sources.list /etc/apt/sources.list
-    fi
-
-    apt-get update && apt-get -y upgrade
-    apt-get clean && apt-get autoclean
 else
   echo "Script must be run using sudo or root"
   exit 1
 fi
 
 home="/home/$user"
+
+if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]
+  then
+        wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list
+        cp /etc/apt/sources.list /etc/apt/sources.list.bak
+        mv sources.list /etc/apt/sources.list
+fi
+
+apt-get update && apt-get -y upgrade
+apt-get clean && apt-get autoclean
+    
+if [ $(dpkg-query -W -f='${Status}' sudo 2>/dev/null | grep -c "ok installed") -eq 0 ];
+  then
+    echo "Installing sudo"
+    apt-get -y install sudo > /dev/null;
+fi
+
+if groups $user | grep -q -E ' sudo(\s|$)'
+  then
+    echo "$user already has sudo privileges"
+  else
+    adduser $user sudo
+fi
 
 # download rt scripts and config files
 mkdir $home/rtscripts
