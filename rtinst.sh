@@ -369,6 +369,7 @@ mkdir -p /var/www/rutorrent/conf/users/$user/plugins
 
 echo "<?php" | tee /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 echo | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
+echo "\$topDirectory = \'$home\';" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 echo "\$scgi_port = 5000;" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 echo "\$XMLRPCMountPoint = \"/RPC2\";" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 echo | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
