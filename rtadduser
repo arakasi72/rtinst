@@ -323,6 +323,7 @@ sudo perl -pi -e "s/network\.scgi\.open_port = 127\.0\.0\.1:5000/network\.scgi\.
 
 echo "<?php" | tee /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 echo | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
+echo "\$topDirectory = '$home';" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 echo "\$scgi_port = $newscgi;" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 echo "\$XMLRPCMountPoint = \"/RPC$newrpc\";" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 echo | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
