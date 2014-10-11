@@ -218,7 +218,7 @@ if [ -d "/var/www/rutorrent/conf/users/$user" ]
 fi
 
 check_ssh=1
-if ! [ -z "$(grep $user /etc/ssh/sshd_config)" ]
+if groups $user | grep -q -E ' sshuser(\s|$)'
   then
     echo "ssh already granted"
     check_ssh=0
