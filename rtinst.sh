@@ -9,13 +9,17 @@ PASS2=''
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 DLFLAG=1
+logfile="/dev/null"
+gotip=0
 
+#function to generate random password
 genpasswd() {
 local genln=$1
 [ -z "$genln" ] && genln=8
 tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
 }
 
+#function to determine random number between 2 numbers
 random()
 {
     local min=$1
@@ -25,6 +29,7 @@ random()
     echo $RAND
 }
 
+#function to fetch the rtinst scripts and files
 get_scripts() {
 local script_name=$1
 local script_dest=$2
@@ -42,7 +47,7 @@ while [ $script_size = 0 ]
         echo "If the Github website is down, you can try again later"
         exit 1
     fi
-    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name
+    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name >> $logfile 2>&1
     script_size=$(du -b $script_name | cut -f1)
   done
 
@@ -53,6 +58,47 @@ if ! [ -z "$script_dest" ]
       chmod 755 $script_dest
     fi
 fi
+}
+
+# function to install package
+install_package() {
+local pack_name=$1
+if [ $(dpkg-query -W -f='${Status}' $pack_name 2>/dev/null | grep -c "ok installed") -eq 0 ];
+  then
+    printf '%s\r' "Installing $pack_name                   "
+    apt-get -y install $pack_name >> $logfile 2>&1
+    if [ $? = 0 ]; then
+      return 0
+    else
+      echo "error trying to install $pack_name"
+      echo "Try to install using 'sudo apt-get install $pack_name' from command line"
+      echo "Then rerun rtinst.sh script"
+      exit
+    fi
+  else
+    return 0
+fi
+}
+
+# function to ask user for y/n response
+ask_user(){
+while true
+  do
+    read answer
+    case $answer in [Yy]* ) return 0 ;;
+                    [Nn]* ) return 1 ;;
+                        * ) echo "Enter y or n";;
+    esac
+  done
+}
+
+enter_ip() {
+echo "enter your server's name or IP address"
+echo "e.g. example.com or 213.0.113.113"
+read SERVERIP
+echo "Your Server IP/Name is $SERVERIP"
+echo -n "Is this correct y/n? "
+ask_user
 }
 
 # determine system
@@ -77,11 +123,12 @@ else
 fi
 
 # get options
-while getopts ":d" optname
+while getopts ":dl" optname
   do
     case $optname in
       "d" ) DLFLAG=0 ;;
-        * ) echo "incorrect option, only -d allowed" && exit 1 ;;
+      "l" ) logfile="$HOME/rtinst.log" ;;
+        * ) echo "incorrect option, only -d and -l allowed" && exit 1 ;;
     esac
   done
 
@@ -94,6 +141,29 @@ if [ $# -gt 0 ]
     exit 1
 fi
 
+# check IP Address
+case $SERVERIP in
+    127* ) gotip=1 ;;
+  local* ) gotip=1 ;;
+      "" ) gotip=1 ;;
+esac
+
+if [ $gotip = 1 ]; then
+  echo "Unable to determine your IP address"
+  gotip=enter_ip
+else
+  echo "Your Server IP/Name is $SERVERIP"
+  echo -n "Is this correct y/n? "
+  gotip=ask_user
+fi
+
+until $gotip
+    do
+      gotip=enter_ip
+    done
+
+echo "Your server's IP/Name is set to $SERVERIP"
+
 # set and prepare user
 if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "root"; }
   then
@@ -101,25 +171,20 @@ if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "r
     echo "This will be your primary user"
     echo "It can be an existing user or a new user"
     echo
-	
+
     confirm_name=1
     while [ $confirm_name = 1 ]
       do
         read -p "Enter user name: " answer
         addname=$answer
-        check_name=1
-        while [ $check_name = 1 ]
-          do
-            read -p "Is $addname correct? " answer
-            case $answer in [Yy]* ) confirm_name=0 && check_name=0  ;;
-                            [Nn]* ) confirm_name=1 && check_name=0  ;;
-                                * ) echo "Enter y or n";;
-            esac
-        done
-    done
-    
+        echo -n "Confirm that user name is $answer y/n? "
+        if ask_user; then
+          confirm_name=0
+        fi
+      done
+
     user=$addname
-    
+
     if id -u $user >/dev/null 2>&1
       then
         echo "$user already exists"
@@ -138,35 +203,91 @@ fi
 
 home="/home/$user"
 
+#update amd upgrade system
 if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]
   then
-        wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list
+        wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list >> $logfile 2>&1
         cp /etc/apt/sources.list /etc/apt/sources.list.bak
         mv sources.list /etc/apt/sources.list
 fi
 
-apt-get update && apt-get -y upgrade
-apt-get clean && apt-get autoclean
-    
-if [ $(dpkg-query -W -f='${Status}' sudo 2>/dev/null | grep -c "ok installed") -eq 0 ];
+echo "Updating package lists"
+apt-get update > $logfile 2>&1
+echo "Upgrading packages"
+apt-get -y upgrade >> $logfile 2>&1
+apt-get clean >> $logfile 2>&1
+apt-get autoclean >> $logfile 2>&1
+
+#install the packsges needed
+echo "Installing required packages"
+install_package sudo
+install_package nano
+install_package autoconf
+install_package build-essential
+install_package ca-certificates
+install_package comerr-dev
+install_package curl
+install_package cfv
+install_package dtach
+install_package htop
+install_package irssi
+install_package libcloog-ppl-dev
+install_package libcppunit-dev
+install_package libcurl3
+install_package libncurses5-dev
+install_package libterm-readline-gnu-perl
+install_package libsigc++-2.0-dev
+install_package libperl-dev
+install_package libtool
+install_package libxml2-dev
+install_package ncurses-base
+install_package ncurses-term
+install_package ntp
+install_package patch
+install_package pkg-config
+install_package php5-fpm
+install_package php5
+install_package php5-cli
+install_package php5-dev
+install_package php5-curl
+install_package php5-geoip
+install_package php5-mcrypt
+install_package php5-xmlrpc
+install_package python-scgi
+install_package screen
+install_package subversion
+install_package texinfo
+install_package unrar-free
+install_package unzip
+install_package zlib1g-dev
+install_package libcurl4-openssl-dev
+install_package mediainfo
+install_package python-software-properties
+install_package aptitude
+install_package php5-json
+install_package nginx-full
+install_package apache2-utils
+install_package git
+install_package libarchive-zip-perl
+install_package libnet-ssleay-perl
+install_package libhtml-parser-perl
+install_package libxml-libxml-perl
+install_package libjson-perl
+install_package libjson-xs-perl
+install_package libxml-libxslt-perl
+install_package libjson-rpc-perl
+install_package libarchive-zip-perl
+
+if [ $RELNO = 14 ]
   then
-    echo "Installing sudo"
-    apt-get -y install sudo > /dev/null;
+    apt-add-repository -y ppa:jon-severinsson/ffmpeg >> $logfile 2>&1
+    apt-get update >> $logfile 2>&1
 fi
+install_package ffmpeg
 
-if [ $(dpkg-query -W -f='${Status}' aptitude 2>/dev/null | grep -c "ok installed") -eq 0 ];
-  then
-    echo "Installing aptitude"
-    apt-get -y install aptitude > /dev/null;
-fi
+echo "Completed installation of required packages        "
 
-if [ $(dpkg-query -W -f='${Status}' nano 2>/dev/null | grep -c "ok installed") -eq 0 ];
-  then
-    echo "Installing nano"
-    apt-get -y install nano > /dev/null;
-fi
-
-
+#add user to sudo group if not already
 if groups $user | grep -q -E ' sudo(\s|$)'
   then
     echo "$user already has sudo privileges"
@@ -175,6 +296,7 @@ if groups $user | grep -q -E ' sudo(\s|$)'
 fi
 
 # download rt scripts and config files
+echo "Fetching rtinst scripts"
 mkdir $home/rtscripts
 cd $home/rtscripts
 
@@ -197,6 +319,8 @@ get_scripts nginxsite
 cd $home
 
 # secure ssh
+echo "Securing SSH"
+
 portline=$(grep 'Port ' /etc/ssh/sshd_config)
 if [ "$portline" = "Port 22" ]
 then
@@ -230,43 +354,29 @@ if ! [ -z "$allowlist" ]
 fi
 echo "AllowGroups sudo sshuser" | tee -a /etc/ssh/sshd_config > /dev/null
 
-if [ -z "$(groups $user | grep sshuser)" ]; then
-  adduser $user sshuser
-fi
-
 service ssh restart
-
-# prepare system
-cd $home
-
-apt-get -y install autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config php5 php5-cli php5-dev php5-fpm php5-curl php5-geoip php5-mcrypt php5-xmlrpc pkg-config python-scgi screen subversion texinfo unrar-free unzip zlib1g-dev libcurl4-openssl-dev mediainfo
-
-if [ $RELNO = 13 ]
-  then
-    apt-get -y install php5-json
-fi
+echo "SSH secured. Port set to $sshport"
 
 # install ftp
-
+echo "Installing vsftpd"
 ftpport=$(random 41005 48995)
 
 if [ $RELNO = 12 ]
   then
-    apt-get -y install python-software-properties
-    add-apt-repository -y ppa:thefrontiergroup/vsftpd
-    apt-get update
+    add-apt-repository -y ppa:thefrontiergroup/vsftpd  >> $logfile 2>&1
+    apt-get update  >> $logfile 2>&1
 fi
 
 if [ $RELNO = 7 ]
   then
     echo "deb http://ftp.cyconet.org/debian wheezy-updates main non-free contrib" | tee -a /etc/apt/sources.list.d/wheezy-updates.cyconet2.list > /dev/null
-    aptitude update
-    aptitude -o Aptitude::Cmdline::ignore-trust-violations=true -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd
+    aptitude update  >> $logfile 2>&1
+    aptitude -o Aptitude::Cmdline::ignore-trust-violations=true -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd  >> $logfile 2>&1
   else
-    apt-get -y install vsftpd
+    install_package vsftpd
 fi
 
-
+echo "Configuring vsftpd"
 
 perl -pi -e "s/anonymous_enable=YES/anonymous_enable=NO/g" /etc/vsftpd.conf
 perl -pi -e "s/#local_enable=YES/local_enable=YES/g" /etc/vsftpd.conf
@@ -276,93 +386,119 @@ perl -pi -e "s/^rsa_private_key_file/#rsa_private_key_file/g" /etc/vsftpd.conf
 perl -pi -e "s/rsa_cert_file=\/etc\/ssl\/certs\/ssl-cert-snakeoil\.pem/rsa_cert_file=\/etc\/ssl\/private\/vsftpd\.pem/g" /etc/vsftpd.conf
 
 if [ -z "$(grep chroot_local_user /etc/vsftpd.conf | grep -v "#")" ]; then
-echo "chroot_local_user=YES" | tee -a /etc/vsftpd.conf > /dev/null
+  echo "chroot_local_user=YES" | tee -a /etc/vsftpd.conf > /dev/null
 fi
 if [ -z "$(grep allow_writeable_chroot /etc/vsftpd.conf)" ]; then
-echo "allow_writeable_chroot=YES" | tee -a /etc/vsftpd.conf > /dev/null
+  echo "allow_writeable_chroot=YES" | tee -a /etc/vsftpd.conf > /dev/null
 fi
 if [ -z "$(grep ssl_enable /etc/vsftpd.conf)" ]; then
-echo "ssl_enable=YES" | tee -a /etc/vsftpd.conf > /dev/null
+  echo "ssl_enable=YES" | tee -a /etc/vsftpd.conf > /dev/null
 fi
 if [ -z "$(grep allow_anon_ssl /etc/vsftpd.conf)" ]; then
-echo "allow_anon_ssl=NO" | tee -a /etc/vsftpd.conf > /dev/null
+  echo "allow_anon_ssl=NO" | tee -a /etc/vsftpd.conf > /dev/null
 fi
 if [ -z "$(grep force_local_data_ssl /etc/vsftpd.conf)" ]; then
-echo "force_local_data_ssl=YES" | tee -a /etc/vsftpd.conf > /dev/null
+  echo "force_local_data_ssl=YES" | tee -a /etc/vsftpd.conf > /dev/null
 fi
 if [ -z "$(grep force_local_logins_ssl /etc/vsftpd.conf)" ]; then
-echo "force_local_logins_ssl=YES" | tee -a /etc/vsftpd.conf > /dev/null
+  echo "force_local_logins_ssl=YES" | tee -a /etc/vsftpd.conf > /dev/null
 fi
 if [ -z "$(grep ssl_sslv2 /etc/vsftpd.conf)" ]; then
-echo "ssl_sslv2=YES" | tee -a /etc/vsftpd.conf > /dev/null
+  echo "ssl_sslv2=YES" | tee -a /etc/vsftpd.conf > /dev/null
 fi
 if [ -z "$(grep ssl_sslv3 /etc/vsftpd.conf)" ]; then
-echo "ssl_sslv3=YES" | tee -a /etc/vsftpd.conf > /dev/null
+  echo "ssl_sslv3=YES" | tee -a /etc/vsftpd.conf > /dev/null
 fi
 if [ -z "$(grep ssl_tlsv1 /etc/vsftpd.conf)" ]; then
-echo "ssl_tlsv1=YES" | tee -a /etc/vsftpd.conf > /dev/null
+  echo "ssl_tlsv1=YES" | tee -a /etc/vsftpd.conf > /dev/null
 fi
 if [ -z "$(grep require_ssl_reuse /etc/vsftpd.conf)" ]; then
-echo "require_ssl_reuse=NO" | tee -a /etc/vsftpd.conf > /dev/null
+  echo "require_ssl_reuse=NO" | tee -a /etc/vsftpd.conf > /dev/null
 fi
 if [ -z "$(grep listen_port /etc/vsftpd.conf)" ]; then
-echo "listen_port=$ftpport" | tee -a /etc/vsftpd.conf > /dev/null
+  echo "listen_port=$ftpport" | tee -a /etc/vsftpd.conf > /dev/null
 fi
 if [ -z "$(grep ssl_ciphers /etc/vsftpd.conf)" ]; then
-echo "ssl_ciphers=HIGH" | tee -a /etc/vsftpd.conf > /dev/null
+  echo "ssl_ciphers=HIGH" | tee -a /etc/vsftpd.conf > /dev/null
 fi
 
-openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem
+openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem >> $logfile 2>&1
 
 service vsftpd restart
 
+echo "FTP port set to $ftpport"
 
 # install rtorrent
 cd $home
 mkdir source
 cd source
-svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc
-curl http://libtorrent.rakshasa.no/downloads/libtorrent-0.13.4.tar.gz | tar xz
-curl http://libtorrent.rakshasa.no/downloads/rtorrent-0.9.4.tar.gz | tar xz
+echo "Downloading rtorrent source files"
+
+if ! (svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc  >> $logfile 2>&1); then
+  echo "Unable to download xmlrpc source files"
+  exit
+fi
+
+if ! (curl -# http://libtorrent.rakshasa.no/downloads/libtorrent-0.13.4.tar.gz | tar xz  >> $logfile 2>&1); then
+  echo "Unable to download libtorrent source files"
+  exit
+fi
+
+if ! (curl -# http://libtorrent.rakshasa.no/downloads/rtorrent-0.9.4.tar.gz | tar xz  >> $logfile 2>&1); then
+  echo "Unable to download rtorrent source files"
+  exit
+fi
 
 cd xmlrpc
-./configure --prefix=/usr --enable-libxml2-backend --disable-libwww-client --disable-wininet-client --disable-abyss-server --disable-cgi-server
-make
-make install
+echo "Installing xmlrpc"
+./configure --prefix=/usr --enable-libxml2-backend --disable-libwww-client --disable-wininet-client --disable-abyss-server --disable-cgi-server >> $logfile 2>&1
+make >> $logfile 2>&1
+make install >> $logfile 2>&1
 
 cd ../libtorrent-0.13.4
-./autogen.sh
-./configure --prefix=/usr
-make -j2
-make install
+echo "Installing libtorrent"
+./autogen.sh >> $logfile 2>&1
+./configure --prefix=/usr >> $logfile 2>&1
+make -j2 >> $logfile 2>&1
+make install >> $logfile 2>&1
 
 cd ../rtorrent-0.9.4
-./autogen.sh
-./configure --prefix=/usr --with-xmlrpc-c
-make -j2
-make install
-ldconfig
+echo "Installing rtorrent"
+./autogen.sh >> $logfile 2>&1
+./configure --prefix=/usr --with-xmlrpc-c >> $logfile 2>&1
+make -j2 >> $logfile 2>&1
+make install >> $logfile 2>&1
+ldconfig >> $logfile 2>&1
 
+echo "Configuring rtorrent"
 cd $home
 mkdir rtorrent
-cd rtorrent
-mkdir .session downloads watch
+mkdir rtorrent/.session
+mkdir rtorrent/downloads
+mkdir rtorrent/watch
 
-cd $home
 mv -f $home/rtscripts/.rtorrent.rc $home/.rtorrent.rc
 perl -pi -e "s/<user name>/$user/g" $home/.rtorrent.rc
 
 # install rutorrent
 cd $home
+echo "Installing Rutorrent"
+if ! [ -d "/var/www" ]; then
+  mkdir /var/www
+fi
 
-mkdir /var/www
 cd /var/www
 
-svn checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent
-svn checkout http://rutorrent.googlecode.com/svn/trunk/plugins
+if [ -d "/var/www/rutorrent" ]; then
+  rm -r /var/www/rutorrent
+fi
+
+svn checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent >> $logfile 2>&1
+svn checkout http://rutorrent.googlecode.com/svn/trunk/plugins >> $logfile 2>&1
 rm -r rutorrent/plugins
 mv plugins rutorrent
 
+echo "Configuring Rutorrent"
 rm rutorrent/conf/config.php
 mv $home/rtscripts/ru.config /var/www/rutorrent/conf/config.php
 mkdir -p /var/www/rutorrent/conf/users/$user/plugins
@@ -378,20 +514,13 @@ echo "?>" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 mkdir rutorrent/plugins/conf
 mv $home/rtscripts/ru.ini /var/www/rutorrent/plugins/conf/plugins.ini
 
-if [ $RELNO = 14 ]
-  then
-    apt-add-repository -y ppa:jon-severinsson/ffmpeg
-    apt-get update
-fi
-apt-get -y install ffmpeg
-
 # install nginx
 cd $home
-apt-get -y install nginx-full apache2-utils
+echo "Installing nginx"
 WEBPASS=$(genpasswd)
-htpasswd -c -b /var/www/rutorrent/.htpasswd $user $WEBPASS
+htpasswd -c -b /var/www/rutorrent/.htpasswd $user $WEBPASS >> $logfile 2>&1
 
-openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt
+openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 
 perl -pi -e "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
 perl -pi -e "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
@@ -431,22 +560,21 @@ fi
 service nginx restart && service php5-fpm restart
 
 # install autodl-irssi
-
+echo "Installing autodl-irssi"
 adlport=$(random 36001 36100)
 adlpass=$(genpasswd $(random 12 16))
 
-apt-get -y install git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libxml-libxml-perl libjson-rpc-perl libarchive-zip-perl
 mkdir -p $home/.irssi/scripts/autorun
 cd $home/.irssi/scripts
-wget --no-check-certificate -O autodl-irssi.zip http://update.autodl-community.com/autodl-irssi-community.zip
-unzip -o autodl-irssi.zip
+wget --no-check-certificate -O autodl-irssi.zip http://update.autodl-community.com/autodl-irssi-community.zip >> $logfile 2>&1
+unzip -o autodl-irssi.zip >> $logfile 2>&1
 rm autodl-irssi.zip
 cp autodl-irssi.pl autorun/
 mkdir -p $home/.autodl
 touch $home/.autodl/autodl.cfg && touch $home/.autodl/autodl2.cfg
 
 cd /var/www/rutorrent/plugins
-git clone https://github.com/autodl-community/autodl-rutorrent.git autodl-irssi
+git clone https://github.com/autodl-community/autodl-rutorrent.git autodl-irssi >> $logfile 2>&1
 
 mkdir /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi
 
@@ -467,6 +595,7 @@ echo "gui-server-password = $adlpass" | tee -a autodl2.cfg > /dev/null
 perl -pi -e "s/if \(\\$\.browser\.msie\)/if \(navigator\.appName \=\= \'Microsoft Internet Explorer\' \&\& navigator\.userAgent\.match\(\/msie 6\/i\)\)/g" /var/www/rutorrent/plugins/autodl-irssi/AutodlFilesDownloader.js
 
 # set permissions
+echo "Setting permissions, Starting services"
 chown -R www-data:www-data /var/www
 chmod -R 755 /var/www/rutorrent
 chown -R $user:$user $home
@@ -485,6 +614,7 @@ sleep 2
 sudo -u $user screen -S irssi -p 0 -X stuff "/WINDOW LOG ON $home/ir.log$(printf \\r)"
 sudo -u $user screen -S irssi -p 0 -X stuff "/autodl update$(printf \\r)"
 echo -n "updating autodl-irssi"
+sleep 3
 while ! ((tail -n1 $home/ir.log | grep -c -q "You are using the latest autodl-trackers") || (tail -n1 $home/ir.log | grep -c -q "Successfully loaded tracker files"))
 do
 sleep 1
@@ -500,11 +630,11 @@ rm $home/ir.log
 echo "autodl-irssi update complete"
 
 if [ -z "$(crontab -u $user -l | grep "$cronline1")" ]; then
-    (crontab -u $user -l; echo "$cronline1" ) | crontab -u $user -
+    (crontab -u $user -l; echo "$cronline1" ) | crontab -u $user - >> $logfile 2>&1
 fi
 
 if [ -z  "$(crontab -u $user -l | grep "\*/10 \* \* \* \* /usr/local/bin/rtcheck irssi rtorrent")" ]; then
-    (crontab -u $user -l; echo "$cronline2" ) | crontab -u $user -
+    (crontab -u $user -l; echo "$cronline2" ) | crontab -u $user - >> $logfile 2>&1
 fi
 
 sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
@@ -517,7 +647,7 @@ echo "ftp client should be set to explicit ftp over tls using port $ftpport" | t
 echo
 if [ $DLFLAG = 0 ]
   then
-    find $home -type d -print0 | xargs -0 chmod 755 
+    find $home -type d -print0 | xargs -0 chmod 755
     echo "Access https downloads at https://$SERVERIP/download/$user" | tee -a $home/rtinst.info
     echo
 fi
