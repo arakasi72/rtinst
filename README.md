@@ -17,7 +17,6 @@ It uses latest versions of all software at time of posting.
 
 After you have run the script and everything is working, I suggest a reboot.
 
-
 1.1 Log into your server
 
 Log into your server with a terminal client like Putty. Fill in the following details in Putty: 
@@ -33,6 +32,7 @@ This script has been tested on Ubuntu 12.04, 12.05, 13.10, 14.04, and Debian 7.
 It takes about 10 minutes to run.
 
 1.1 Main Script
+
 You can run the script with -d option to include implementation of https downloads 
 
 Run the script from root, or if you have a sudo user already set up you can run it from there. If for some reason it is interrupted you can run it again to completion. 
@@ -55,6 +55,8 @@ If you run it with the -d option it will enable https downloads, and provide web
 
 if you run it with -l option it will create the rtinst.log file with detailed output. 
 
+	bash rtinst.sh -l
+
 
 The script will assign a random ssh port for security purposes. It will display this on the screen when it has finished running and write it to ~/rtinst.info
 
@@ -69,6 +71,7 @@ To access that information just use the following command
 	cat ~/rtinst.info
 
 1.2 Additional scripts
+
 A number of additional scripts will be installed that carry out a variety of useful functions. These will be installed by the main script but if you want to get the latest versions you can run the following:
 
 	wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtgetscripts
@@ -76,6 +79,7 @@ A number of additional scripts will be installed that carry out a variety of use
 	rm rtgetscripts
 
 1.2.1 rtadduser
+
 This will add new users. Ensuring there are no conflicts with the existing user ports. You can use it to create brand new users, or reset the config on existing users. If you use it on an existing user, you will NOT lose any torrents, files, of autodl-filters. It will just reset the ports used.
 to run this:
 
@@ -83,6 +87,7 @@ to run this:
 and enter the information asked for.
 
 1.2.2 rtremove
+
 WARNING: This will completely remove a user wiping all their config and data, and removing them from the system.
 to run this:
 
@@ -91,7 +96,9 @@ to run this:
 and enter the user name when asked
 
 1.2.3 rtdload
+
 This script will enable or disable https download
+
 to enable:
 
 	sudo rtdload enable
@@ -101,14 +108,18 @@ to disable:
 	sudo rtdload disable
 
 The following scripts can be used by any user
+
 1.2.4 rtpass
+
 This will allow user to change their rutorrent password.
 to run this:
 
 	rtpass
 
 1.2.5 rt
+
 This script can stop, start, or restart rtorrent or irssi. Use the arguments stop start or restart, with no arguments it will tell tell you if rtorrent is running or not
+
 examples: 
 
 	rt
