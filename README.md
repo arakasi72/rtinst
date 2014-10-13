@@ -46,7 +46,7 @@ bash rtinst.sh
 or if you run it from a non-root sudo user:
 sudo bash rtinst.sh
 
-If you run it with the -d option it will enable https downloads, and provide web access to your home directory for https downloads
+If you run it with the -d option it will enable https downloads, and provide web access to your home directory for https downloads:
 bash rtinst.sh -d
 
 if you run it with -l option it will create the rtinst.log file with detailed output. 
@@ -65,15 +65,14 @@ To access that information just use the following command
 cat ~/rtinst.info
 
 1.2 Additional scripts
-A number of additional scripts will be installed that carry out a variety of useful functions. These will be installed by the main script but if you want to get the latest versions you can run the following
-Code:
+A number of additional scripts will be installed that carry out a variety of useful functions. These will be installed by the main script but if you want to get the latest versions you can run the following:
 wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtgetscripts
 sudo bash rtgetscripts
 rm rtgetscripts
+
 1.2.1 rtadduser
 This will add new users. Ensuring there are no conflicts with the existing user ports. You can use it to create brand new users, or reset the config on existing users. If you use it on an existing user, you will NOT lose any torrents, files, of autodl-filters. It will just reset the ports used.
-to run this
-Code:
+to run this:
 sudo rtadduser
 and enter the information asked for.
 
