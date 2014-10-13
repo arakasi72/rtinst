@@ -17,7 +17,6 @@ It uses latest versions of all software at time of posting.
 
 After you have run the script and everything is working, I suggest a reboot.
 
-
 1.1 Log into your server
 
 Log into your server with a terminal client like Putty. Fill in the following details in Putty: 
@@ -109,6 +108,7 @@ to disable:
 	sudo rtdload disable
 
 The following scripts can be used by any user
+
 1.2.4 rtpass
 
 This will allow user to change their rutorrent password.
