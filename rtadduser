@@ -218,7 +218,7 @@ if [ -d "/var/www/rutorrent/conf/users/$user" ]
 fi
 
 check_ssh=1
-if groups $user | grep -q -E ' sshuser(\s|$)'
+if groups $user | grep -q -E ' sshuser(\s|$)' || groups $user | grep -q -E ' sudo(\s|$)'
   then
     echo "ssh already granted"
     check_ssh=0
@@ -385,7 +385,7 @@ echo "autodl port: $adlport"
 echo "autodl pass: $adlpass"
 echo "crontab entries made, rtorrent and irssi will start on boot"
 echo
-if groups $user | grep -q -E ' sshuser(\s|$)'; then
+if groups $user | grep -q -E ' sshuser(\s|$)' || groups $user | grep -q -E ' sudo(\s|$)'
 echo "$user has SSH access on port $sshport" | tee -a $home/rtinst.info
 echo
 fi
