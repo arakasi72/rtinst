@@ -12,7 +12,7 @@ Services that will be installed and configured are
 	4. Nginx
 	5. autodl-irssi
 
-I use nginx with Apache2 as an option. It uses less system resources, and I find it easier to configure. I don't think the difference is huge, given that we will have at most a handful of users, accessing our server, but unless you really want to stick with Apache I would recommend nginx, it is what I am currently using on my live seedbox.
+I use nginx, tt uses less system resources, and I find it easier to configure than apache2. I don't think the difference is huge, given that we will have at most a handful of users, accessing our server, but unless you really want to stick with Apache I would recommend nginx, it is what I am currently using on my live seedbox.
 
 It uses latest versions of all software at time of posting.
 
