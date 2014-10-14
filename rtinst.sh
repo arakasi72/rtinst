@@ -11,6 +11,7 @@ cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 DLFLAG=1
 logfile="/dev/null"
 gotip=0
+install_rt=0
 
 #function to generate random password
 genpasswd() {
@@ -41,42 +42,39 @@ while [ $script_size = 0 ]
   do
     rm -f $script_name
     attempts=$(( $attempts + 1 ))
-    if [ $attempts = 20 ]
-      then
-        echo "There is a problem downloading the scripts. Please check your network or there may be an issue with the github website"
-        echo "If the Github website is down, you can try again later"
-        exit 1
+    if [ $attempts = 20 ]; then
+      echo "There is a problem downloading the scripts. Please check your network or there may be an issue with the github website"
+      echo "If the Github website is down, you can try again later"
+      exit 1
     fi
     wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name >> $logfile 2>&1
     script_size=$(du -b $script_name | cut -f1)
   done
 
-if ! [ -z "$script_dest" ]
-  then
-    mv -f $script_name $script_dest
-    if case $script_dest in *"${bindest}"*) true;; *) false;; esac; then
-      chmod 755 $script_dest
-    fi
+if ! [ -z "$script_dest" ]; then
+  mv -f $script_name $script_dest
+  if case $script_dest in *"${bindest}"*) true;; *) false;; esac; then
+    chmod 755 $script_dest
+  fi
 fi
 }
 
 # function to install package
 install_package() {
 local pack_name=$1
-if [ $(dpkg-query -W -f='${Status}' $pack_name 2>/dev/null | grep -c "ok installed") -eq 0 ];
-  then
-    printf '%s\r' "Installing $pack_name                   "
-    apt-get -y install $pack_name >> $logfile 2>&1
-    if [ $? = 0 ]; then
-      return 0
-    else
-      echo "error trying to install $pack_name"
-      echo "Try to install using 'sudo apt-get install $pack_name' from command line"
-      echo "Then rerun rtinst.sh script"
-      exit
-    fi
-  else
+if [ $(dpkg-query -W -f='${Status}' $pack_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+  printf '%s\r' "Installing $pack_name                   "
+  apt-get -y install $pack_name >> $logfile 2>&1
+  if [ $? = 0 ]; then
     return 0
+  else
+    echo "error trying to install $pack_name"
+    echo "Try to install using 'sudo apt-get install $pack_name' from command line"
+    echo "Then rerun rtinst.sh script"
+    exit
+  fi
+else
+  return 0
 fi
 }
 
@@ -102,21 +100,16 @@ ask_user
 }
 
 # determine system
-if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ] || [ "$FULLREL" = "Ubuntu 14.04 LTS" ]
-  then
-    RELNO=14
-elif [ "$FULLREL" = "Ubuntu 13.10" ]
-  then
-    RELNO=13
-elif [ "$FULLREL" = "Ubuntu 12.04.4 LTS" ]
-  then
-    RELNO=12
-elif [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]
-  then
-    RELNO=12
-elif [ "$FULLREL" = "Debian GNU/Linux 7" ]
-  then
-    RELNO=7
+if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ] || [ "$FULLREL" = "Ubuntu 14.04 LTS" ]; then
+  RELNO=14
+elif [ "$FULLREL" = "Ubuntu 13.10" ]; then
+  RELNO=13
+elif [ "$FULLREL" = "Ubuntu 12.04.4 LTS" ]; then
+  RELNO=12
+elif [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]; then
+  RELNO=12
+elif [ "$FULLREL" = "Debian GNU/Linux 7" ]; then
+  RELNO=7
 else
   echo "Unable to determine OS or OS unsupported"
   exit
@@ -135,10 +128,9 @@ while getopts ":dl" optname
 shift $(( $OPTIND - 1 ))
 
 # Check if there is more than 0 argument
-if [ $# -gt 0 ]
-  then
-    echo "No arguments allowed $1 is not a valid argument"
-    exit 1
+if [ $# -gt 0 ]; then
+  echo "No arguments allowed $1 is not a valid argument"
+  exit 1
 fi
 
 # check IP Address
@@ -164,6 +156,19 @@ until $gotip
 
 echo "Your server's IP/Name is set to $SERVERIP"
 
+#check rtorrent installation
+if which rtorrent; then
+  echo "It appears that rtorrent has been installed."
+  echo -n "Do you wish to skip rtorrent compilation? "
+  if ask_user; then
+    install_rt=1
+    echo "rtorrent installation will be skipped."
+  else
+    skip_rt=0
+    echo "rtorrent will be re-installed"
+  fi
+fi
+
 # set and prepare user
 if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "root"; }
   then
@@ -185,17 +190,14 @@ if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "r
 
     user=$addname
 
-    if id -u $user >/dev/null 2>&1
-      then
-        echo "$user already exists"
-      else
-        echo "adding $user"
-          adduser --gecos "" $user
+    if id -u $user >/dev/null 2>&1; then
+      echo "$user already exists"
+    else
+      adduser --gecos "" $user
     fi
 
-elif ! [ -z "$SUDO_USER" ]
-  then
-    user=$SUDO_USER
+elif ! [ -z "$SUDO_USER" ]; then
+  user=$SUDO_USER
 else
   echo "Script must be run using sudo or root"
   exit 1
@@ -204,19 +206,29 @@ fi
 home="/home/$user"
 
 #update amd upgrade system
-if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]
-  then
-        wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list >> $logfile 2>&1
-        cp /etc/apt/sources.list /etc/apt/sources.list.bak
-        mv sources.list /etc/apt/sources.list
+if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]; then
+  if wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list >> $logfile 2>&1; then
+    cp /etc/apt/sources.list /etc/apt/sources.list.bak
+    mv sources.list /etc/apt/sources.list
+  else
+    echo "Unable to get sources file. This is most likely a network issue. 'bash rtinst.sh -l' to generate log and get more info."
+    exit 1
+  fi
 fi
 
 echo "Updating package lists"
 apt-get update > $logfile 2>&1
+if ! [ $? = 0 ]; then
+  echo "Problem updating packages. This is most likely a network issue. 'bash rtinst.sh -l' to generate log and get more info."
+  exit 1
+fi
 echo "Upgrading packages"
 apt-get -y upgrade >> $logfile 2>&1
-apt-get clean >> $logfile 2>&1
-apt-get autoclean >> $logfile 2>&1
+if ! [ $? = 0 ]; then
+  echo "Problem updating packages. This is most likely a network issue. 'bash rtinst.sh -l' to generate log and get more info."
+  exit 1
+fi
+apt-get clean && apt-get autoclean >> $logfile 2>&1
 
 #install the packsges needed
 echo "Installing required packages"
@@ -278,21 +290,19 @@ install_package libxml-libxslt-perl
 install_package libjson-rpc-perl
 install_package libarchive-zip-perl
 
-if [ $RELNO = 14 ]
-  then
-    apt-add-repository -y ppa:jon-severinsson/ffmpeg >> $logfile 2>&1
-    apt-get update >> $logfile 2>&1
+if [ $RELNO = 14 ]; then
+  apt-add-repository -y ppa:jon-severinsson/ffmpeg >> $logfile 2>&1
+  apt-get update >> $logfile 2>&1
 fi
 install_package ffmpeg
 
 echo "Completed installation of required packages        "
 
 #add user to sudo group if not already
-if groups $user | grep -q -E ' sudo(\s|$)'
-  then
-    echo "$user already has sudo privileges"
-  else
-    adduser $user sudo
+if groups $user | grep -q -E ' sudo(\s|$)'; then
+  echo "$user already has sudo privileges"
+else
+  adduser $user sudo
 fi
 
 # download rt scripts and config files
@@ -322,10 +332,9 @@ cd $home
 echo "Securing SSH"
 
 portline=$(grep 'Port ' /etc/ssh/sshd_config)
-if [ "$portline" = "Port 22" ]
-then
-sshport=$(random 21000 29000)
-perl -pi -e "s/Port 22/Port $sshport/g" /etc/ssh/sshd_config
+if [ "$portline" = "Port 22" ]; then
+  sshport=$(random 21000 29000)
+  perl -pi -e "s/Port 22/Port $sshport/g" /etc/ssh/sshd_config
 fi
 
 perl -pi -e "s/X11Forwarding yes/X11Forwarding no/g" /etc/ssh/sshd_config
@@ -333,47 +342,47 @@ perl -pi -e "s/PermitRootLogin without-password/PermitRootLogin no/g" /etc/ssh/s
 perl -pi -e "s/PermitRootLogin yes/PermitRootLogin no/g" /etc/ssh/sshd_config
 
 usedns=$(grep UseDNS /etc/ssh/sshd_config)
-if [ -z "$usedns" ]
-  then
-    echo "UseDNS no" | tee -a /etc/ssh/sshd_config > /dev/null
-  else
-   perl -pi -e "s/$usedns/UseDNS no/g" /etc/ssh/sshd_config
+if [ -z "$usedns" ]; then
+  echo "UseDNS no" | tee -a /etc/ssh/sshd_config > /dev/null
+else
+ perl -pi -e "s/$usedns/UseDNS no/g" /etc/ssh/sshd_config
 fi
 
+if [ -z "$(grep sshuser /etc/group)" ]; then
 groupadd sshuser
+fi
+
 allowlist=$(grep AllowUsers /etc/ssh/sshd_config)
-if ! [ -z "$allowlist" ]
-  then
-    for ssh_user in $allowlist
-      do
-        if ! [ "$ssh_user" = "AllowUsers" ]; then
-          adduser $ssh_user sshuser
-        fi
-      done
-    perl -pi -e "s/$allowlist//g" /etc/ssh/sshd_config
+if ! [ -z "$allowlist" ]; then
+  for ssh_user in $allowlist
+    do
+      if ! [ "$ssh_user" = "AllowUsers" ]; then
+        adduser $ssh_user sshuser
+      fi
+    done
+  perl -pi -e "s/$allowlist//g" /etc/ssh/sshd_config
 fi
 echo "AllowGroups sudo sshuser" | tee -a /etc/ssh/sshd_config > /dev/null
 
 service ssh restart
+sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
 echo "SSH secured. Port set to $sshport"
 
 # install ftp
 echo "Installing vsftpd"
 ftpport=$(random 41005 48995)
 
-if [ $RELNO = 12 ]
-  then
-    add-apt-repository -y ppa:thefrontiergroup/vsftpd  >> $logfile 2>&1
-    apt-get update  >> $logfile 2>&1
+if [ $RELNO = 12 ]; then
+  add-apt-repository -y ppa:thefrontiergroup/vsftpd  >> $logfile 2>&1
+  apt-get update  >> $logfile 2>&1
 fi
 
-if [ $RELNO = 7 ]
-  then
-    echo "deb http://ftp.cyconet.org/debian wheezy-updates main non-free contrib" | tee -a /etc/apt/sources.list.d/wheezy-updates.cyconet2.list > /dev/null
-    aptitude update  >> $logfile 2>&1
-    aptitude -o Aptitude::Cmdline::ignore-trust-violations=true -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd  >> $logfile 2>&1
-  else
-    install_package vsftpd
+if [ $RELNO = 7 ]; then
+  echo "deb http://ftp.cyconet.org/debian wheezy-updates main non-free contrib" | tee -a /etc/apt/sources.list.d/wheezy-updates.cyconet2.list > /dev/null
+  aptitude update  >> $logfile 2>&1
+  aptitude -o Aptitude::Cmdline::ignore-trust-violations=true -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd  >> $logfile 2>&1
+else
+  install_package vsftpd
 fi
 
 echo "Configuring vsftpd"
@@ -426,67 +435,70 @@ openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout
 
 service vsftpd restart
 
+ftpport=$(grep 'listen_port=' /etc/vsftpd.conf | sed 's/[^0-9]*//g')
 echo "FTP port set to $ftpport"
 
 # install rtorrent
-cd $home
-mkdir source
-cd source
-echo "Downloading rtorrent source files"
+if [ $install_rt = 0 ]; then
+  cd $home
+  mkdir -p source
+  cd source
+  echo "Downloading rtorrent source files"
 
-if ! (svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc  >> $logfile 2>&1); then
-  echo "Unable to download xmlrpc source files"
-  exit
+  if ! (svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc  >> $logfile 2>&1); then
+    echo "Unable to download xmlrpc source files"
+    exit
+  fi
+
+  if ! (curl -# http://libtorrent.rakshasa.no/downloads/libtorrent-0.13.4.tar.gz | tar xz  >> $logfile 2>&1); then
+    echo "Unable to download libtorrent source files"
+    exit
+  fi
+
+  if ! (curl -# http://libtorrent.rakshasa.no/downloads/rtorrent-0.9.4.tar.gz | tar xz  >> $logfile 2>&1); then
+    echo "Unable to download rtorrent source files"
+    exit
+  fi
+
+  cd xmlrpc
+  echo "Installing xmlrpc"
+  ./configure --prefix=/usr --enable-libxml2-backend --disable-libwww-client --disable-wininet-client --disable-abyss-server --disable-cgi-server >> $logfile 2>&1
+  make >> $logfile 2>&1
+  make install >> $logfile 2>&1
+
+  cd ../libtorrent-0.13.4
+  echo "Installing libtorrent"
+  ./autogen.sh >> $logfile 2>&1
+  ./configure --prefix=/usr >> $logfile 2>&1
+  make -j2 >> $logfile 2>&1
+  make install >> $logfile 2>&1
+
+  cd ../rtorrent-0.9.4
+  echo "Installing rtorrent"
+  ./autogen.sh >> $logfile 2>&1
+  ./configure --prefix=/usr --with-xmlrpc-c >> $logfile 2>&1
+  make -j2 >> $logfile 2>&1
+  make install >> $logfile 2>&1
+  ldconfig >> $logfile 2>&1
+else
+ echo "skiping rtorrent installation"
 fi
-
-if ! (curl -# http://libtorrent.rakshasa.no/downloads/libtorrent-0.13.4.tar.gz | tar xz  >> $logfile 2>&1); then
-  echo "Unable to download libtorrent source files"
-  exit
-fi
-
-if ! (curl -# http://libtorrent.rakshasa.no/downloads/rtorrent-0.9.4.tar.gz | tar xz  >> $logfile 2>&1); then
-  echo "Unable to download rtorrent source files"
-  exit
-fi
-
-cd xmlrpc
-echo "Installing xmlrpc"
-./configure --prefix=/usr --enable-libxml2-backend --disable-libwww-client --disable-wininet-client --disable-abyss-server --disable-cgi-server >> $logfile 2>&1
-make >> $logfile 2>&1
-make install >> $logfile 2>&1
-
-cd ../libtorrent-0.13.4
-echo "Installing libtorrent"
-./autogen.sh >> $logfile 2>&1
-./configure --prefix=/usr >> $logfile 2>&1
-make -j2 >> $logfile 2>&1
-make install >> $logfile 2>&1
-
-cd ../rtorrent-0.9.4
-echo "Installing rtorrent"
-./autogen.sh >> $logfile 2>&1
-./configure --prefix=/usr --with-xmlrpc-c >> $logfile 2>&1
-make -j2 >> $logfile 2>&1
-make install >> $logfile 2>&1
-ldconfig >> $logfile 2>&1
 
 echo "Configuring rtorrent"
 cd $home
-mkdir rtorrent
-mkdir rtorrent/.session
-mkdir rtorrent/downloads
-mkdir rtorrent/watch
+
+mkdir -p rtorrent/.session
+mkdir -p rtorrent/downloads
+mkdir -p rtorrent/watch
+
 
 mv -f $home/rtscripts/.rtorrent.rc $home/.rtorrent.rc
 perl -pi -e "s/<user name>/$user/g" $home/.rtorrent.rc
 
 # install rutorrent
-cd $home
 echo "Installing Rutorrent"
-if ! [ -d "/var/www" ]; then
-  mkdir /var/www
-fi
 
+mkdir -p /var/www
 cd /var/www
 
 if [ -d "/var/www/rutorrent" ]; then
@@ -530,14 +542,12 @@ perl -pi -e "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /et
 perl -pi -e "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
 
 
-if [ $RELNO = 14 ] || [ $RELNO = 13 ]
-  then
-    cp /usr/share/nginx/html/* /var/www
+if [ $RELNO = 14 ] || [ $RELNO = 13 ]; then
+  cp /usr/share/nginx/html/* /var/www
 fi
 
-if [ $RELNO = 12 ] || [ $RELNO = 7 ]
-  then
-    cp /usr/share/nginx/www/* /var/www
+if [ $RELNO = 12 ] || [ $RELNO = 7 ]; then
+  cp /usr/share/nginx/www/* /var/www
 fi
 
 mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
@@ -545,16 +555,14 @@ mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
 mv $home/rtscripts/nginxsite /etc/nginx/sites-available/default
 mv $home/rtscripts/nginxsitedl /etc/nginx/conf.d/rtdload
 
-if [ $DLFLAG = 0 ]
-  then
-    perl -pi -e "s/#include \/etc\/nginx\/conf\.d\/rtdload;/include \/etc\/nginx\/conf\.d\/rtdload;/g" /etc/nginx/sites-available/default
+if [ $DLFLAG = 0 ]; then
+  perl -pi -e "s/#include \/etc\/nginx\/conf\.d\/rtdload;/include \/etc\/nginx\/conf\.d\/rtdload;/g" /etc/nginx/sites-available/default
 fi
 
 perl -pi -e "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
 
-if [ $RELNO = 12 ]
-  then
-    perl -pi -e "s/fastcgi_pass unix\:\/var\/run\/php5-fpm\.sock/fastcgi_pass 127\.0\.0\.1\:9000/g" /etc/nginx/sites-available/default
+if [ $RELNO = 12 ]; then
+  perl -pi -e "s/fastcgi_pass unix\:\/var\/run\/php5-fpm\.sock/fastcgi_pass 127\.0\.0\.1\:9000/g" /etc/nginx/sites-available/default
 fi
 
 service nginx restart && service php5-fpm restart
@@ -637,29 +645,22 @@ if [ -z  "$(crontab -u $user -l | grep "\*/10 \* \* \* \* /usr/local/bin/rtcheck
     (crontab -u $user -l; echo "$cronline2" ) | crontab -u $user - >> $logfile 2>&1
 fi
 
-sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
-ftpport=$(grep 'listen_port=' /etc/vsftpd.conf | sed 's/[^0-9]*//g')
-
 echo
 echo "crontab entries made. rtorrent and irssi will start on boot for $user"
 echo
 echo "ftp client should be set to explicit ftp over tls using port $ftpport" | tee -a $home/rtinst.info
 echo
-if [ $DLFLAG = 0 ]
-  then
-    find $home -type d -print0 | xargs -0 chmod 755
-    echo "Access https downloads at https://$SERVERIP/download/$user" | tee -a $home/rtinst.info
-    echo
+if [ $DLFLAG = 0 ]; then
+  find $home -type d -print0 | xargs -0 chmod 755
+  echo "Access https downloads at https://$SERVERIP/download/$user" | tee -a $home/rtinst.info
+  echo
 fi
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | tee -a $home/rtinst.info
 echo "rutorrent password set to $WEBPASS" | tee -a $home/rtinst.info
 echo "to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
 echo
-if ! [ -z "$sshport" ]
-  then
-    echo "IMPORTANT: SSH Port set to $sshport - Ensure you can login before closing this session"
-	echo "ssh port changed to $sshport" | tee -a $home/rtinst.info > /dev/null
-fi
+echo "IMPORTANT: SSH Port set to $sshport - Ensure you can login before closing this session"
+echo "ssh port changed to $sshport" | tee -a $home/rtinst.info > /dev/null
 echo
 echo "The above information is stored in rtinst.info in your home directory."
 echo "To see contents enter: cat $home/rtinst.info"
