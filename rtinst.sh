@@ -170,31 +170,30 @@ if which rtorrent; then
 fi
 
 # set and prepare user
-if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "root"; }
-  then
-    echo "Enter the name of the user to install to"
-    echo "This will be your primary user"
-    echo "It can be an existing user or a new user"
-    echo
+if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "root"; }; then
+  echo "Enter the name of the user to install to"
+  echo "This will be your primary user"
+  echo "It can be an existing user or a new user"
+  echo
 
-    confirm_name=1
-    while [ $confirm_name = 1 ]
-      do
-        read -p "Enter user name: " answer
-        addname=$answer
-        echo -n "Confirm that user name is $answer y/n? "
-        if ask_user; then
-          confirm_name=0
-        fi
-      done
+  confirm_name=1
+  while [ $confirm_name = 1 ]
+    do
+      read -p "Enter user name: " answer
+      addname=$answer
+      echo -n "Confirm that user name is $answer y/n? "
+      if ask_user; then
+        confirm_name=0
+      fi
+    done
 
-    user=$addname
+  user=$addname
 
-    if id -u $user >/dev/null 2>&1; then
-      echo "$user already exists"
-    else
-      adduser --gecos "" $user
-    fi
+  if id -u $user >/dev/null 2>&1; then
+    echo "$user already exists"
+  else
+    adduser --gecos "" $user
+  fi
 
 elif ! [ -z "$SUDO_USER" ]; then
   user=$SUDO_USER
