@@ -76,15 +76,7 @@ install_package() {
 local pack_name=$1
 if [ $(dpkg-query -W -f='${Status}' $pack_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
   printf '%s\r' "Installing $pack_name                   "
-  apt-get -y install $pack_name >> $logfile 2>&1
-  if [ $? = 0 ]; then
-    return 0
-  else
-    error_exit "error trying to install $pack_name"
-    exit
-  fi
-else
-  return 0
+  apt-get -y install $pack_name >> $logfile 2>&1 || error_exit "error trying to install $pack_name"
 fi
 }
 
@@ -229,12 +221,13 @@ apt-get update >> $logfile 2>&1
 if ! [ $? = 0 ]; then
   error_exit "Problem updating packages."
 fi
+
 echo "Upgrading packages" | tee -a $logfile
 apt-get -y upgrade >> $logfile 2>&1
 if ! [ $? = 0 ]; then
   error_exit "Problem upgrading packages."
-  exit 1
 fi
+
 apt-get clean && apt-get autoclean >> $logfile 2>&1
 
 #install the packsges needed
