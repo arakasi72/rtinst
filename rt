@@ -7,7 +7,7 @@ SERVICEB='irssi'
 RTPID=$(pgrep -fx -u $LOGNAME $SERVICE)
 # Sets default status can be askkill, autokill, or donotkill
 KILLSTATUS='askkill'
-KILLSIGNAL='-15'
+KILLSIGNAL='2'
 RTLOG="/dev/null"
 loglines=500
 useerr=0
