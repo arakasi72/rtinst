@@ -652,7 +652,7 @@ fi
 echo
 echo "crontab entries made. rtorrent and irssi will start on boot for $user"
 echo
-echo "ftp client should be set to explicit ftp over tls using port $ftpport" | tee -a $home/rtinst.info
+echo "ftp client should be set to explicit ftp over tls using port $ftpport" | tee $home/rtinst.info
 echo
 if [ $DLFLAG = 0 ]; then
   find $home -type d -print0 | xargs -0 chmod 755
