@@ -529,7 +529,7 @@ cd $home
 if [ -f "/etc/apache2/ports.conf" ]; then
   echo "Detected apache2. Changing apache2 port to 81 in /etc/apache2/ports.conf" | tee -a $logfile
   perl -pi -e "s/Listen 80/Listen 81/g" /etc/apache2/ports.conf
-  service apache2 restart >> $logfile 2>&1
+  service apache2 stop >> $logfile 2>&1
 fi
 
 echo "Installing nginx" | tee -a $logfile
