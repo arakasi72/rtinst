@@ -275,6 +275,7 @@ install_package zlib1g-dev
 install_package libcurl4-openssl-dev
 install_package mediainfo
 install_package python-software-properties
+install_package software-properties-common
 install_package aptitude
 install_package php5-json
 install_package nginx-full
