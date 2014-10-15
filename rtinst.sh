@@ -373,8 +373,8 @@ echo "Installing vsftpd" | tee -a $logfile
 ftpport=$(random 41005 48995)
 
 if [ $RELNO = 12 ]; then
-  add-apt-repository -y ppa:thefrontiergroup/vsftpd  >> $logfile 2>&1
-  apt-get update  >> $logfile 2>&1
+  add-apt-repository -y ppa:thefrontiergroup/vsftpd >> $logfile 2>&1
+  apt-get update >> $logfile 2>&1
 fi
 
 if [ $RELNO = 7 ]; then
@@ -525,6 +525,13 @@ mv $home/rtscripts/ru.ini /var/www/rutorrent/plugins/conf/plugins.ini
 
 # install nginx
 cd $home
+
+if [ -f "/etc/apache2/ports.conf" ]; then
+  echo "Detected apache2. Changing apache2 port to 81 in /etc/apache2/ports.conf" | tee -a $logfile
+  perl -pi -e "s/Listen 80/Listen 81/g" /etc/apache2/ports.conf
+  service apache2 restart >> $logfile 2>&1
+fi
+
 echo "Installing nginx" | tee -a $logfile
 WEBPASS=$(genpasswd)
 htpasswd -c -b /var/www/rutorrent/.htpasswd $user $WEBPASS >> $logfile 2>&1
