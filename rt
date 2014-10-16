@@ -46,8 +46,8 @@ if [ -t 1 ]
       esac
     done
   else
-    echo "Running in background -a auto response is n" >> $RTLOG
-    return 1
+    echo "Running in background -a auto response is y" >> $RTLOG
+    return 0
 fi
 }
 
