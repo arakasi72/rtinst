@@ -1,0 +1,3 @@
+location ~* \.(jpg|jpeg|gif|css|png|js|woff|ttf|svg|eot)$ {
+        expires 30d;
+}
