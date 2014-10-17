@@ -515,10 +515,8 @@ if [ $rudevflag = 1 ]; then
   mv plugins rutorrent
 else
   echo "Installing Rutorrent Development" | tee -a $logfile
-  wget https://github.com/Novik/ruTorrent/tarball/master/Novik-ruTorrent-2d63719.tar.gz >> $logfile 2>&1
-  tar xzf Novik-ruTorrent-2d63719.tar.gz >> $logfile 2>&1
-  mv Novik-ruTorrent-2d63719 rutorrent
-  rm Novik-ruTorrent-2d63719.tar.gz
+  git clone https://github.com/Novik/ruTorrent.git
+  mv ruTorrent rutorrent
 fi
   
 echo "Configuring Rutorrent" | tee -a $logfile
