@@ -509,7 +509,7 @@ if [ $rudevflag = 1 ]; then
   rm -r rutorrent/plugins
   mv plugins rutorrent
 else
-  echo "Installing Rutorrent Development" | tee -a $logfile
+  echo "Installing Rutorrent (development)" | tee -a $logfile
   git clone https://github.com/Novik/ruTorrent.git
   mv ruTorrent rutorrent
 fi
