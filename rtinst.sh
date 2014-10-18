@@ -13,6 +13,7 @@ logfile="/dev/null"
 gotip=0
 install_rt=0
 sshport=''
+rudevflag=1
 
 #exit on error function
 error_exit() {
@@ -59,7 +60,7 @@ while [ $script_size = 0 ]
     if [ $attempts = 20 ]; then
       error_exit "Problem downloading scripts from github - https://github.com/"
     fi
-    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name >> $logfile 2>&1
+    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/$script_name >> $logfile 2>&1
     script_size=$(du -b $script_name | cut -f1)
   done
 
@@ -118,11 +119,12 @@ else
 fi
 
 # get options
-while getopts ":dl" optname
+while getopts ":dlr" optname
   do
     case $optname in
       "d" ) DLFLAG=0 ;;
       "l" ) logfile="$HOME/rtinst.log" ;;
+      "r" ) rudevflag=0 ;;
         * ) echo "incorrect option, only -d and -l allowed" && exit 1 ;;
     esac
   done
@@ -208,12 +210,9 @@ home="/home/$user"
 
 #update amd upgrade system
 if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]; then
-  if wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list >> $logfile 2>&1; then
-    cp /etc/apt/sources.list /etc/apt/sources.list.bak
-    mv sources.list /etc/apt/sources.list
-  else
-    error_exit "Unable to download sources file from https://help.ubuntu.com/12.04/sample/sources.list"
-  fi
+  wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list >> $logfile 2>&1 || error_exit "Unable to download sources file from https://help.ubuntu.com/12.04/sample/sources.list"
+  cp /etc/apt/sources.list /etc/apt/sources.list.bak
+  mv sources.list /etc/apt/sources.list
 fi
 
 echo "Updating package lists" | tee $logfile
@@ -494,7 +493,7 @@ mv -f $home/rtscripts/.rtorrent.rc $home/.rtorrent.rc
 perl -pi -e "s/<user name>/$user/g" $home/.rtorrent.rc
 
 # install rutorrent
-echo "Installing Rutorrent" | tee -a $logfile
+
 
 mkdir -p /var/www
 cd /var/www
@@ -503,11 +502,18 @@ if [ -d "/var/www/rutorrent" ]; then
   rm -r /var/www/rutorrent
 fi
 
-svn checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent >> $logfile 2>&1 || error_exit "Unable to download rutorrent files from http://rutorrent.googlecode.com/svn/trunk/rutorrent"
-svn checkout http://rutorrent.googlecode.com/svn/trunk/plugins >> $logfile 2>&1 || error_exit "Unable to download rutorrent plugin files from http://rutorrent.googlecode.com/svn/trunk/plugins"
-rm -r rutorrent/plugins
-mv plugins rutorrent
-
+if [ $rudevflag = 1 ]; then
+  echo "Installing Rutorrent (stable)" | tee -a $logfile
+  svn checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent >> $logfile 2>&1 || error_exit "Unable to download rutorrent files from http://rutorrent.googlecode.com/svn/trunk/rutorrent"
+  svn checkout http://rutorrent.googlecode.com/svn/trunk/plugins >> $logfile 2>&1 || error_exit "Unable to download rutorrent plugin files from http://rutorrent.googlecode.com/svn/trunk/plugins"
+  rm -r rutorrent/plugins
+  mv plugins rutorrent
+else
+  echo "Installing Rutorrent (development)" | tee -a $logfile
+  git clone https://github.com/Novik/ruTorrent.git
+  mv ruTorrent rutorrent
+fi
+  
 echo "Configuring Rutorrent" | tee -a $logfile
 rm rutorrent/conf/config.php
 mv $home/rtscripts/ru.config /var/www/rutorrent/conf/config.php
@@ -560,15 +566,30 @@ mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
 mv $home/rtscripts/nginxsite /etc/nginx/sites-available/default
 mv $home/rtscripts/nginxsitedl /etc/nginx/conf.d/rtdload
 
+echo "location ~ \.php$ {" | tee /etc/nginx/conf.d/php > /dev/null
+echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" | tee -a /etc/nginx/conf.d/php > /dev/null
+if [ $RELNO = 12 ]; then
+  echo "          fastcgi_pass 127.0.0.1:9000;" | tee -a /etc/nginx/conf.d/php > /dev/null
+else
+  echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" | tee -a /etc/nginx/conf.d/php > /dev/null
+fi
+echo "          fastcgi_index index.php;" | tee -a /etc/nginx/conf.d/php > /dev/null
+echo "          include fastcgi_params;" | tee -a /etc/nginx/conf.d/php > /dev/null
+echo "}" | tee -a /etc/nginx/conf.d/php > /dev/null
+
+echo "location ~* \.(jpg|jpeg|gif|css|png|js|woff|ttf|svg|eot)$ {" | tee /etc/nginx/conf.d/cache > /dev/null
+echo "        expires 30d;" | tee -a /etc/nginx/conf.d/cache > /dev/null
+echo "}" | tee -a /etc/nginx/conf.d/cache > /dev/null
+
 if [ $DLFLAG = 0 ]; then
   perl -pi -e "s/#include \/etc\/nginx\/conf\.d\/rtdload;/include \/etc\/nginx\/conf\.d\/rtdload;/g" /etc/nginx/sites-available/default
 fi
 
 perl -pi -e "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
 
-if [ $RELNO = 12 ]; then
-  perl -pi -e "s/fastcgi_pass unix\:\/var\/run\/php5-fpm\.sock/fastcgi_pass 127\.0\.0\.1\:9000/g" /etc/nginx/sites-available/default
-fi
+#if [ $RELNO = 12 ]; then
+#  perl -pi -e "s/fastcgi_pass unix\:\/var\/run\/php5-fpm\.sock/fastcgi_pass 127\.0\.0\.1\:9000/g" /etc/nginx/conf.d/php
+#fi
 
 service nginx restart && service php5-fpm restart
 

@@ -22,12 +22,8 @@ server {
         location ^~ /rutorrent {
                auth_basic "Restricted";
                auth_basic_user_file /var/www/rutorrent/.htpasswd;
-               location ~ \.php$ {
-                        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-                        fastcgi_pass unix:/var/run/php5-fpm.sock;
-                        fastcgi_index index.php;
-                        include fastcgi_params;
-                }
+               include /etc/nginx/conf.d/php;
+               include /etc/nginx/conf.d/cache;
         }
 
         #include /etc/nginx/conf.d/rtdload;
