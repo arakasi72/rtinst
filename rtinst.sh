@@ -210,12 +210,9 @@ home="/home/$user"
 
 #update amd upgrade system
 if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]; then
-  if wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list >> $logfile 2>&1; then
-    cp /etc/apt/sources.list /etc/apt/sources.list.bak
-    mv sources.list /etc/apt/sources.list
-  else
-    error_exit "Unable to download sources file from https://help.ubuntu.com/12.04/sample/sources.list"
-  fi
+  wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list >> $logfile 2>&1 || error_exit "Unable to download sources file from https://help.ubuntu.com/12.04/sample/sources.list"
+  cp /etc/apt/sources.list /etc/apt/sources.list.bak
+  mv sources.list /etc/apt/sources.list
 fi
 
 echo "Updating package lists" | tee $logfile
@@ -328,8 +325,6 @@ get_scripts ru.config
 get_scripts ru.ini
 get_scripts nginxsitedl
 get_scripts nginxsite
-get_scripts nginxcache
-get_scripts nginxphp
 
 cd $home
 
@@ -570,8 +565,21 @@ mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
 
 mv $home/rtscripts/nginxsite /etc/nginx/sites-available/default
 mv $home/rtscripts/nginxsitedl /etc/nginx/conf.d/rtdload
-mv $home/rtscripts/nginxphp /etc/nginx/conf.d/php
-mv $home/rtscripts/nginxcache /etc/nginx/conf.d/cache
+
+echo "location ~ \.php$ {" | tee /etc/nginx/conf.d/php > /dev/null
+echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" | tee -a /etc/nginx/conf.d/php > /dev/null
+if [ $RELNO = 12 ]; then
+  echo "          fastcgi_pass 127.0.0.1:9000;" | tee -a /etc/nginx/conf.d/php > /dev/null
+else
+  echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" | tee -a /etc/nginx/conf.d/php > /dev/null
+fi
+echo "          fastcgi_index index.php;" | tee -a /etc/nginx/conf.d/php > /dev/null
+echo "          include fastcgi_params;" | tee -a /etc/nginx/conf.d/php > /dev/null
+echo "}" | tee -a /etc/nginx/conf.d/php > /dev/null
+
+echo "location ~* \.(jpg|jpeg|gif|css|png|js|woff|ttf|svg|eot)$ {" | tee /etc/nginx/conf.d/cache > /dev/null
+echo "        expires 30d;" | tee -a /etc/nginx/conf.d/cache > /dev/null
+echo "}" | tee -a /etc/nginx/conf.d/cache > /dev/null
 
 if [ $DLFLAG = 0 ]; then
   perl -pi -e "s/#include \/etc\/nginx\/conf\.d\/rtdload;/include \/etc\/nginx\/conf\.d\/rtdload;/g" /etc/nginx/sites-available/default
@@ -579,9 +587,9 @@ fi
 
 perl -pi -e "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
 
-if [ $RELNO = 12 ]; then
-  perl -pi -e "s/fastcgi_pass unix\:\/var\/run\/php5-fpm\.sock/fastcgi_pass 127\.0\.0\.1\:9000/g" /etc/nginx/conf.d/php
-fi
+#if [ $RELNO = 12 ]; then
+#  perl -pi -e "s/fastcgi_pass unix\:\/var\/run\/php5-fpm\.sock/fastcgi_pass 127\.0\.0\.1\:9000/g" /etc/nginx/conf.d/php
+#fi
 
 service nginx restart && service php5-fpm restart
 
