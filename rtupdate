@@ -1,6 +1,5 @@
 #!/bin/bash
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
-chkans=0
 SERVERIP=$(ip a s eth0 | awk '/inet / {print$2}' | cut -d/ -f1)
 RTFILE=/usr/local/bin/rt
 home="/home/$SUDO_USER"
@@ -56,17 +55,22 @@ confirm_answer() {
 while true
       do
       read -p "Sure you wish to install $libvers/$rtvers? " answer
-      case $answer in [Yy]* ) chkans=1 && return 0 ;;
-                      [Nn]* ) return 0 ;;
+      case $answer in [Yy]* ) return 0 ;;
+                      [Nn]* ) exit ;;
                           * ) echo "Enter y or n";;
       esac
     done
 
 }
 
+if [ -z "$SUDO_USER" -o "$SUDO_USER" = "root" ]; then
+  echo "Must be run using sudo"
+  exit
+fi
+
 if ( installed rtorrent )
   then
-    sudo echo "rtorrent detected"
+    echo "rtorrent detected"
     echo
   else
     echo "rtorrent NOT installed"
@@ -74,47 +78,50 @@ if ( installed rtorrent )
     exit 1
 fi
 
-while [ $chkans = 0 ]
-do
+
 ask_version
 confirm_answer
-done
+
 echo
 echo "Installing $libvers/$rtvers"
 
 if ! [ -x $RTFILE ]
 then
-sudo wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rt -O /usr/local/bin/rt && sudo chmod 755 /usr/local/bin/rt
+get_scripts rt /usr/local/bin/rt
 fi
 
 
-crontab -l | perl -nle 's/^([^#@])/# $1/;print' | crontab
-rt stop
-cd source
-#svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc
-curl http://libtorrent.rakshasa.no/downloads/$libvers.tar.gz | tar xz
-curl http://libtorrent.rakshasa.no/downloads/$rtvers.tar.gz | tar xz
+(crontab -u $SUDO_USER -l) | perl -nle 's/^([^#@])/# $1/;print' | crontab -u $SUDO_USER -
+sudo -u $SUDO_USER rt stop
+cd $home
+if [ -d source ]; then
+  cd source
+else
+  mkdir source && cd source
+fi
+rm -r libtorrent* rtorrent*
 
-#cd xmlrpc
-#./configure --prefix=/usr --enable-libxml2-backend --disable-libwww-client --disable-wininet-client --disable-abyss-server --disable-cgi-server
-#make
-#sudo make install
+echo "Fetching source files"
+curl -# http://libtorrent.rakshasa.no/downloads/$libvers.tar.gz | tar xz
+curl -# http://libtorrent.rakshasa.no/downloads/$rtvers.tar.gz | tar xz
 
-cd ~/source/$libvers
-./autogen.sh
-./configure --prefix=/usr
-make -j2
-sudo make install
+echo "Compiling libtorrent"
+cd $home/source/$libvers
+./autogen.sh >> /dev/null 2>&1
+./configure --prefix=/usr >> /dev/null 2>&1
+make -j2 >> /dev/null 2>&1
+make install >> /dev/null 2>&1
 
-cd ~/source/$rtvers
-./autogen.sh
-./configure --prefix=/usr --with-xmlrpc-c
-make -j2
-sudo make install
-sudo ldconfig
+echo "Compiling rtorrent"
+cd $home/source/$rtvers
+./autogen.sh >> /dev/null 2>&1
+./configure --prefix=/usr --with-xmlrpc-c >> /dev/null 2>&1
+make -j2 >> /dev/null 2>&1
+make install >> /dev/null 2>&1
+ldconfig
 
-rt start
-crontab -l | perl -nle 's/^#\s*([0-9*])/$1/;print' | crontab
+sudo -u $SUDO_USER rt start
+(crontab -u $SUDO_USER -l) | perl -nle 's/^#\s*([0-9*])/$1/;print' | crontab -u $SUDO_USER -
 echo
 echo "$libvers/$rtvers installed"
 echo
