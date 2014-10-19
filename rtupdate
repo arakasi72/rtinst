@@ -90,9 +90,6 @@ then
 get_scripts rt /usr/local/bin/rt
 fi
 
-
-(crontab -u $SUDO_USER -l) | perl -nle 's/^([^#@])/# $1/;print' | crontab -u $SUDO_USER -
-sudo -u $SUDO_USER rt stop
 cd $home
 if [ -d source ]; then
   cd source
@@ -120,8 +117,17 @@ make -j2 >> /dev/null 2>&1
 make install >> /dev/null 2>&1
 ldconfig
 
-sudo -u $SUDO_USER rt start
-(crontab -u $SUDO_USER -l) | perl -nle 's/^#\s*([0-9*])/$1/;print' | crontab -u $SUDO_USER -
+cd /var/www/rutorrent/conf/users
+user_list=*
+
+for user in $user_list
+  do
+    echo "Restarting rtorrent for $user"
+    sudo -u $user rt restart >> /dev/null 2>&1
+  done
+
+cd $home
+
 echo
 echo "$libvers/$rtvers installed"
 echo
