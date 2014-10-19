@@ -60,7 +60,7 @@ while [ $script_size = 0 ]
     if [ $attempts = 20 ]; then
       error_exit "Problem downloading scripts from github - https://github.com/"
     fi
-    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name >> $logfile 2>&1
+    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/$script_name >> $logfile 2>&1
     script_size=$(du -b $script_name | cut -f1)
   done
 
@@ -527,8 +527,7 @@ echo "\$XMLRPCMountPoint = \"/RPC2\";" | tee -a /var/www/rutorrent/conf/users/$u
 echo | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 echo "?>" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 
-mkdir rutorrent/plugins/conf
-mv $home/rtscripts/ru.ini /var/www/rutorrent/plugins/conf/plugins.ini
+mv $home/rtscripts/ru.ini /var/www/rutorrent/conf/plugins.ini
 
 # install nginx
 cd $home
