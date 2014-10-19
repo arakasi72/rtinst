@@ -527,8 +527,7 @@ echo "\$XMLRPCMountPoint = \"/RPC2\";" | tee -a /var/www/rutorrent/conf/users/$u
 echo | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 echo "?>" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
 
-mkdir rutorrent/plugins/conf
-mv $home/rtscripts/ru.ini /var/www/rutorrent/plugins/conf/plugins.ini
+mv $home/rtscripts/ru.ini /var/www/rutorrent/conf/plugins.ini
 
 # install nginx
 cd $home
