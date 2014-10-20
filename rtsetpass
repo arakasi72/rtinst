@@ -21,5 +21,5 @@ elif [ -z "$(grep $user $passfile)" ]
     echo "Invalid user. Please contact your sysadmin for assistance"
     exit 1
   else
-    htpasswd "$passfile" "$user"
+    htpasswd $passfile $user
 fi
