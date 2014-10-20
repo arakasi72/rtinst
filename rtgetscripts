@@ -18,7 +18,7 @@ while [ $script_size = 0 ]
         echo "If the Github website is down, you can try again later"
         exit 1
     fi
-    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/$script_name
+    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name
     script_size=$(du -b $script_name | cut -f1)
   done
 
