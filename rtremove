@@ -1,5 +1,6 @@
 #!/bin/bash
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+passfile='/etc/nginx/.htpasswd'
 
 if [ -z "$SUDO_USER" -a  "$LOGNAME" != "root" ]; then
 echo "Must be run from root or using sudo" && exit 1
@@ -41,7 +42,7 @@ crontab -u $user -r
 if [ -d /var/www/rutorrent/conf/users/$user ]; then
 rm -r /var/www/rutorrent/conf/users/$user
 fi
-htpasswd -D /etc/nginx/.htpasswd $user
+htpasswd -D $passfile $user
 deluser --remove-home $user
 rm -r /var/run/screen/S-$user
 ssh_allow=$(grep "$user" /etc/ssh/sshd_config)
