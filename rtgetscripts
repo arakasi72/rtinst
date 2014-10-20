@@ -41,6 +41,7 @@ if [ -f "/var/www/rutorrent/.htpasswd" ]; then
   chmod 640 /etc/nginx/.htpasswd
   sed -i 's/\/var\/www\/rutorrent\/\.htpasswd/\/etc\/nginx\/\.htpasswd/g' /etc/nginx/sites-available/default
   sed -i 's/\/var\/www\/rutorrent\/\.htpasswd/\/etc\/nginx\/\.htpasswd/g' /etc/nginx/conf.d/rtdload
+  service nginx reload
 fi
 
 get_scripts rt /usr/local/bin/rt
