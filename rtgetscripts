@@ -35,6 +35,15 @@ if [ -z "$SUDO_USER" -a  "$LOGNAME" != "root" ]; then
 echo "Must be run from root or using sudo" && exit 1
 fi
 
+if [ -f "/var/www/rutorrent/.htpasswd" ]; then
+  mv /var/www/rutorrent/.htpasswd /etc/nginx
+  chown www-data:www-data /etc/nginx/.htpasswd
+  chmod 640 /etc/nginx/.htpasswd
+  sed -i 's/\/var\/www\/rutorrent\/\.htpasswd/\/etc\/nginx\/\.htpasswd/g' /etc/nginx/sites-available/default
+  sed -i 's/\/var\/www\/rutorrent\/\.htpasswd/\/etc\/nginx\/\.htpasswd/g' /etc/nginx/conf.d/rtdload
+  service nginx reload
+fi
+
 get_scripts rt /usr/local/bin/rt
 get_scripts rtcheck /usr/local/bin/rtcheck
 get_scripts rtupdate /usr/local/bin/rtupdate

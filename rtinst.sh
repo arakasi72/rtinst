@@ -14,6 +14,7 @@ gotip=0
 install_rt=0
 sshport=''
 rudevflag=1
+passfile='/etc/nginx/.htpasswd'
 
 #exit on error function
 error_exit() {
@@ -540,7 +541,9 @@ fi
 
 echo "Installing nginx" | tee -a $logfile
 WEBPASS=$(genpasswd)
-htpasswd -c -b /var/www/rutorrent/.htpasswd $user $WEBPASS >> $logfile 2>&1
+htpasswd -c -b $passfile $user $WEBPASS >> $logfile 2>&1
+chown www-data:www-data $passfile
+chmod 640 $passfile
 
 openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 

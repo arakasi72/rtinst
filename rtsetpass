@@ -8,6 +8,7 @@ parent_pid() {
 
 user=$1
 PARENT=$(parent_pid $PPID)
+passfile='/etc/nginx/.htpasswd'
 
 echo "Set rutorrent web interface password for $user"
 
@@ -15,10 +16,10 @@ if ! [ "$(ps --no-heading -o %c $PARENT)" = "rtpass" ]
   then
     echo "Can only be run using rtpass"
     exit 1
-elif [ -z "$(grep $user /var/www/rutorrent/.htpasswd)" ]
+elif [ -z "$(grep $user $passfile)" ]
   then
     echo "Invalid user. Please contact your sysadmin for assistance"
     exit 1
   else
-    htpasswd /var/www/rutorrent/.htpasswd "$user"
+    htpasswd $passfile $user
 fi
