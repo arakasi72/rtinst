@@ -301,7 +301,7 @@ mkdir $home/rtorrent/watch
 fi
 
 WEBPASS=$(genpasswd)
-htpasswd -b /var/www/rutorrent/.htpasswd $user $WEBPASS
+htpasswd -b /etc/nginx/.htpasswd $user $WEBPASS
 
 get_scripts .rtorrent.rc $home/.rtorrent.rc
 
