@@ -1,6 +1,6 @@
 #!/bin/bash
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
-passfile='/var/www/rutorrent/.htpasswd'
+passfile='/etc/nginx/.htpasswd'
 
 scgi_port_start=5000
 rpc_start=2
