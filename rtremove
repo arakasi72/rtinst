@@ -41,7 +41,7 @@ crontab -u $user -r
 if [ -d /var/www/rutorrent/conf/users/$user ]; then
 rm -r /var/www/rutorrent/conf/users/$user
 fi
-htpasswd -D /var/www/rutorrent/.htpasswd $user
+htpasswd -D /et/nginx/.htpasswd $user
 deluser --remove-home $user
 rm -r /var/run/screen/S-$user
 ssh_allow=$(grep "$user" /etc/ssh/sshd_config)
