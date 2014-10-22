@@ -331,6 +331,8 @@ cd $home
 
 #raise file limits
 sed -i '/# End of file/ i\* hard nofile 32768\n* soft nofile 16384\n' /etc/security/limits.conf
+ulimit -H -n 32768
+ulimit -S -n 16384
 
 # secure ssh
 echo "Securing SSH" | tee -a $logfile
