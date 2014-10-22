@@ -10,12 +10,10 @@ pgrep -fx -u $LOGNAME $1 > /dev/null
 
 
 for arg do
-if ! ( service_running $arg )  
-  then
-    if [[ $arg = "rtorrent" && -a $FILE ]] 
-      then
-        rm -f $FILE
-    fi
-    screen -d -m -S $arg $arg
+if ! ( service_running $arg ); then
+  if [[ $arg = "rtorrent" && -a $FILE ]]; then
+    rm -f $FILE
+  fi
+  screen -d -m -S $arg $arg
 fi
 done

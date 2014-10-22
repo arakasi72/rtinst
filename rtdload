@@ -12,56 +12,49 @@ while [ $script_size = 0 ]
   do
     rm -f $script_name
     attempts=$(( $attempts + 1 ))
-    if [ $attempts = 20 ]
-      then
-        echo "There is a problem downloading from github. Please check your network or there may be an issue with the github website"
-        echo "If the Github website is down, you can try again later"
-        exit 1
+    if [ $attempts = 20 ]; then
+      echo "There is a problem downloading from github. Please check your network or there may be an issue with the github website"
+      echo "If the Github website is down, you can try again later"
+      exit 1
     fi
     wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name
     script_size=$(du -b $script_name | cut -f1)
   done
 
-if ! [ -z "$script_dest" ]
-  then
-    mv -f $script_name $script_dest
-    if case $script_dest in *"${bindest}"*) true;; *) false;; esac; then
-      chmod 755 $script_dest
-    fi
+if ! [ -z "$script_dest" ]; then
+  mv -f $script_name $script_dest
+  if case $script_dest in *"${bindest}"*) true;; *) false;; esac; then
+    chmod 755 $script_dest
+  fi
 fi
 }
 
 lineno=$(sed -n '/include \/etc\/nginx\/conf\.d\/rtdload;/=' /etc/nginx/sites-available/default)
 
-if ! [ "$LOGNAME" = "root" ]
-  then
-    echo "Must be run as root, directly or with sudo"
-    exit 1
+if ! [ "$LOGNAME" = "root" ]; then
+  echo "Must be run as root, directly or with sudo"
+  exit 1
 fi
 
-if [ "$1" = "enable" ]
-  then
-    if ! [ -f /etc/nginx/conf.d/rtdload ]; then
-      get_scripts nginxsitedl /etc/nginx/conf.d/rtdload
-    fi
+if [ "$1" = "enable" ]; then
+  if ! [ -f /etc/nginx/conf.d/rtdload ]; then
+    get_scripts nginxsitedl /etc/nginx/conf.d/rtdload
+  fi
 
   if [ -z "$lineno" ]; then
-    lineno=$(sed -n '/location \~ \/\\\.ht/=' /etc/nginx/sites-available/default)
-    lineno=$(( $lineno -1 ))
-    sed -i $lineno's/.*/        include \/etc\/nginx\/conf\.d\/rtdload;\n/g' /etc/nginx/sites-available/default
+    sed -i '/location \~ \/\\\.ht/ i\        include \/etc\/nginx\/conf\.d\/rtdload;\n' /etc/nginx/sites-available/default
   else
-    sed -i $lineno's/.*/        include \/etc\/nginx\/conf\.d\/rtdload;/g' /etc/nginx/sites-available/default
+    sed -i '/rtdload/ c\        include \/etc\/nginx\/conf\.d\/rtdload;' /etc/nginx/sites-available/default
   fi
-    service nginx reload
-    echo "http download enabled"
+  service nginx reload
+  echo "http download enabled"
 
-elif [ "$1" = "disable" ]
-  then
-    if ! [ -z "$lineno" ]; then
-      sed -i $lineno's/.*/        #include \/etc\/nginx\/conf\.d\/rtdload;/g' /etc/nginx/sites-available/default
-      service nginx reload
-    fi
-    echo "http download disabled"
+elif [ "$1" = "disable" ]; then
+  if ! [ -z "$lineno" ]; then
+    sed -i '/rtdload/ c\        #include \/etc\/nginx\/conf\.d\/rtdload;' /etc/nginx/sites-available/default
+    service nginx reload
+  fi
+  echo "http download disabled"
 else
   echo "argument must be enable or disable"
   exit 1

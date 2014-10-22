@@ -47,6 +47,6 @@ deluser --remove-home $user
 rm -r /var/run/screen/S-$user
 ssh_allow=$(grep "$user" /etc/ssh/sshd_config)
 if ! [ -z "$ssh_allow" ]; then
-perl -pi -e "s/ $user//g" /etc/ssh/sshd_config
+sed -i "s/ $user//g" /etc/ssh/sshd_config
 service ssh restart
 fi

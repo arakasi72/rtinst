@@ -12,14 +12,12 @@ passfile='/etc/nginx/.htpasswd'
 
 echo "Set rutorrent web interface password for $user"
 
-if ! [ "$(ps --no-heading -o %c $PARENT)" = "rtpass" ]
-  then
-    echo "Can only be run using rtpass"
-    exit 1
-elif [ -z "$(grep $user $passfile)" ]
-  then
-    echo "Invalid user. Please contact your sysadmin for assistance"
-    exit 1
-  else
-    htpasswd $passfile $user
+if ! [ "$(ps --no-heading -o %c $PARENT)" = "rtpass" ]; then
+  echo "Can only be run using rtpass"
+  exit 1
+elif [ -z "$(grep $user $passfile)" ]; then
+  echo "Invalid user. Please contact your sysadmin for assistance"
+  exit 1
+else
+  htpasswd $passfile $user
 fi
