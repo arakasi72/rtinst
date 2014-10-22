@@ -119,7 +119,7 @@ user_list=*
 for user in $user_list
   do
     echo "Restarting rtorrent for $user"
-    sudo -u $user rt restart >> /dev/null 2>&1
+    su $user -c 'rt restart >> /dev/null 2>&1'
   done
 
 cd $home
