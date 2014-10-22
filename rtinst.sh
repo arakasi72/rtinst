@@ -329,6 +329,9 @@ get_scripts nginxsite
 
 cd $home
 
+#raise file limits
+sed -i '/# End of file/ i\* hard nofile 32768\n* soft nofile 16384\n' /etc/security/limits.conf
+
 # secure ssh
 echo "Securing SSH" | tee -a $logfile
 
@@ -483,7 +486,7 @@ else
   git clone https://github.com/Novik/ruTorrent.git
   mv ruTorrent rutorrent
 fi
-  
+
 echo "Configuring Rutorrent" | tee -a $logfile
 rm rutorrent/conf/config.php
 mv $home/rtscripts/ru.config /var/www/rutorrent/conf/config.php
@@ -522,7 +525,8 @@ sed -i "s/pid \/run\/nginx\.pid;/pid \/var\/run\/nginx\.pid;/g" /etc/nginx/nginx
 sed -i "s/# server_tokens off;/server_tokens off;/g" /etc/nginx/nginx.conf
 sed -i "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/nginx/nginx.conf
 sed -i "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
-
+grep client_max_body_size /etc/nginx/nginx.conf > /dev/null 2>&1 || sed -i "/server_tokens off;/ a\        client_max_body_size 40m;\n" /etc/nginx/nginx.conf
+sed -i "/upload_max_filesize/ c\upload_max_filesize = 40M" /etc/php5/fpm/php.ini
 
 if [ $RELNO = 14 ] || [ $RELNO = 13 ]; then
   cp /usr/share/nginx/html/* /var/www
