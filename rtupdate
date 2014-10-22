@@ -19,17 +19,15 @@ until [ $no_err = 0 ]
     wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name
     no_err=$?
     attempts=$(( $attempts + 1 ))
-    if [ $attempts = 20 ]
-      then
-        echo "There is a problem downloading the scripts. Please check your network or there may be an issue with the github website"
-        echo "If the Github website is down, you can try again later"
-        exit 1
+    if [ $attempts = 20 ]; then
+      echo "There is a problem downloading the scripts. Please check your network or there may be an issue with the github website"
+      echo "If the Github website is down, you can try again later"
+      exit 1
     fi
   done
 
-if ! [ -z "$script_dest" ]
-  then
-    mv -f $script_name $script_dest
+if ! [ -z "$script_dest" ]; then
+  mv -f $script_name $script_dest
 fi
 }
 
@@ -68,14 +66,13 @@ if [ -z "$SUDO_USER" -o "$SUDO_USER" = "root" ]; then
   exit
 fi
 
-if ( installed rtorrent )
-  then
-    echo "rtorrent detected"
-    echo
-  else
-    echo "rtorrent NOT installed"
-    echo "This script is for upgrading/downgrading only, not for initial install"
-    exit 1
+if ( installed rtorrent ); then
+  echo "rtorrent detected"
+  echo
+else
+  echo "rtorrent NOT installed"
+  echo "This script is for upgrading/downgrading only, not for initial install"
+  exit 1
 fi
 
 
@@ -85,9 +82,8 @@ confirm_answer
 echo
 echo "Installing $libvers/$rtvers"
 
-if ! [ -x $RTFILE ]
-then
-get_scripts rt /usr/local/bin/rt
+if ! [ -x $RTFILE ]; then
+  get_scripts rt /usr/local/bin/rt
 fi
 
 cd $home
