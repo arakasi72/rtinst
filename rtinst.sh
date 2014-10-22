@@ -663,4 +663,5 @@ echo "ssh port changed to $sshport" | tee -a $home/rtinst.info > /dev/null
 echo
 echo "The above information is stored in rtinst.info in your home directory."
 echo "To see contents enter: cat $home/rtinst.info"
+echo "PLEASE REBOOT YOUR SYSTEM ONCE YOU HAVE NOTED THE ABOVE INFORMATION"
 chown $user rtinst.info
