@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # rTorrent Stop/Start/Restart
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 FILE="$HOME/rtorrent/.session/rtorrent.lock"
@@ -20,11 +21,10 @@ RTLOG="$HOME/rt.log"
 echo >> $RTLOG
 date >> $RTLOG
 echo "$0 $@" >> $RTLOG
-if [ $(cat "$RTLOG" | wc -l) -gt $loglines ]
-  then
-    tail -$loglines  "$RTLOG" > $HOME/rt.temp 
-    cat $HOME/rt.temp > $RTLOG
-    rm -f $HOME/rt.temp
+if [ $(cat "$RTLOG" | wc -l) -gt $loglines ]; then
+  tail -$loglines  "$RTLOG" > $HOME/rt.temp
+  cat $HOME/rt.temp > $RTLOG
+  rm -f $HOME/rt.temp
 fi
 }
 
@@ -35,100 +35,84 @@ pgrep -fx -u $LOGNAME $SERVICE > /dev/null
 
 # function to ask user for y/n response
 ask_user(){
-if [ -t 1 ]
-  then
-    while true
-      do
+if [ -t 1 ]; then
+  while true
+    do
       read -p "Unable to close $SERVICE, close using kill -9? " answer
       case $answer in [Yy]* ) return 0 ;;
                       [Nn]* ) return 1 ;;
                           * ) echo "Enter y or n";;
       esac
     done
-  else
-    echo "Running in background -a auto response is y" >> $RTLOG
-    return 0
+else
+  echo "Running in background -a auto response is y" >> $RTLOG
+  return 0
 fi
 }
 
 # function that starts service
 start_service(){
-  local seconds=0
-  if [ $SERVICE = "rtorrent" ]
-    then
-      if [ -a $FILE ]
-        then
-          echo "removing $FILE" | tee -a "$RTLOG"
-          rm -f $FILE
-        else
-          echo "No session lock file" | tee -a "$RTLOG"
-      fi
+local seconds=0
+if [ $SERVICE = "rtorrent" ]; then
+  if [ -a $FILE ]; then
+    echo "removing $FILE" | tee -a "$RTLOG"
+    rm -f $FILE
+  else
+    echo "No session lock file" | tee -a "$RTLOG"
   fi
+fi
 
-  echo -n "Starting $SERVICE"
-  screen -d -m -S $SERVICE $SERVICE
+echo -n "Starting $SERVICE"
+screen -d -m -S $SERVICE $SERVICE
 
-  while ! (service_running)
-    do
-      seconds=$(( $seconds + 1 ))
-      echo -n "."
-      sleep 1
-      if [ $seconds = 10 ]
-        then
-          echo
-          return 1
-      fi
+while ! (service_running)
+  do
+    seconds=$(( $seconds + 1 ))
+    echo -n "."
+    sleep 1
+    if [ $seconds = 10 ]; then
+      echo
+      return 1
+    fi
   done
 
-  echo
-  return 0
+echo
+return 0
 }
 
 # function that stops service
 stop_service(){
- local seconds=0
- echo -n "$SERVICE shutting down using kill $1"
- kill $1 $RTPID
+local seconds=0
+echo -n "$SERVICE shutting down using kill $1"
+kill $1 $RTPID
 
- while ( service_running )
-   do
+while ( service_running )
+  do
      seconds=$(( $seconds + 1 ))
      echo -n " ."
      sleep 1
-     if [ $seconds = 20 ]
-       then
-         echo
-         return 1
+     if [ $seconds = 20 ]; then
+       echo
+       return 1
      fi
-   done
+  done
 
-   echo
-   return 0
+echo
+return 0
 }
 
 # reports any usage error
 usage_error() {
 echo "usage: [-h] [-a|-k|-d] [-l] [start | stop | restart]" | tee -a "$RTLOG"
-if [ $1 = 1 ]
-  then
-    echo "only one of the options -a -k -d allowed" | tee -a "$RTLOG"
+if [ $1 = 1 ]; then
+  echo "only one of the options -a -k -d allowed" | tee -a "$RTLOG"
+elif [ $1 = 2 ]; then
+  echo "incorrect option used" | tee -a "$RTLOG"
+elif [ $1 = 3 ]; then
+  echo "incorrect argument used" | tee -a "$RTLOG"
+elif [ $1 = 4 ]; then
+  echo "too many arguments, only 1 argument allowed" | tee -a "$RTLOG"
 fi
-
-if [ $1 = 2 ]
-  then
-    echo "incorrect option used" | tee -a "$RTLOG"
-fi
-
-if [ $1 = 3 ]
-  then
-    echo "incorrect argument used" | tee -a "$RTLOG"
-fi
-
-if [ $1 = 4 ]
-  then
-    echo "too many arguments, only 1 argument allowed" | tee -a "$RTLOG"
-fi
-
 
 exit 1
 }
@@ -166,97 +150,81 @@ while getopts ":hlikad" optname
     esac
   done
 
-if [ $helpflag = 0 ]
-  then
-    usage_help
+if [ $helpflag = 0 ]; then
+  usage_help
 fi
 
-if [ $LOGFLAG = 1 ]
-  then
-    log_header "$@"
+if [ $LOGFLAG = 1 ]; then
+  log_header "$@"
 fi
 
-if [ $useerr -gt 0 ]
-  then
-    usage_error $useerr
+if [ $useerr -gt 0 ]; then
+  usage_error $useerr
 fi
 
 shift $(( $OPTIND - 1 ))
 
 # Check correct arguments used
-if [ $# = 1 ]
-  then
-    if ! [[ $1 = "stop" || $1 = "start" || $1 = "restart"  ]]
-      then
-        useerr=3
-        usage_error $useerr
-    fi
+if [ $# = 1 ]; then
+  if ! [[ $1 = "stop" || $1 = "start" || $1 = "restart"  ]]; then
+    useerr=3
+    usage_error $useerr
+  fi
 fi
 
 # Check if there is more than 1 argument
-if [ $# -gt 1 ]
-  then
-    useerr=4
-    usage_error $useerr
+if [ $# -gt 1 ]; then
+  useerr=4
+  usage_error $useerr
 fi
 
 # Check if service is running
-if [ $# = 0 ]
-  then
-    if ( service_running )
-      then
-        echo "$SERVICE is running"
-      else
-        echo "$SERVICE is NOT running"
-    fi
+if [ $# = 0 ]; then
+  if ( service_running ); then
+    echo "$SERVICE is running"
+  else
+    echo "$SERVICE is NOT running"
+  fi
 fi
 
 # Stop Service
-if [[ $1 = "stop" || $1 = "restart" ]]
-  then
-    if ! ( service_running )
-      then
-        echo "$SERVICE was not running"
-      else
-        if ! ( stop_service $KILLSIGNAL )
-          then
-            case $KILLSTATUS in
-              "autokill" )
-                KILLSIGNAL='-9'
-                stop_service $KILLSIGNAL ;;
-              "askkill" )
-                if ( ask_user )
-                  then
-                    KILLSIGNAL='-9'
-                    stop_service $KILLSIGNAL
-                fi ;;
-            esac
-        fi
-
-        if ( service_running )
-          then
-            echo "WARNING unable to close $SERVICE using $KILLSIGNAL" | tee -a "$RTLOG"
-            exit 1
-          else
-            echo "$SERVICE has been closed using kill $KILLSIGNAL" | tee -a "$RTLOG"
-        fi
+if [[ $1 = "stop" || $1 = "restart" ]]; then
+  if ! ( service_running ); then
+    echo "$SERVICE was not running"
+  else
+    if ! ( stop_service $KILLSIGNAL ); then
+      case $KILLSTATUS in
+        "autokill" )
+          KILLSIGNAL='-9'
+          stop_service $KILLSIGNAL ;;
+        "askkill" )
+          if ( ask_user ); then
+            KILLSIGNAL='-9'
+            stop_service $KILLSIGNAL
+          fi ;;
+      esac
     fi
+
+    if ( service_running ); then
+      echo "WARNING unable to close $SERVICE using $KILLSIGNAL" | tee -a "$RTLOG"
+      exit 1
+    else
+      echo "$SERVICE has been closed using kill $KILLSIGNAL" | tee -a "$RTLOG"
+    fi
+  fi
 fi
 
 # Start Service
-if [[ $1 = "start" || $1 = "restart" ]]
-  then
-    if ( service_running )
-      then
-        echo "$SERVICE was already running"
-      else
-        if ( start_service )
-          then
-            echo "$SERVICE has been started" | tee -a "$RTLOG"
-          else
-            echo "WARNING: Unable to start $SERVICE" | tee -a "$RTLOG"
-        fi
+if [[ $1 = "start" || $1 = "restart" ]]; then
+  if ( service_running ); then
+    echo "$SERVICE was already running"
+  else
+    if ( start_service ); then
+      echo "$SERVICE has been started" | tee -a "$RTLOG"
+    else
+      echo "WARNING: Unable to start $SERVICE" | tee -a "$RTLOG"
     fi
+  fi
 fi
 
 echo "There were no problems encountered" >> "$RTLOG"
