@@ -61,7 +61,7 @@ while [ $script_size = 0 ]
     if [ $attempts = 20 ]; then
       error_exit "Problem downloading scripts from github - https://github.com/"
     fi
-    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name >> $logfile 2>&1
+    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/$script_name >> $logfile 2>&1
     script_size=$(du -b $script_name | cut -f1)
   done
 
@@ -335,18 +335,18 @@ echo "Securing SSH" | tee -a $logfile
 portline=$(grep 'Port ' /etc/ssh/sshd_config)
 if [ "$portline" = "Port 22" ]; then
   sshport=$(random 21000 29000)
-  perl -pi -e "s/Port 22/Port $sshport/g" /etc/ssh/sshd_config
+  sed -i "s/Port 22/Port $sshport/g" /etc/ssh/sshd_config
 fi
 
-perl -pi -e "s/X11Forwarding yes/X11Forwarding no/g" /etc/ssh/sshd_config
-perl -pi -e "s/PermitRootLogin without-password/PermitRootLogin no/g" /etc/ssh/sshd_config
-perl -pi -e "s/PermitRootLogin yes/PermitRootLogin no/g" /etc/ssh/sshd_config
+sed -i "s/X11Forwarding yes/X11Forwarding no/g" /etc/ssh/sshd_config
+sed -i "s/PermitRootLogin without-password/PermitRootLogin no/g" /etc/ssh/sshd_config
+sed -i "s/PermitRootLogin yes/PermitRootLogin no/g" /etc/ssh/sshd_config
 
 usedns=$(grep UseDNS /etc/ssh/sshd_config)
 if [ -z "$usedns" ]; then
-  echo "UseDNS no" | tee -a /etc/ssh/sshd_config > /dev/null
+  echo "UseDNS no" >> /etc/ssh/sshd_config
 else
- perl -pi -e "s/$usedns/UseDNS no/g" /etc/ssh/sshd_config
+ sed -i "s/$usedns/UseDNS no/g" /etc/ssh/sshd_config
 fi
 
 if [ -z "$(grep sshuser /etc/group)" ]; then
@@ -357,13 +357,13 @@ allowlist=$(grep AllowUsers /etc/ssh/sshd_config)
 if ! [ -z "$allowlist" ]; then
   for ssh_user in $allowlist
     do
-      if ! [ "$ssh_user" = "AllowUsers" ]; then
+      if  ! [ "$ssh_user" = "AllowUsers" -o "$(groups $ssh_user 2> /dev/null | grep -E ' sudo(\s|$)')" != "" ]; then
         adduser $ssh_user sshuser
       fi
     done
-  perl -pi -e "s/$allowlist//g" /etc/ssh/sshd_config
+  sed -i "s/$allowlist//g" /etc/ssh/sshd_config
 fi
-echo "AllowGroups sudo sshuser" | tee -a /etc/ssh/sshd_config > /dev/null
+grep "AllowGroups sudo sshuser" /etc/ssh/sshd_config > /dev/null || echo "AllowGroups sudo sshuser" >> /etc/ssh/sshd_config
 
 service ssh restart
 sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
@@ -379,7 +379,7 @@ if [ $RELNO = 12 ]; then
 fi
 
 if [ $RELNO = 7 ]; then
-  echo "deb http://ftp.cyconet.org/debian wheezy-updates main non-free contrib" | tee -a /etc/apt/sources.list.d/wheezy-updates.cyconet2.list > /dev/null
+  echo "deb http://ftp.cyconet.org/debian wheezy-updates main non-free contrib" >> /etc/apt/sources.list.d/wheezy-updates.cyconet2.list
   aptitude update  >> $logfile 2>&1 || error_exit "problem updating package lists"
   aptitude -o Aptitude::Cmdline::ignore-trust-violations=true -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd  >> $logfile 2>&1 || error_exit "Unable to download vsftpd"
 else
@@ -388,49 +388,26 @@ fi
 
 echo "Configuring vsftpd" | tee -a $logfile
 
-perl -pi -e "s/anonymous_enable=YES/anonymous_enable=NO/g" /etc/vsftpd.conf
-perl -pi -e "s/#local_enable=YES/local_enable=YES/g" /etc/vsftpd.conf
-perl -pi -e "s/#write_enable=YES/write_enable=YES/g" /etc/vsftpd.conf
-perl -pi -e "s/#local_umask=022/local_umask=022/g" /etc/vsftpd.conf
-perl -pi -e "s/^rsa_private_key_file/#rsa_private_key_file/g" /etc/vsftpd.conf
-perl -pi -e "s/rsa_cert_file=\/etc\/ssl\/certs\/ssl-cert-snakeoil\.pem/rsa_cert_file=\/etc\/ssl\/private\/vsftpd\.pem/g" /etc/vsftpd.conf
+sed -i "s/anonymous_enable=YES/anonymous_enable=NO/g" /etc/vsftpd.conf
+sed -i "s/#local_enable=YES/local_enable=YES/g" /etc/vsftpd.conf
+sed -i "s/#write_enable=YES/write_enable=YES/g" /etc/vsftpd.conf
+sed -i "s/#local_umask=022/local_umask=022/g" /etc/vsftpd.conf
+sed -i "s/^rsa_private_key_file/#rsa_private_key_file/g" /etc/vsftpd.conf
+sed -i "s/rsa_cert_file=\/etc\/ssl\/certs\/ssl-cert-snakeoil\.pem/rsa_cert_file=\/etc\/ssl\/private\/vsftpd\.pem/g" /etc/vsftpd.conf
 
-if [ -z "$(grep chroot_local_user /etc/vsftpd.conf | grep -v "#")" ]; then
-  echo "chroot_local_user=YES" | tee -a /etc/vsftpd.conf > /dev/null
-fi
-if [ -z "$(grep allow_writeable_chroot /etc/vsftpd.conf)" ]; then
-  echo "allow_writeable_chroot=YES" | tee -a /etc/vsftpd.conf > /dev/null
-fi
-if [ -z "$(grep ssl_enable /etc/vsftpd.conf)" ]; then
-  echo "ssl_enable=YES" | tee -a /etc/vsftpd.conf > /dev/null
-fi
-if [ -z "$(grep allow_anon_ssl /etc/vsftpd.conf)" ]; then
-  echo "allow_anon_ssl=NO" | tee -a /etc/vsftpd.conf > /dev/null
-fi
-if [ -z "$(grep force_local_data_ssl /etc/vsftpd.conf)" ]; then
-  echo "force_local_data_ssl=YES" | tee -a /etc/vsftpd.conf > /dev/null
-fi
-if [ -z "$(grep force_local_logins_ssl /etc/vsftpd.conf)" ]; then
-  echo "force_local_logins_ssl=YES" | tee -a /etc/vsftpd.conf > /dev/null
-fi
-if [ -z "$(grep ssl_sslv2 /etc/vsftpd.conf)" ]; then
-  echo "ssl_sslv2=YES" | tee -a /etc/vsftpd.conf > /dev/null
-fi
-if [ -z "$(grep ssl_sslv3 /etc/vsftpd.conf)" ]; then
-  echo "ssl_sslv3=YES" | tee -a /etc/vsftpd.conf > /dev/null
-fi
-if [ -z "$(grep ssl_tlsv1 /etc/vsftpd.conf)" ]; then
-  echo "ssl_tlsv1=YES" | tee -a /etc/vsftpd.conf > /dev/null
-fi
-if [ -z "$(grep require_ssl_reuse /etc/vsftpd.conf)" ]; then
-  echo "require_ssl_reuse=NO" | tee -a /etc/vsftpd.conf > /dev/null
-fi
-if [ -z "$(grep listen_port /etc/vsftpd.conf)" ]; then
-  echo "listen_port=$ftpport" | tee -a /etc/vsftpd.conf > /dev/null
-fi
-if [ -z "$(grep ssl_ciphers /etc/vsftpd.conf)" ]; then
-  echo "ssl_ciphers=HIGH" | tee -a /etc/vsftpd.conf > /dev/null
-fi
+grep chroot_local_user /etc/vsftpd.conf | grep -v "#" > /dev/null || echo "chroot_local_user=YES" >> /etc/vsftpd.conf
+grep allow_writeable_chroot /etc/vsftpd.conf > /dev/null || echo "allow_writeable_chroot=YES" >> /etc/vsftpd.conf
+grep ssl_enable /etc/vsftpd.conf > /dev/null || echo "ssl_enable=YES" >> /etc/vsftpd.conf
+grep allow_anon_ssl /etc/vsftpd.conf > /dev/null || echo "allow_anon_ssl=NO" >> /etc/vsftpd.conf
+grep force_local_data_ssl /etc/vsftpd.conf > /dev/null || echo "force_local_data_ssl=YES" >> /etc/vsftpd.conf
+grep force_local_logins_ssl /etc/vsftpd.conf > /dev/null || echo "force_local_logins_ssl=YES" >> /etc/vsftpd.conf
+grep ssl_sslv2 /etc/vsftpd.conf > /dev/null || echo "ssl_sslv2=YES" >> /etc/vsftpd.conf
+grep ssl_sslv3 /etc/vsftpd.conf > /dev/null || echo "ssl_sslv3=YES" >> /etc/vsftpd.conf
+grep ssl_tlsv1 /etc/vsftpd.conf > /dev/null || echo "ssl_tlsv1=YES" >> /etc/vsftpd.conf
+grep require_ssl_reuse /etc/vsftpd.conf > /dev/null || echo "require_ssl_reuse=NO" >> /etc/vsftpd.conf
+grep listen_port /etc/vsftpd.conf > /dev/null || echo "listen_port=$ftpport" >> /etc/vsftpd.conf
+grep ssl_ciphers /etc/vsftpd.conf > /dev/null || echo "ssl_ciphers=HIGH" >> /etc/vsftpd.conf
+
 
 openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem >> $logfile 2>&1
 
@@ -446,17 +423,9 @@ if [ $install_rt = 0 ]; then
   cd source
   echo "Downloading rtorrent source files" | tee -a $logfile
 
-  if ! (svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc  >> $logfile 2>&1); then
-    error_exit "Unable to download xmlrpc source files from https://svn.code.sf.net/p/xmlrpc-c/code/stable"
-  fi
-
-  if ! (curl -# http://libtorrent.rakshasa.no/downloads/libtorrent-0.13.4.tar.gz | tar xz  >> $logfile 2>&1); then
-    error_exit "Unable to download libtorrent source files from http://libtorrent.rakshasa.no/downloads"
-  fi
-
-  if ! (curl -# http://libtorrent.rakshasa.no/downloads/rtorrent-0.9.4.tar.gz | tar xz  >> $logfile 2>&1); then
-    error_exit "Unable to download rtorrent source files from http://libtorrent.rakshasa.no/downloads"
-  fi
+  svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc  >> $logfile 2>&1 ||error_exit "Unable to download xmlrpc source files from https://svn.code.sf.net/p/xmlrpc-c/code/stable"
+  curl -# http://libtorrent.rakshasa.no/downloads/libtorrent-0.13.4.tar.gz | tar xz  >> $logfile 2>&1 || error_exit "Unable to download libtorrent source files from http://libtorrent.rakshasa.no/downloads"
+  curl -# http://libtorrent.rakshasa.no/downloads/rtorrent-0.9.4.tar.gz | tar xz  >> $logfile 2>&1 || error_exit "Unable to download rtorrent source files from http://libtorrent.rakshasa.no/downloads"
 
   cd xmlrpc
   echo "Installing xmlrpc" | tee -a $logfile
@@ -491,7 +460,7 @@ mkdir -p rtorrent/watch
 
 
 mv -f $home/rtscripts/.rtorrent.rc $home/.rtorrent.rc
-perl -pi -e "s/<user name>/$user/g" $home/.rtorrent.rc
+sed -i "s/<user name>/$user/g" $home/.rtorrent.rc
 
 # install rutorrent
 
@@ -520,13 +489,13 @@ rm rutorrent/conf/config.php
 mv $home/rtscripts/ru.config /var/www/rutorrent/conf/config.php
 mkdir -p /var/www/rutorrent/conf/users/$user/plugins
 
-echo "<?php" | tee /var/www/rutorrent/conf/users/$user/config.php > /dev/null
-echo | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
-echo "\$topDirectory = '$home';" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
-echo "\$scgi_port = 5000;" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
-echo "\$XMLRPCMountPoint = \"/RPC2\";" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
-echo | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
-echo "?>" | tee -a /var/www/rutorrent/conf/users/$user/config.php > /dev/null
+echo "<?php" > /var/www/rutorrent/conf/users/$user/config.php
+echo >> /var/www/rutorrent/conf/users/$user/config.php
+echo "\$topDirectory = '$home';" >> /var/www/rutorrent/conf/users/$user/config.php
+echo "\$scgi_port = 5000;" >> /var/www/rutorrent/conf/users/$user/config.php
+echo "\$XMLRPCMountPoint = \"/RPC2\";" >> /var/www/rutorrent/conf/users/$user/config.php
+echo >> /var/www/rutorrent/conf/users/$user/config.php
+echo "?>" >> /var/www/rutorrent/conf/users/$user/config.php
 
 mv $home/rtscripts/ru.ini /var/www/rutorrent/conf/plugins.ini
 
@@ -535,7 +504,7 @@ cd $home
 
 if [ -f "/etc/apache2/ports.conf" ]; then
   echo "Detected apache2. Changing apache2 port to 81 in /etc/apache2/ports.conf" | tee -a $logfile
-  perl -pi -e "s/Listen 80/Listen 81/g" /etc/apache2/ports.conf
+  sed -i "s/Listen 80/Listen 81/g" /etc/apache2/ports.conf
   service apache2 stop >> $logfile 2>&1
 fi
 
@@ -547,12 +516,12 @@ chmod 640 $passfile
 
 openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 
-perl -pi -e "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
-perl -pi -e "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
-perl -pi -e "s/pid \/run\/nginx\.pid;/pid \/var\/run\/nginx\.pid;/g" /etc/nginx/nginx.conf
-perl -pi -e "s/# server_tokens off;/server_tokens off;/g" /etc/nginx/nginx.conf
-perl -pi -e "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/nginx/nginx.conf
-perl -pi -e "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
+sed -i "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
+sed -i "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
+sed -i "s/pid \/run\/nginx\.pid;/pid \/var\/run\/nginx\.pid;/g" /etc/nginx/nginx.conf
+sed -i "s/# server_tokens off;/server_tokens off;/g" /etc/nginx/nginx.conf
+sed -i "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/nginx/nginx.conf
+sed -i "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
 
 
 if [ $RELNO = 14 ] || [ $RELNO = 13 ]; then
@@ -568,30 +537,26 @@ mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
 mv $home/rtscripts/nginxsite /etc/nginx/sites-available/default
 mv $home/rtscripts/nginxsitedl /etc/nginx/conf.d/rtdload
 
-echo "location ~ \.php$ {" | tee /etc/nginx/conf.d/php > /dev/null
-echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" | tee -a /etc/nginx/conf.d/php > /dev/null
+echo "location ~ \.php$ {" > /etc/nginx/conf.d/php
+echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/php
 if [ $RELNO = 12 ]; then
-  echo "          fastcgi_pass 127.0.0.1:9000;" | tee -a /etc/nginx/conf.d/php > /dev/null
+  echo "          fastcgi_pass 127.0.0.1:9000;" >> /etc/nginx/conf.d/php
 else
-  echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" | tee -a /etc/nginx/conf.d/php > /dev/null
+  echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
 fi
-echo "          fastcgi_index index.php;" | tee -a /etc/nginx/conf.d/php > /dev/null
-echo "          include fastcgi_params;" | tee -a /etc/nginx/conf.d/php > /dev/null
-echo "}" | tee -a /etc/nginx/conf.d/php > /dev/null
+echo "          fastcgi_index index.php;" >> /etc/nginx/conf.d/php
+echo "          include fastcgi_params;" >> /etc/nginx/conf.d/php
+echo "}" >> /etc/nginx/conf.d/php
 
-echo "location ~* \.(jpg|jpeg|gif|css|png|js|woff|ttf|svg|eot)$ {" | tee /etc/nginx/conf.d/cache > /dev/null
-echo "        expires 30d;" | tee -a /etc/nginx/conf.d/cache > /dev/null
-echo "}" | tee -a /etc/nginx/conf.d/cache > /dev/null
+echo "location ~* \.(jpg|jpeg|gif|css|png|js|woff|ttf|svg|eot)$ {" > /etc/nginx/conf.d/cache
+echo "        expires 30d;" >> /etc/nginx/conf.d/cache
+echo "}" >> /etc/nginx/conf.d/cache
 
 if [ $DLFLAG = 0 ]; then
-  perl -pi -e "s/#include \/etc\/nginx\/conf\.d\/rtdload;/include \/etc\/nginx\/conf\.d\/rtdload;/g" /etc/nginx/sites-available/default
+  sed -i "s/#include \/etc\/nginx\/conf\.d\/rtdload;/include \/etc\/nginx\/conf\.d\/rtdload;/g" /etc/nginx/sites-available/default
 fi
 
-perl -pi -e "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
-
-#if [ $RELNO = 12 ]; then
-#  perl -pi -e "s/fastcgi_pass unix\:\/var\/run\/php5-fpm\.sock/fastcgi_pass 127\.0\.0\.1\:9000/g" /etc/nginx/conf.d/php
-#fi
+sed -i "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
 
 service nginx restart && service php5-fpm restart
 
@@ -616,19 +581,19 @@ mkdir /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi
 
 touch /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 
-echo "<?php" | tee /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
-echo | tee -a /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
-echo "\$autodlPort = $adlport;" | tee -a /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
-echo "\$autodlPassword = \"$adlpass\";" | tee -a /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
-echo | tee -a /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
-echo "?>" | tee -a /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php > /dev/null
+echo "<?php" > /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
+echo >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
+echo "\$autodlPort = $adlport;" >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
+echo "\$autodlPassword = \"$adlpass\";" >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
+echo >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
+echo "?>" >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 
 cd $home/.autodl
-echo "[options]" | tee autodl2.cfg > /dev/null
-echo "gui-server-port = $adlport" | tee -a autodl2.cfg > /dev/null
-echo "gui-server-password = $adlpass" | tee -a autodl2.cfg > /dev/null
+echo "[options]" > autodl2.cfg
+echo "gui-server-port = $adlport" >> autodl2.cfg
+echo "gui-server-password = $adlpass" >> autodl2.cfg
 
-perl -pi -e "s/if \(\\$\.browser\.msie\)/if \(navigator\.appName \=\= \'Microsoft Internet Explorer\' \&\& navigator\.userAgent\.match\(\/msie 6\/i\)\)/g" /var/www/rutorrent/plugins/autodl-irssi/AutodlFilesDownloader.js
+sed -i "s/if (\\$\.browser\.msie)/if (navigator\.appName == \'Microsoft Internet Explorer\' \&\& navigator\.userAgent\.match(\/msie 6\/i))/g" /var/www/rutorrent/plugins/autodl-irssi/AutodlFilesDownloader.js
 
 # set permissions
 echo "Setting permissions, Starting services" | tee -a $logfile
