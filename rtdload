@@ -42,18 +42,16 @@ if [ "$1" = "enable" ]; then
   fi
 
   if [ -z "$lineno" ]; then
-    lineno=$(sed -n '/location \~ \/\\\.ht/=' /etc/nginx/sites-available/default)
-    lineno=$(( $lineno -1 ))
-    sed -i $lineno's/.*/        include \/etc\/nginx\/conf\.d\/rtdload;\n/g' /etc/nginx/sites-available/default
+    sed -i '/location \~ \/\\\.ht/ i\        include \/etc\/nginx\/conf\.d\/rtdload;\n' /etc/nginx/sites-available/default
   else
-    sed -i $lineno's/.*/        include \/etc\/nginx\/conf\.d\/rtdload;/g' /etc/nginx/sites-available/default
+    sed -i '/rtdload/ c\        include \/etc\/nginx\/conf\.d\/rtdload;' /etc/nginx/sites-available/default
   fi
   service nginx reload
   echo "http download enabled"
 
 elif [ "$1" = "disable" ]; then
   if ! [ -z "$lineno" ]; then
-    sed -i $lineno's/.*/        #include \/etc\/nginx\/conf\.d\/rtdload;/g' /etc/nginx/sites-available/default
+    sed -i '/rtdload/ c\        #include \/etc\/nginx\/conf\.d\/rtdload;' /etc/nginx/sites-available/default
     service nginx reload
   fi
   echo "http download disabled"
