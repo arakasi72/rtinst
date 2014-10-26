@@ -399,6 +399,7 @@ sed -i "s/#write_enable=YES/write_enable=YES/g" /etc/vsftpd.conf
 sed -i "s/#local_umask=022/local_umask=022/g" /etc/vsftpd.conf
 sed -i "s/^rsa_private_key_file/#rsa_private_key_file/g" /etc/vsftpd.conf
 sed -i "s/rsa_cert_file=\/etc\/ssl\/certs\/ssl-cert-snakeoil\.pem/rsa_cert_file=\/etc\/ssl\/private\/vsftpd\.pem/g" /etc/vsftpd.conf
+sed -i "s/ssl_enable=NO/ssl_enable=YES/g" /etc/vsftpd.conf
 
 grep chroot_local_user /etc/vsftpd.conf | grep -v "#" > /dev/null || echo "chroot_local_user=YES" >> /etc/vsftpd.conf
 grep allow_writeable_chroot /etc/vsftpd.conf > /dev/null || echo "allow_writeable_chroot=YES" >> /etc/vsftpd.conf
