@@ -608,6 +608,7 @@ if [ $RELNO = 12 ]; then
 else
   echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
 fi
+echo "          fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;" >> /etc/nginx/conf.d/php
 echo "          fastcgi_index index.php;" >> /etc/nginx/conf.d/php
 echo "          include fastcgi_params;" >> /etc/nginx/conf.d/php
 echo "}" >> /etc/nginx/conf.d/php
