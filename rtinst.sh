@@ -584,6 +584,9 @@ sed -i "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/ngi
 sed -i "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
 grep client_max_body_size /etc/nginx/nginx.conf > /dev/null 2>&1 || sed -i "/server_tokens off;/ a\        client_max_body_size 40m;\n" /etc/nginx/nginx.conf
 sed -i "/upload_max_filesize/ c\upload_max_filesize = 40M" /etc/php5/fpm/php.ini
+sed -i '/^;\?listen.owner/ c\listen.owner = www-data' /etc/php5/fpm/pool.d/www.conf
+sed -i '/^;\?listen.group/ c\listen.group = www-data' /etc/php5/fpm/pool.d/www.conf
+sed -i '/^;\?listen.mode/ c\listen.mode = 0660' /etc/php5/fpm/pool.d/www.conf
 
 if [ $RELNO = 14 ] || [ $RELNO = 13 ]; then
   cp /usr/share/nginx/html/* /var/www
