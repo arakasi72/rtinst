@@ -104,7 +104,7 @@ ask_user
 }
 
 # determine system
-if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ] || [ "$FULLREL" = "Ubuntu 14.04 LTS" ]; then
+if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ] || [ "$FULLREL" = "Ubuntu 14.04 LTS" ] || [ "$FULLREL" = "Ubuntu 14.10" ]; then
   RELNO=14
 elif [ "$FULLREL" = "Ubuntu 13.10" ]; then
   RELNO=13
@@ -292,11 +292,11 @@ install_package libjson-rpc-perl
 install_package libarchive-zip-perl
 
 if [ $RELNO = 14 ]; then
-  apt-add-repository -y ppa:jon-severinsson/ffmpeg >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~jon-severinsson/+archive/ubuntu/ffmpeg"
+  apt-add-repository -y ppa:samrog131/ppa >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~samrog131/+archive/ubuntu/ppa"
   apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
 fi
-install_package ffmpeg
-
+install_package ffmpeg-real
+ln -sf /opt/ffmpeg/bin/ffmpeg /usr/bin/ffmpeg
 echo "Completed installation of required packages        "
 
 #add user to sudo group if not already
