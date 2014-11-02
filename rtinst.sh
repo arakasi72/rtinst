@@ -104,7 +104,7 @@ ask_user
 }
 
 # determine system
-if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ] || [ "$FULLREL" = "Ubuntu 14.04 LTS" ]; then
+if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ] || [ "$FULLREL" = "Ubuntu 14.04 LTS" ] || [ "$FULLREL" = "Ubuntu 14.10" ]; then
   RELNO=14
 elif [ "$FULLREL" = "Ubuntu 13.10" ]; then
   RELNO=13
@@ -292,11 +292,13 @@ install_package libjson-rpc-perl
 install_package libarchive-zip-perl
 
 if [ $RELNO = 14 ]; then
-  apt-add-repository -y ppa:jon-severinsson/ffmpeg >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~jon-severinsson/+archive/ubuntu/ffmpeg"
+  apt-add-repository -y ppa:samrog131/ppa >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~samrog131/+archive/ubuntu/ppa"
   apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
+  install_package ffmpeg-real
+  ln -sf /opt/ffmpeg/bin/ffmpeg /usr/bin/ffmpeg
+else
+  install_package ffmpeg
 fi
-install_package ffmpeg
-
 echo "Completed installation of required packages        "
 
 #add user to sudo group if not already
@@ -344,8 +346,7 @@ if [ "$portline" = "Port 22" ]; then
 fi
 
 sed -i "s/X11Forwarding yes/X11Forwarding no/g" /etc/ssh/sshd_config
-sed -i "s/PermitRootLogin without-password/PermitRootLogin no/g" /etc/ssh/sshd_config
-sed -i "s/PermitRootLogin yes/PermitRootLogin no/g" /etc/ssh/sshd_config
+sed -i '/^PermitRootLogin/ c\PermitRootLogin no' /etc/ssh/sshd_config
 
 usedns=$(grep UseDNS /etc/ssh/sshd_config)
 if [ -z "$usedns" ]; then
@@ -393,27 +394,82 @@ fi
 
 echo "Configuring vsftpd" | tee -a $logfile
 
-sed -i "s/anonymous_enable=YES/anonymous_enable=NO/g" /etc/vsftpd.conf
-sed -i "s/#local_enable=YES/local_enable=YES/g" /etc/vsftpd.conf
-sed -i "s/#write_enable=YES/write_enable=YES/g" /etc/vsftpd.conf
-sed -i "s/#local_umask=022/local_umask=022/g" /etc/vsftpd.conf
-sed -i "s/^rsa_private_key_file/#rsa_private_key_file/g" /etc/vsftpd.conf
-sed -i "s/rsa_cert_file=\/etc\/ssl\/certs\/ssl-cert-snakeoil\.pem/rsa_cert_file=\/etc\/ssl\/private\/vsftpd\.pem/g" /etc/vsftpd.conf
-sed -i "s/ssl_enable=NO/ssl_enable=YES/g" /etc/vsftpd.conf
+sed -i '/^#\?anonymous_enable/ c\anonymous_enable=NO' /etc/vsftpd.conf
+sed -i '/^#\?local_enable/ c\local_enable=YES' /etc/vsftpd.conf
+sed -i '/^#\?write_enable/ c\write_enable=YES' /etc/vsftpd.conf
+sed -i '/^#\?local_umask/ c\local_umask=022' /etc/vsftpd.conf
+sed -i '/^#\?listen=/ c\listen=YES' /etc/vsftpd.conf
+sed -i 's/^listen_ipv6/#listen_ipv6/g' /etc/vsftpd.conf
+sed -i 's/^rsa_private_key_file/#rsa_private_key_file/g' /etc/vsftpd.conf
+sed -i '/^rsa_cert_file/ c\rsa_cert_file=\/etc\/ssl\/private\/vsftpd\.pem' /etc/vsftpd.conf
 
-grep chroot_local_user /etc/vsftpd.conf | grep -v "#" > /dev/null || echo "chroot_local_user=YES" >> /etc/vsftpd.conf
-grep allow_writeable_chroot /etc/vsftpd.conf > /dev/null || echo "allow_writeable_chroot=YES" >> /etc/vsftpd.conf
-grep ssl_enable /etc/vsftpd.conf > /dev/null || echo "ssl_enable=YES" >> /etc/vsftpd.conf
-grep allow_anon_ssl /etc/vsftpd.conf > /dev/null || echo "allow_anon_ssl=NO" >> /etc/vsftpd.conf
-grep force_local_data_ssl /etc/vsftpd.conf > /dev/null || echo "force_local_data_ssl=YES" >> /etc/vsftpd.conf
-grep force_local_logins_ssl /etc/vsftpd.conf > /dev/null || echo "force_local_logins_ssl=YES" >> /etc/vsftpd.conf
-grep ssl_sslv2 /etc/vsftpd.conf > /dev/null || echo "ssl_sslv2=YES" >> /etc/vsftpd.conf
-grep ssl_sslv3 /etc/vsftpd.conf > /dev/null || echo "ssl_sslv3=YES" >> /etc/vsftpd.conf
-grep ssl_tlsv1 /etc/vsftpd.conf > /dev/null || echo "ssl_tlsv1=YES" >> /etc/vsftpd.conf
-grep require_ssl_reuse /etc/vsftpd.conf > /dev/null || echo "require_ssl_reuse=NO" >> /etc/vsftpd.conf
-grep listen_port /etc/vsftpd.conf > /dev/null || echo "listen_port=$ftpport" >> /etc/vsftpd.conf
-grep ssl_ciphers /etc/vsftpd.conf > /dev/null || echo "ssl_ciphers=HIGH" >> /etc/vsftpd.conf
+grep ^listen_port /etc/vsftpd.conf > /dev/null || echo "listen_port=$ftpport" >> /etc/vsftpd.conf
 
+if [ -z "$(grep ^ssl_enable /etc/vsftpd.conf)" ]; then
+  echo "ssl_enable=YES" >> /etc/vsftpd.conf
+else
+  sed -i '/^ssl_enable/ c\ssl_enable=YES' /etc/vsftpd.conf
+fi
+
+if [ -z "$(grep ^chroot_local_user /etc/vsftpd.conf)" ];then
+  echo "chroot_local_user=YES" >> /etc/vsftpd.conf
+else
+ sed -i '/^chroot_local_user/ c\chroot_local_user=YES' /etc/vsftpd.conf
+fi
+
+if [ -z "$(grep ^allow_writeable_chroot /etc/vsftpd.conf)" ]; then
+   echo "allow_writeable_chroot=YES" >> /etc/vsftpd.conf
+else
+  sed -i '/^allow_writeable_chroot/ c\allow_writeable_chroot=YES' /etc/vsftpd.conf
+fi
+
+if [ -z "$(grep ^allow_anon_ssl /etc/vsftpd.conf)" ];then
+  echo "allow_anon_ssl=NO" >> /etc/vsftpd.conf
+else
+   sed -i '/^allow_anon_ssl/ c\allow_anon_ssl=NO' /etc/vsftpd.conf
+fi
+
+if [ -z "$(grep ^force_local_data_ssl /etc/vsftpd.conf)" ];then
+  echo "force_local_data_ssl=YES" >> /etc/vsftpd.conf
+else
+  sed -i '/^force_local_data_ssl/ c\force_local_data_ssl=YES' /etc/vsftpd.conf
+fi
+
+if [ -z "$(grep ^force_local_logins_ssl /etc/vsftpd.conf)" ];then
+  echo "force_local_logins_ssl=YES" >> /etc/vsftpd.conf
+else
+  sed -i '/^force_local_logins_ssl/ c\force_local_logins_ssl=YES' /etc/vsftpd.conf
+fi
+
+if [ -z "$(grep ^ssl_sslv2 /etc/vsftpd.conf)" ];then
+  echo "ssl_sslv2=YES" >> /etc/vsftpd.conf
+else
+  sed -i '/^ssl_sslv2/ c\ssl_sslv2=YES' /etc/vsftpd.conf
+fi
+
+if [ -z "$(grep ^ssl_sslv3 /etc/vsftpd.conf)" ];then
+  echo "ssl_sslv3=YES" >> /etc/vsftpd.conf
+else
+  sed -i '/^ssl_sslv3/ c\ssl_sslv3=YES' /etc/vsftpd.conf
+fi
+
+if [ -z "$(grep ^ssl_tlsv1 /etc/vsftpd.conf)" ];then
+  echo "ssl_tlsv1=YES" >> /etc/vsftpd.conf
+else
+  sed -i '/^ssl_tlsv1/ c\ssl_tlsv1=YES' /etc/vsftpd.conf
+fi
+
+if [ -z "$(grep ^require_ssl_reuse /etc/vsftpd.conf)" ];then
+  echo "require_ssl_reuse=NO" >> /etc/vsftpd.conf
+else
+  sed -i '/^require_ssl_reuse/ c\require_ssl_reuse=NO' /etc/vsftpd.conf
+fi
+
+if [ -z "$(grep ^ssl_ciphers /etc/vsftpd.conf)" ];then
+  echo "ssl_ciphers=HIGH" >> /etc/vsftpd.conf
+else
+  sed -i '/^ssl_ciphers/ c\ssl_ciphers=HIGH' /etc/vsftpd.conf
+fi
 
 openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem >> $logfile 2>&1
 
@@ -530,6 +586,9 @@ sed -i "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/ngi
 sed -i "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
 grep client_max_body_size /etc/nginx/nginx.conf > /dev/null 2>&1 || sed -i "/server_tokens off;/ a\        client_max_body_size 40m;\n" /etc/nginx/nginx.conf
 sed -i "/upload_max_filesize/ c\upload_max_filesize = 40M" /etc/php5/fpm/php.ini
+sed -i '/^;\?listen.owner/ c\listen.owner = www-data' /etc/php5/fpm/pool.d/www.conf
+sed -i '/^;\?listen.group/ c\listen.group = www-data' /etc/php5/fpm/pool.d/www.conf
+sed -i '/^;\?listen.mode/ c\listen.mode = 0660' /etc/php5/fpm/pool.d/www.conf
 
 if [ $RELNO = 14 ] || [ $RELNO = 13 ]; then
   cp /usr/share/nginx/html/* /var/www
@@ -551,6 +610,7 @@ if [ $RELNO = 12 ]; then
 else
   echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
 fi
+echo "          fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;" >> /etc/nginx/conf.d/php
 echo "          fastcgi_index index.php;" >> /etc/nginx/conf.d/php
 echo "          include fastcgi_params;" >> /etc/nginx/conf.d/php
 echo "}" >> /etc/nginx/conf.d/php
