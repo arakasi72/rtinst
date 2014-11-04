@@ -2,10 +2,7 @@
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 FULLREL=$(cat /etc/issue.net)
 SERVERIP=$(ip a s eth0 | awk '/inet / {print$2}' | cut -d/ -f1)
-RELNO=0
 WEBPASS=''
-PASS1=''
-PASS2=''
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 DLFLAG=1
@@ -15,6 +12,8 @@ install_rt=0
 sshport=''
 rudevflag=1
 passfile='/etc/nginx/.htpasswd'
+package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config php5-fpm php5 php5-cli php5-dev php5-curl php5-geoip php5-mcrypt php5-xmlrpc python-scgi screen subversion texinfo unrar-free unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude php5-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
+install_list=""
 
 #exit on error function
 error_exit() {
@@ -73,15 +72,6 @@ if ! [ -z "$script_dest" ]; then
 fi
 }
 
-# function to install package
-install_package() {
-local pack_name=$1
-if [ $(dpkg-query -W -f='${Status}' $pack_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-  printf '%s\r' "Installing $pack_name                   "
-  apt-get -y install $pack_name >> $logfile 2>&1 || error_exit "error trying to install $pack_name"
-fi
-}
-
 # function to ask user for y/n response
 ask_user(){
 while true
@@ -104,20 +94,13 @@ ask_user
 }
 
 # determine system
-if [ "$FULLREL" = "Ubuntu 14.04.1 LTS" ] || [ "$FULLREL" = "Ubuntu 14.04 LTS" ] || [ "$FULLREL" = "Ubuntu 14.10" ]; then
-  RELNO=14
-elif [ "$FULLREL" = "Ubuntu 13.10" ]; then
-  RELNO=13
-elif [ "$FULLREL" = "Ubuntu 12.04.4 LTS" ]; then
-  RELNO=12
-elif [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]; then
-  RELNO=12
-elif [ "$FULLREL" = "Debian GNU/Linux 7" ]; then
-  RELNO=7
-else
-  echo "Unable to determine OS or OS unsupported"
-  exit
-fi
+test "${FULLREL#*Ubuntu 12.04}" != "$FULLREL" && RELNO=12
+test "${FULLREL#*Ubuntu 13.10}" != "$FULLREL" && RELNO=13
+test "${FULLREL#*Ubuntu 14}" != "$FULLREL" && RELNO=14
+test "${FULLREL#*Debian*7}" != "$FULLREL" && RELNO=7
+test "${FULLREL#*Debian*jessie}" != "$FULLREL" && RELNO=8
+test -z "$RELNO" && echo "Unable to determine OS or OS unsupported" && exit
+echo $FULLREL
 
 # get options
 while getopts ":dlr" optname
@@ -126,7 +109,7 @@ while getopts ":dlr" optname
       "d" ) DLFLAG=0 ;;
       "l" ) logfile="$HOME/rtinst.log" ;;
       "r" ) rudevflag=0 ;;
-        * ) echo "incorrect option, only -d and -l allowed" && exit 1 ;;
+        * ) echo "incorrect option, only -d, -l, and -r allowed" && exit 1 ;;
     esac
   done
 
@@ -232,72 +215,27 @@ apt-get clean && apt-get autoclean >> $logfile 2>&1
 
 #install the packsges needed
 echo "Installing required packages" | tee -a $logfile
-install_package sudo
-install_package nano
-install_package autoconf
-install_package build-essential
-install_package ca-certificates
-install_package comerr-dev
-install_package curl
-install_package cfv
-install_package dtach
-install_package htop
-install_package irssi
-install_package libcloog-ppl-dev
-install_package libcppunit-dev
-install_package libcurl3
-install_package libncurses5-dev
-install_package libterm-readline-gnu-perl
-install_package libsigc++-2.0-dev
-install_package libperl-dev
-install_package libtool
-install_package libxml2-dev
-install_package ncurses-base
-install_package ncurses-term
-install_package ntp
-install_package patch
-install_package pkg-config
-install_package php5-fpm
-install_package php5
-install_package php5-cli
-install_package php5-dev
-install_package php5-curl
-install_package php5-geoip
-install_package php5-mcrypt
-install_package php5-xmlrpc
-install_package python-scgi
-install_package screen
-install_package subversion
-install_package texinfo
-install_package unrar-free
-install_package unzip
-install_package zlib1g-dev
-install_package libcurl4-openssl-dev
-install_package mediainfo
-install_package python-software-properties
-install_package software-properties-common
-install_package aptitude
-install_package php5-json
-install_package nginx-full
-install_package apache2-utils
-install_package git
-install_package libarchive-zip-perl
-install_package libnet-ssleay-perl
-install_package libhtml-parser-perl
-install_package libxml-libxml-perl
-install_package libjson-perl
-install_package libjson-xs-perl
-install_package libxml-libxslt-perl
-install_package libjson-rpc-perl
-install_package libarchive-zip-perl
+for package_name in $package_list
+  do
+    if [ $(dpkg-query -W -f='${Status}' $package_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+      install_list="$install_list $package_name"
+    fi
+  done
 
-if [ $RELNO = 14 ]; then
+test -z "$install_list" || apt-get -y install $install_list >> $logfile 2>&1
+
+if [ $RELNO = 14 ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg-real" 2>/dev/null | grep -c "ok installed") = 0 ]; then
   apt-add-repository -y ppa:samrog131/ppa >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~samrog131/+archive/ubuntu/ppa"
   apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
-  install_package ffmpeg-real
+  apt-get -y install ffmpeg-real >> $logfile 2>&1
   ln -sf /opt/ffmpeg/bin/ffmpeg /usr/bin/ffmpeg
-else
-  install_package ffmpeg
+elif [ $RELNO = 8 ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
+  grep "deb http://www.deb-multimedia.org jessie main" /etc/apt/sources.list >> /dev/null || echo "deb http://www.deb-multimedia.org jessie main" >> /etc/apt/sources.list
+  apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
+  apt-get -y --force-yes install deb-multimedia-keyring >> $logfile 2>&1
+  apt-get -y --force-yes install ffmpeg >> $logfile 2>&1
+elif [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
+  apt-get -y install ffmpeg >> $logfile 2>&1
 fi
 echo "Completed installation of required packages        "
 
@@ -333,8 +271,6 @@ cd $home
 
 #raise file limits
 sed -i '/# End of file/ i\* hard nofile 32768\n* soft nofile 16384\n' /etc/security/limits.conf
-ulimit -H -n 32768
-ulimit -S -n 16384
 
 # secure ssh
 echo "Securing SSH" | tee -a $logfile
@@ -376,22 +312,24 @@ sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
 echo "SSH secured. Port set to $sshport"
 
 # install ftp
-echo "Installing vsftpd" | tee -a $logfile
+
 ftpport=$(random 41005 48995)
 
-if [ $RELNO = 12 ]; then
-  add-apt-repository -y ppa:thefrontiergroup/vsftpd >> $logfile 2>&1
-  apt-get update >> $logfile 2>&1
-fi
+if [ $(dpkg-query -W -f='${Status}' "vsftpd" 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+  echo "Installing vsftpd" | tee -a $logfile
+  if [ $RELNO = 12 ]; then
+    add-apt-repository -y ppa:thefrontiergroup/vsftpd >> $logfile 2>&1
+    apt-get update >> $logfile 2>&1
+  fi
 
-if [ $RELNO = 7 ]; then
-  echo "deb http://ftp.cyconet.org/debian wheezy-updates main non-free contrib" >> /etc/apt/sources.list.d/wheezy-updates.cyconet2.list
-  aptitude update  >> $logfile 2>&1 || error_exit "problem updating package lists"
-  aptitude -o Aptitude::Cmdline::ignore-trust-violations=true -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd  >> $logfile 2>&1 || error_exit "Unable to download vsftpd"
-else
-  install_package vsftpd
+  if [ $RELNO = 7 ]; then
+    echo "deb http://ftp.cyconet.org/debian wheezy-updates main non-free contrib" >> /etc/apt/sources.list.d/wheezy-updates.cyconet2.list
+    aptitude update  >> $logfile 2>&1 || error_exit "problem updating package lists"
+    aptitude -o Aptitude::Cmdline::ignore-trust-violations=true -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd  >> $logfile 2>&1 || error_exit "Unable to download vsftpd"
+  else
+    apt-get -y install vsftpd >> $logfile 2>&1
+  fi
 fi
-
 echo "Configuring vsftpd" | tee -a $logfile
 
 sed -i '/^#\?anonymous_enable/ c\anonymous_enable=NO' /etc/vsftpd.conf
@@ -485,7 +423,7 @@ if [ $install_rt = 0 ]; then
   cd source
   echo "Downloading rtorrent source files" | tee -a $logfile
 
-  svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc  >> $logfile 2>&1 ||error_exit "Unable to download xmlrpc source files from https://svn.code.sf.net/p/xmlrpc-c/code/stable"
+  svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc  >> $logfile 2>&1 || error_exit "Unable to download xmlrpc source files from https://svn.code.sf.net/p/xmlrpc-c/code/stable"
   curl -# http://libtorrent.rakshasa.no/downloads/libtorrent-0.13.4.tar.gz | tar xz  >> $logfile 2>&1 || error_exit "Unable to download libtorrent source files from http://libtorrent.rakshasa.no/downloads"
   curl -# http://libtorrent.rakshasa.no/downloads/rtorrent-0.9.4.tar.gz | tar xz  >> $logfile 2>&1 || error_exit "Unable to download rtorrent source files from http://libtorrent.rakshasa.no/downloads"
 
@@ -590,7 +528,7 @@ sed -i '/^;\?listen.owner/ c\listen.owner = www-data' /etc/php5/fpm/pool.d/www.c
 sed -i '/^;\?listen.group/ c\listen.group = www-data' /etc/php5/fpm/pool.d/www.conf
 sed -i '/^;\?listen.mode/ c\listen.mode = 0660' /etc/php5/fpm/pool.d/www.conf
 
-if [ $RELNO = 14 ] || [ $RELNO = 13 ]; then
+if [ $RELNO = 14 ] || [ $RELNO = 13 ] || [ $RELNO = 8 ]; then
   cp /usr/share/nginx/html/* /var/www
 fi
 
