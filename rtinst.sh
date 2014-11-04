@@ -219,6 +219,7 @@ for package_name in $package_list
   do
     if [ $(dpkg-query -W -f='${Status}' $package_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
       install_list="$install_list $package_name"
+    fi
   done
 
 test -z "$install_list" || apt-get -y install $install_list >> $logfile 2>&1
