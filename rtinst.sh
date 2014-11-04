@@ -317,18 +317,19 @@ ftpport=$(random 41005 48995)
 
 if [ $(dpkg-query -W -f='${Status}' "vsftpd" 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
   echo "Installing vsftpd" | tee -a $logfile
+
   if [ $RELNO = 12 ]; then
     add-apt-repository -y ppa:thefrontiergroup/vsftpd >> $logfile 2>&1
     apt-get update >> $logfile 2>&1
-  fi
-
-  if [ $RELNO = 7 ]; then
+    apt-get -y install vsftpd >> $logfile 2>&1
+  elif [ $RELNO = 7 ]; then
     echo "deb http://ftp.cyconet.org/debian wheezy-updates main non-free contrib" >> /etc/apt/sources.list.d/wheezy-updates.cyconet2.list
     aptitude update  >> $logfile 2>&1 || error_exit "problem updating package lists"
     aptitude -o Aptitude::Cmdline::ignore-trust-violations=true -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd  >> $logfile 2>&1 || error_exit "Unable to download vsftpd"
   else
     apt-get -y install vsftpd >> $logfile 2>&1
   fi
+
 fi
 echo "Configuring vsftpd" | tee -a $logfile
 
@@ -528,12 +529,10 @@ sed -i '/^;\?listen.owner/ c\listen.owner = www-data' /etc/php5/fpm/pool.d/www.c
 sed -i '/^;\?listen.group/ c\listen.group = www-data' /etc/php5/fpm/pool.d/www.conf
 sed -i '/^;\?listen.mode/ c\listen.mode = 0660' /etc/php5/fpm/pool.d/www.conf
 
-if [ $RELNO = 14 ] || [ $RELNO = 13 ] || [ $RELNO = 8 ]; then
-  cp /usr/share/nginx/html/* /var/www
-fi
-
 if [ $RELNO = 12 ] || [ $RELNO = 7 ]; then
   cp /usr/share/nginx/www/* /var/www
+else
+  cp /usr/share/nginx/html/* /var/www
 fi
 
 mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
