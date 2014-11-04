@@ -217,14 +217,12 @@ apt-get clean && apt-get autoclean >> $logfile 2>&1
 echo "Installing required packages" | tee -a $logfile
 for package_name in $package_list
   do
-    if [ $(dpkg-query -W -f='${Status}' $package_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-      install_list="$install_list $package_name"
-    fi
+    test dpkg-query -W -f='${Status}' $package_name || install_list="$install_list $package_name"
   done
 
 test -z "$install_list" || apt-get -y install $install_list >> $logfile 2>&1
 
-if [ $RELNO = 14 ]; then
+if [ $RELNO = 14 ] && ! dpkg-query -W -f='${Status}' ffmpeg >> $logfile 2>&1 ; then
   apt-add-repository -y ppa:samrog131/ppa >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~samrog131/+archive/ubuntu/ppa"
   apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
   apt-get -y install ffmpeg-real >> $logfile 2>&1
