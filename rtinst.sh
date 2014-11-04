@@ -423,7 +423,7 @@ if [ $install_rt = 0 ]; then
   cd source
   echo "Downloading rtorrent source files" | tee -a $logfile
 
-  svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc  >> $logfile 2>&1 ||error_exit "Unable to download xmlrpc source files from https://svn.code.sf.net/p/xmlrpc-c/code/stable"
+  svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc  >> $logfile 2>&1 || error_exit "Unable to download xmlrpc source files from https://svn.code.sf.net/p/xmlrpc-c/code/stable"
   curl -# http://libtorrent.rakshasa.no/downloads/libtorrent-0.13.4.tar.gz | tar xz  >> $logfile 2>&1 || error_exit "Unable to download libtorrent source files from http://libtorrent.rakshasa.no/downloads"
   curl -# http://libtorrent.rakshasa.no/downloads/rtorrent-0.9.4.tar.gz | tar xz  >> $logfile 2>&1 || error_exit "Unable to download rtorrent source files from http://libtorrent.rakshasa.no/downloads"
 
