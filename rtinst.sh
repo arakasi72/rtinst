@@ -476,8 +476,12 @@ fi
 
 if [ $rudevflag = 1 ]; then
   echo "Installing Rutorrent (stable)" | tee -a $logfile
-  curl -# https://bintray.com/artifact/download/novik65/generic/rutorrent-3.6.tar.gz | tar xz >> $logfile 2>&1 || error_exit "Unable to download rutorrent files from http://rutorrent.googlecode.com/svn/trunk/rutorrent"
-  curl -# https://bintray.com/artifact/download/novik65/generic/plugins-3.6.tar.gz | tar xz >> $logfile 2>&1 || error_exit "Unable to download rutorrent plugin files from http://rutorrent.googlecode.com/svn/trunk/plugins"
+  wget --no-check-certificate https://bintray.com/artifact/download/novik65/generic/rutorrent-3.6.tar.gz >> $logfile 2>&1 || error_exit "Unable to download rutorrent files from http://rutorrent.googlecode.com/svn/trunk/rutorrent"
+  wget --no-check-certificate https://bintray.com/artifact/download/novik65/generic/plugins-3.6.tar.gz >> $logfile 2>&1 || error_exit "Unable to download rutorrent plugin files from http://rutorrent.googlecode.com/svn/trunk/plugins"
+  tar -xzf rutorrent-3.6.tar.gz
+  tar -xzf plugins-3.6.tar.gz
+  rm rutorrent-3.6.tar.gz
+  rm plugins-3.6.tar.gz
   rm -r rutorrent/plugins
   mv plugins rutorrent
 else
