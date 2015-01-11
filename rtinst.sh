@@ -99,6 +99,7 @@ test "${FULLREL#*Ubuntu 13.10}" != "$FULLREL" && RELNO=13
 test "${FULLREL#*Ubuntu 14}" != "$FULLREL" && RELNO=14
 test "${FULLREL#*Debian*7}" != "$FULLREL" && RELNO=7
 test "${FULLREL#*Debian*jessie}" != "$FULLREL" && RELNO=8
+test "${FULLREL#*Debian*8}" != "$FULLREL" && RELNO=8
 test -z "$RELNO" && echo "Unable to determine OS or OS unsupported" && exit
 echo $FULLREL
 
@@ -475,8 +476,12 @@ fi
 
 if [ $rudevflag = 1 ]; then
   echo "Installing Rutorrent (stable)" | tee -a $logfile
-  svn checkout http://rutorrent.googlecode.com/svn/trunk/rutorrent >> $logfile 2>&1 || error_exit "Unable to download rutorrent files from http://rutorrent.googlecode.com/svn/trunk/rutorrent"
-  svn checkout http://rutorrent.googlecode.com/svn/trunk/plugins >> $logfile 2>&1 || error_exit "Unable to download rutorrent plugin files from http://rutorrent.googlecode.com/svn/trunk/plugins"
+  wget --no-check-certificate https://bintray.com/artifact/download/novik65/generic/rutorrent-3.6.tar.gz >> $logfile 2>&1 || error_exit "Unable to download rutorrent files from http://rutorrent.googlecode.com/svn/trunk/rutorrent"
+  wget --no-check-certificate https://bintray.com/artifact/download/novik65/generic/plugins-3.6.tar.gz >> $logfile 2>&1 || error_exit "Unable to download rutorrent plugin files from http://rutorrent.googlecode.com/svn/trunk/plugins"
+  tar -xzf rutorrent-3.6.tar.gz
+  tar -xzf plugins-3.6.tar.gz
+  rm rutorrent-3.6.tar.gz
+  rm plugins-3.6.tar.gz
   rm -r rutorrent/plugins
   mv plugins rutorrent
 else
