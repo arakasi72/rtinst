@@ -2,7 +2,8 @@
 ======
 
 ####1. Introduction
-seedbox installation
+Seedbox installation
+
 It has been tested with clean installs of Ubuntu 12.04, 12.05, 13.10, and 14.04, 14.10 and Debian Wheezy (7.6) and Debian 8 beta2
 
 Services that will be installed and configured are
@@ -13,7 +14,7 @@ Services that will be installed and configured are
 	4. Nginx
 	5. autodl-irssi
 
-I use nginx, it uses less system resources, and I find it easier to configure than apache2. The difference is not huge, given that we will have at most a handful of users, accessing our server. I also find it easier to configure.
+I use nginx, it uses less system resources, and I find it easier to configure than apache2.
 
 It uses latest versions of all software at time of posting.
 
