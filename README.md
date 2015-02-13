@@ -24,11 +24,8 @@ After you have run the script and everything is working, I suggest a reboot, the
 Log into your server with a terminal client like Putty. Fill in the following details in Putty: 
 
 	host name: The IP address or the host name
-
 	protocol: SSH (port 22)
-
 	username: root
-
 	password: use the password your vendor provided
 
 It takes about 10 minutes to run, depending on your server setup.
