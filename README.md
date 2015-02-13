@@ -18,6 +18,8 @@ I use nginx, it uses less system resources, and I find it easier to configure th
 
 It uses latest versions of all software at time of posting.
 
+It takes about 10 minutes to run, depending on your server setup.
+
 After you have run the script and everything is working, I suggest a reboot, the script does not automate this reboot, you need to do it manually using the reboot command.
 
 ####2. Log into your server
@@ -28,8 +30,6 @@ Log into your server with a terminal client like Putty. Fill in the following de
 	protocol: SSH (port 22)
 	username: root
 	password: use the password your vendor provided
-
-It takes about 10 minutes to run, depending on your server setup.
 
 ####3. Main Script
 
