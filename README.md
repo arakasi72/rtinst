@@ -1,6 +1,7 @@
-rtinst
+###rtinst
 ======
 
+####1. Introduction
 seedbox installation
 It has been tested with clean installs of Ubuntu 12.04, 12.05, 13.10, and 14.04, 14.10 and Debian Wheezy (7.6) and Debian 8 beta2
 
@@ -12,31 +13,25 @@ Services that will be installed and configured are
 	4. Nginx
 	5. autodl-irssi
 
-I use nginx, it uses less system resources, and I find it easier to configure than apache2. I don't think the difference is huge, given that we will have at most a handful of users, accessing our server, but unless you really want to stick with Apache I would recommend nginx, it is what I am currently using on my live seedbox.
+I use nginx, it uses less system resources, and I find it easier to configure than apache2. The difference is not huge, given that we will have at most a handful of users, accessing our server. I also find it easier to configure.
 
 It uses latest versions of all software at time of posting.
 
-After you have run the script and everything is working, I suggest a reboot.
+After you have run the script and everything is working, I suggest a reboot, the script does not automate this reboot, you need to do it manually using the reboot command.
 
-1.1 Log into your server
+####2. Log into your server
 
 Log into your server with a terminal client like Putty. Fill in the following details in Putty: 
-host name: The IP address or the host name e.g. ksxxxxxx.kimsufi.ovh.com
+host name: The IP address or the host name
 protocol: SSH (port 22)
 username: root
 password: use the password your vendor provided
 
-This is not a fork of seed box from scratch.It will install vsftps, rtorrent, rutorrent, autodl-irssi, and nginx, as well as all the configuration, so on completion of the script your seedbox will be ready for use.
+It takes about 10 minutes to run, depending on your server setup.
 
-This script has been tested on Ubuntu 12.04, 12.05, 13.10, 14.04, and Debian 7.
+####3. Main Script
 
-It takes about 10 minutes to run.
-
-1.1 Main Script
-
-You can run the script with -d option to include implementation of https downloads 
-
-Run the script from root, or if you have a sudo user already set up you can run it from there. If for some reason it is interrupted you can run it again to completion. 
+Run the script from root, or if you have a sudo user already set up you can run it from there. If for some reason it is interrupted you can run it again to completion. Running the script multiple times will not cause any problems.
 
 First download the script:
 
@@ -71,7 +66,7 @@ To access that information just use the following command
 
 	cat ~/rtinst.info
 
-1.2 Additional scripts
+####4. Additional scripts
 
 A number of additional scripts will be installed that carry out a variety of useful functions. These will be installed by the main script but if you want to get the latest versions you can run the following:
 
@@ -79,7 +74,7 @@ A number of additional scripts will be installed that carry out a variety of use
 	sudo bash rtgetscripts
 	rm rtgetscripts
 
-1.2.1 rtadduser
+######4.1 rtadduser
 
 This will add new users. Ensuring there are no conflicts with the existing user ports. You can use it to create brand new users, or reset the config on existing users. If you use it on an existing user, you will NOT lose any torrents, files, of autodl-filters. It will just reset the ports used.
 to run this:
@@ -87,7 +82,7 @@ to run this:
 	sudo rtadduser
 and enter the information asked for.
 
-1.2.2 rtremove
+######4.2 rtremove
 
 WARNING: This will completely remove a user wiping all their config and data, and removing them from the system.
 to run this:
@@ -96,7 +91,7 @@ to run this:
 
 and enter the user name when asked
 
-1.2.3 rtdload
+######4.3 rtdload
 
 This script will enable or disable https download
 
@@ -110,14 +105,14 @@ to disable:
 
 The following scripts can be used by any user
 
-1.2.4 rtpass
+######4.4 rtpass
 
 This will allow user to change their rutorrent password.
 to run this:
 
 	rtpass
 
-1.2.5 rt
+######4.5 rt
 
 This script can stop, start, or restart rtorrent or irssi. Use the arguments stop start or restart, with no arguments it will tell tell you if rtorrent is running or not
 
