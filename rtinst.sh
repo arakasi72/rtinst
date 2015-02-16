@@ -534,9 +534,9 @@ sed -i '/^;\?listen.owner/ c\listen.owner = www-data' /etc/php5/fpm/pool.d/www.c
 sed -i '/^;\?listen.group/ c\listen.group = www-data' /etc/php5/fpm/pool.d/www.conf
 sed -i '/^;\?listen.mode/ c\listen.mode = 0660' /etc/php5/fpm/pool.d/www.conf
 
-if [ $RELNO = 12 ] || [ $RELNO = 7 ]; then
+if [ -d "/usr/share/nginx/www" ]; then
   cp /usr/share/nginx/www/* /var/www
-else
+elif [ -d "/usr/share/nginx/html" ]; then
   cp /usr/share/nginx/html/* /var/www
 fi
 
