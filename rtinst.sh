@@ -620,24 +620,25 @@ rm -r $home/rtscripts
 su $user -c '/usr/local/bin/rt restart'
 su $user -c '/usr/local/bin/rt -i restart'
 
-sleep 2
-sudo -u $user screen -S irssi -p 0 -X stuff "/WINDOW LOG ON $home/ir.log$(printf \\r)"
-sudo -u $user screen -S irssi -p 0 -X stuff "/autodl update$(printf \\r)"
-echo -n "updating autodl-irssi"
-sleep 3
-while ! ((tail -n1 $home/ir.log | grep -c -q "You are using the latest autodl-trackers") || (tail -n1 $home/ir.log | grep -c -q "Successfully loaded tracker files"))
-do
-sleep 1
-echo -n " ."
-done
-echo
-sudo -u $user screen -S irssi -p 0 -X stuff "/WINDOW LOG OFF$(printf \\r)"
-sleep 1
-sudo -u $user screen -S irssi -p 0 -X quit
-sleep 2
-su $user -c '/usr/local/bin/rt -i start > /dev/null'
-rm $home/ir.log
-echo "autodl-irssi update complete"
+# Next section commented out, as issue this was addressing in autodl seems to be resolved
+#sleep 2
+#sudo -u $user screen -S irssi -p 0 -X stuff "/WINDOW LOG ON $home/ir.log$(printf \\r)"
+#sudo -u $user screen -S irssi -p 0 -X stuff "/autodl update$(printf \\r)"
+#echo -n "updating autodl-irssi"
+#sleep 3
+#while ! ((tail -n1 $home/ir.log | grep -c -q "You are using the latest autodl-trackers") || (tail -n1 $home/ir.log | grep -c -q "Successfully loaded tracker files"))
+#do
+#sleep 1
+#echo -n " ."
+#done
+#echo
+#sudo -u $user screen -S irssi -p 0 -X stuff "/WINDOW LOG OFF$(printf \\r)"
+#sleep 1
+#sudo -u $user screen -S irssi -p 0 -X quit
+#sleep 2
+#su $user -c '/usr/local/bin/rt -i start > /dev/null'
+#rm $home/ir.log
+#echo "autodl-irssi update complete"
 
 if [ -z "$(crontab -u $user -l | grep "$cronline1")" ]; then
     (crontab -u $user -l; echo "$cronline1" ) | crontab -u $user - >> $logfile 2>&1
