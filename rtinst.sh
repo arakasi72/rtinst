@@ -271,7 +271,9 @@ get_scripts nginxsite
 cd $home
 
 #raise file limits
-sed -i '/# End of file/ i\* hard nofile 32768\n* soft nofile 16384\n' /etc/security/limits.conf
+sed -i '/hard nofile/ d' /etc/security/limits.conf
+sed -i '/soft nofile/ d' /etc/security/limits.conf
+sed -i '$ i\* hard nofile 32768\n* soft nofile 16384' /etc/security/limits.conf
 
 # secure ssh
 echo "Securing SSH" | tee -a $logfile
