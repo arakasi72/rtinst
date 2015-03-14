@@ -100,6 +100,7 @@ test "${FULLREL#*Ubuntu 14}" != "$FULLREL" && RELNO=14
 test "${FULLREL#*Debian*7}" != "$FULLREL" && RELNO=7
 test "${FULLREL#*Debian*jessie}" != "$FULLREL" && RELNO=8
 test "${FULLREL#*Debian*8}" != "$FULLREL" && RELNO=8
+test "${FULLREL#*Raspbian GNU/Linux 7}" != "$FULLREL" && RELNO="RPi"
 test -z "$RELNO" && echo "Unable to determine OS or OS unsupported" && exit
 echo $FULLREL
 
@@ -325,7 +326,7 @@ if [ $(dpkg-query -W -f='${Status}' "vsftpd" 2>/dev/null | grep -c "ok installed
     add-apt-repository -y ppa:thefrontiergroup/vsftpd >> $logfile 2>&1
     apt-get update >> $logfile 2>&1
     apt-get -y install vsftpd >> $logfile 2>&1
-  elif [ $RELNO = 7 ]; then
+  elif [ $RELNO = 7 ] || [ $RELNO = "RPi" ]; then
     echo "deb http://ftp.cyconet.org/debian wheezy-updates main non-free contrib" >> /etc/apt/sources.list.d/wheezy-updates.cyconet2.list
     aptitude update  >> $logfile 2>&1 || error_exit "problem updating package lists"
     aptitude -o Aptitude::Cmdline::ignore-trust-violations=true -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd  >> $logfile 2>&1 || error_exit "Unable to download vsftpd"
@@ -440,7 +441,11 @@ if [ $install_rt = 0 ]; then
   cd ../libtorrent-0.13.4
   echo "Installing libtorrent" | tee -a $logfile
   ./autogen.sh >> $logfile 2>&1
-  ./configure --prefix=/usr >> $logfile 2>&1
+  if [ $RELNO = "RPi" ]; then
+    ./configure --prefix=/usr --disable-instrumentation >> $logfile 2>&1
+  else
+    ./configure --prefix=/usr >> $logfile 2>&1
+  fi
   make -j2 >> $logfile 2>&1
   make install >> $logfile 2>&1
 
