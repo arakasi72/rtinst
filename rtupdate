@@ -1,6 +1,5 @@
 #!/bin/bash
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
-SERVERIP=$(ip a s eth0 | awk '/inet / {print$2}' | cut -d/ -f1)
 RTFILE=/usr/local/bin/rt
 home="/home/$SUDO_USER"
 
@@ -126,7 +125,5 @@ cd $home
 
 echo
 echo "$libvers/$rtvers installed"
-echo
-echo "Confirm at https://$SERVERIP/rutorrent"
 echo
 echo "Your .rtorrent.rc file, and download, watch, and .session directories have not been altered in any way"
