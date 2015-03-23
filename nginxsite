@@ -1,7 +1,28 @@
 server {
         listen 80;
         server_name <Server IP>;
+        root /var/www;
+        
         return 301 https://$server_name$request_uri;
+        
+        index index.html index.php index.htm;
+        
+        location / {
+               try_files $uri $uri/ =404;
+        }
+
+        location /rutorrent {
+               auth_basic "Restricted";
+               auth_basic_user_file /etc/nginx/.htpasswd;
+               include /etc/nginx/conf.d/php;
+               include /etc/nginx/conf.d/cache;
+        }
+
+        #include /etc/nginx/conf.d/rtdload;
+
+        location ~ /\.ht {
+                deny all;
+        }
 }
 
 server {
