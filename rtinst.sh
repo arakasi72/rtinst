@@ -608,7 +608,7 @@ echo "[options]" > autodl2.cfg
 echo "gui-server-port = $adlport" >> autodl2.cfg
 echo "gui-server-password = $adlpass" >> autodl2.cfg
 
-sed -i "s/if (\\$\.browser\.msie)/if (navigator\.appName == \'Microsoft Internet Explorer\' \&\& navigator\.userAgent\.match(\/msie 6\/i))/g" /var/www/rutorrent/plugins/autodl-irssi/AutodlFilesDownloader.js
+# sed -i "s/if (\\$\.browser\.msie)/if (navigator\.appName == \'Microsoft Internet Explorer\' \&\& navigator\.userAgent\.match(\/msie 6\/i))/g" /var/www/rutorrent/plugins/autodl-irssi/AutodlFilesDownloader.js
 
 # set permissions
 echo "Setting permissions, Starting services" | tee -a $logfile
