@@ -60,7 +60,7 @@ while [ $script_size = 0 ]
     if [ $attempts = 20 ]; then
       error_exit "Problem downloading scripts from github - https://github.com/"
     fi
-    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name >> $logfile 2>&1
+    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/develop/$script_name >> $logfile 2>&1
     script_size=$(du -b $script_name | cut -f1)
   done
 
@@ -110,8 +110,7 @@ while getopts ":dlr" optname
     case $optname in
       "d" ) DLFLAG=0 ;;
       "l" ) logfile="$HOME/rtinst.log" ;;
-      "r" ) rudevflag=0 ;;
-        * ) echo "incorrect option, only -d, -l, and -r allowed" && exit 1 ;;
+        * ) echo "incorrect option, only -d, and -l allowed" && exit 1 ;;
     esac
   done
 
@@ -226,19 +225,19 @@ for package_name in $package_list
 
 test -z "$install_list" || apt-get -y install $install_list >> $logfile 2>&1
 
-if [ $RELNO = 14 ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg-real" 2>/dev/null | grep -c "ok installed") = 0 ]; then
-  apt-add-repository -y ppa:samrog131/ppa >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~samrog131/+archive/ubuntu/ppa"
-  apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
-  apt-get -y install ffmpeg-real >> $logfile 2>&1
-  ln -sf /opt/ffmpeg/bin/ffmpeg /usr/bin/ffmpeg
-elif [ $RELNO = 8 ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
-  grep "deb http://www.deb-multimedia.org jessie main" /etc/apt/sources.list >> /dev/null || echo "deb http://www.deb-multimedia.org jessie main" >> /etc/apt/sources.list
-  apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
-  apt-get -y --force-yes install deb-multimedia-keyring >> $logfile 2>&1
-  apt-get -y --force-yes install ffmpeg >> $logfile 2>&1
-elif [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
-  apt-get -y install ffmpeg >> $logfile 2>&1
-fi
+# if [ $RELNO = 14 ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg-real" 2>/dev/null | grep -c "ok installed") = 0 ]; then
+#   apt-add-repository -y ppa:samrog131/ppa >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~samrog131/+archive/ubuntu/ppa"
+#   apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
+#   apt-get -y install ffmpeg-real >> $logfile 2>&1
+#   ln -sf /opt/ffmpeg/bin/ffmpeg /usr/bin/ffmpeg
+# elif [ $RELNO = 8 ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
+#   grep "deb http://www.deb-multimedia.org jessie main" /etc/apt/sources.list >> /dev/null || echo "deb http://www.deb-multimedia.org jessie main" >> /etc/apt/sources.list
+#   apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
+#   apt-get -y --force-yes install deb-multimedia-keyring >> $logfile 2>&1
+#   apt-get -y --force-yes install ffmpeg >> $logfile 2>&1
+# elif [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
+#   apt-get -y install ffmpeg >> $logfile 2>&1
+# fi
 echo "Completed installation of required packages        "
 
 #add user to sudo group if not already
@@ -481,21 +480,21 @@ if [ -d "/var/www/rutorrent" ]; then
   rm -r /var/www/rutorrent
 fi
 
-if [ $rudevflag = 1 ]; then
-  echo "Installing Rutorrent (stable)" | tee -a $logfile
-  wget --no-check-certificate https://bintray.com/artifact/download/novik65/generic/rutorrent-3.6.tar.gz >> $logfile 2>&1 || error_exit "Unable to download rutorrent files from https://bintray.com/artifact/download/novik65/generic/rutorrent-3.6.tar.gz"
-  wget --no-check-certificate https://bintray.com/artifact/download/novik65/generic/plugins-3.6.tar.gz >> $logfile 2>&1 || error_exit "Unable to download rutorrent plugin files from https://bintray.com/artifact/download/novik65/generic/plugins-3.6.tar.gz"
-  tar -xzf rutorrent-3.6.tar.gz
-  tar -xzf plugins-3.6.tar.gz
-  rm rutorrent-3.6.tar.gz
-  rm plugins-3.6.tar.gz
-  rm -r rutorrent/plugins
-  mv plugins rutorrent
-else
+# if [ $rudevflag = 1 ]; then
+#   echo "Installing Rutorrent (stable)" | tee -a $logfile
+#   wget --no-check-certificate https://bintray.com/artifact/download/novik65/generic/rutorrent-3.6.tar.gz >> $logfile 2>&1 || error_exit "Unable to download rutorrent files from https://bintray.com/artifact/download/novik65/generic/rutorrent-3.6.tar.gz"
+#   wget --no-check-certificate https://bintray.com/artifact/download/novik65/generic/plugins-3.6.tar.gz >> $logfile 2>&1 || error_exit "Unable to download rutorrent plugin files from https://bintray.com/artifact/download/novik65/generic/plugins-3.6.tar.gz"
+#   tar -xzf rutorrent-3.6.tar.gz
+#   tar -xzf plugins-3.6.tar.gz
+#   rm rutorrent-3.6.tar.gz
+#   rm plugins-3.6.tar.gz
+#   rm -r rutorrent/plugins
+#   mv plugins rutorrent
+# else
   echo "Installing Rutorrent (development)" | tee -a $logfile
   git clone https://github.com/Novik/ruTorrent.git
   mv ruTorrent rutorrent
-fi
+# fi
 
 echo "Configuring Rutorrent" | tee -a $logfile
 rm rutorrent/conf/config.php
