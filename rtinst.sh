@@ -491,10 +491,14 @@ fi
 #   rm -r rutorrent/plugins
 #   mv plugins rutorrent
 # else
-  echo "Installing Rutorrent (development)" | tee -a $logfile
-  git clone https://github.com/Novik/ruTorrent.git
-  mv ruTorrent rutorrent
+#   echo "Installing Rutorrent (development)" | tee -a $logfile
+#   git clone https://github.com/Novik/ruTorrent.git
+#   mv ruTorrent rutorrent
 # fi
+
+echo "Installing Rutorrent (development)" | tee -a $logfile
+git clone https://github.com/Novik/ruTorrent.git
+mv ruTorrent rutorrent
 
 echo "Configuring Rutorrent" | tee -a $logfile
 rm rutorrent/conf/config.php
