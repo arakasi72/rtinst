@@ -4,7 +4,7 @@
 ####1. Introduction
 Seedbox installation
 
-It has been tested with clean installs of Ubuntu 12.04, 12.05, 13.10, and 14.04, 14.10 and Debian Wheezy (7.6) and Debian 8 beta2
+It has been tested with clean installs of Ubuntu 12.04, 12.05, 13.10, and 14.04, 14.10 and Debian Wheezy (7.6) and Debian 8 RC2
 
 Services that will be installed and configured are
 
