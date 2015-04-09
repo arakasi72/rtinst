@@ -497,8 +497,7 @@ fi
 # fi
 
 echo "Installing Rutorrent" | tee -a $logfile
-git clone https://github.com/Novik/ruTorrent.git >> $logfile 2>&1
-mv ruTorrent rutorrent
+git clone https://github.com/Novik/ruTorrent.git rutorrent >> $logfile 2>&1
 
 echo "Configuring Rutorrent" | tee -a $logfile
 rm rutorrent/conf/config.php
