@@ -97,8 +97,8 @@ ask_user
 test "${FULLREL#*Ubuntu 12.04}" != "$FULLREL" && RELNO=12
 test "${FULLREL#*Ubuntu 13.10}" != "$FULLREL" && RELNO=13
 test "${FULLREL#*Ubuntu 14}" != "$FULLREL" && RELNO=14
+test "${FULLREL#*Ubuntu 15}" != "$FULLREL" && RELNO=15
 test "${FULLREL#*Debian*7}" != "$FULLREL" && RELNO=7
-test "${FULLREL#*Debian*jessie}" != "$FULLREL" && RELNO=8
 test "${FULLREL#*Debian*8}" != "$FULLREL" && RELNO=8
 test "${FULLREL#*Raspbian GNU/Linux 7}" != "$FULLREL" && RELNO="RPi"
 test -z "$RELNO" && echo "Unable to determine OS or OS unsupported" && exit
