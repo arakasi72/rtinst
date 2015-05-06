@@ -4,7 +4,7 @@
 ####1. Introduction
 Seedbox installation
 
-It has been tested with clean installs of Ubuntu 12, 14 and 15, and Debian 7 and 8
+It has been tested with clean installs of Ubuntu 12, 13, 14 and 15, and Debian 7 and 8
 
 Services that will be installed and configured are
 
