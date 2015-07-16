@@ -207,6 +207,7 @@ if ! [ $? = 0 ]; then
 fi
 
 echo "Upgrading packages" | tee -a $logfile
+export DEBIAN_FRONTEND=noninteractive
 apt-get -y upgrade >> $logfile 2>&1
 if ! [ $? = 0 ]; then
   error_exit "Problem upgrading packages."
