@@ -1,5 +1,10 @@
 #!/bin/bash
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+
+rtorrentloc='http://rtorrent.net/downloads/rtorrent-0.9.4.tar.gz'
+libtorrentloc='http://rtorrent.net/downloads/libtorrent-0.13.4.tar.gz'
+xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
+
 FULLREL=$(cat /etc/issue.net)
 SERVERIP=$(ip a s eth0 | awk '/inet / {print$2}' | cut -d/ -f1)
 WEBPASS=''
@@ -428,9 +433,9 @@ if [ $install_rt = 0 ]; then
   cd source
   echo "Downloading rtorrent source files" | tee -a $logfile
 
-  svn co https://svn.code.sf.net/p/xmlrpc-c/code/stable xmlrpc  >> $logfile 2>&1 || error_exit "Unable to download xmlrpc source files from https://svn.code.sf.net/p/xmlrpc-c/code/stable"
-  curl -# --connect-timeout 5 http://libtorrent.rakshasa.no/downloads/libtorrent-0.13.4.tar.gz | tar xz  >> $logfile 2>&1 || curl -# https://codeload.github.com/rakshasa/libtorrent/tar.gz/0.13.4 | tar xz  >> $logfile 2>&1 || error_exit "Unable to download libtorrent source files from http://libtorrent.rakshasa.no/downloads"
-  curl -# --connect-timeout 5 http://libtorrent.rakshasa.no/downloads/rtorrent-0.9.4.tar.gz | tar xz  >> $logfile 2>&1 || curl -# https://codeload.github.com/rakshasa/rtorrent/tar.gz/0.9.4 | tar xz  >> $logfile 2>&1 || error_exit "Unable to download rtorrent source files from http://libtorrent.rakshasa.no/downloads"
+  svn co $xmlrpcloc xmlrpc  >> $logfile 2>&1 || error_exit "Unable to download xmlrpc source files from https://svn.code.sf.net/p/xmlrpc-c/code/stable"
+  curl -# $libtorrentloc | tar xz  >> $logfile 2>&1 || error_exit "Unable to download libtorrent source files from http://libtorrent.rakshasa.no/downloads"
+  curl -# $rtorrentloc | tar xz  >> $logfile 2>&1 || error_exit "Unable to download rtorrent source files from http://libtorrent.rakshasa.no/downloads"
 
   cd xmlrpc
   echo "Installing xmlrpc" | tee -a $logfile
