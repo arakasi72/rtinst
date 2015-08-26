@@ -94,8 +94,8 @@ fi
 rm -r libtorrent* rtorrent*
 
 echo "Fetching source files"
-curl -# http://libtorrent.rakshasa.no/downloads/$libvers.tar.gz | tar xz
-curl -# http://libtorrent.rakshasa.no/downloads/$rtvers.tar.gz | tar xz
+curl -# http://rtorrent.net/downloads/$libvers.tar.gz | tar xz
+curl -# http://rtorrent.net/downloads/$rtvers.tar.gz | tar xz
 
 echo "Compiling libtorrent"
 cd $home/source/$libvers
