@@ -1,5 +1,6 @@
 location ~ ^/download/(.+?)(/.*)?$ {
     alias /home/$1$2;
+    charset UTF-8;
     set $user $1;
     if ($remote_user = '') { break; }
     if ($user != $remote_user) { return 403; }
