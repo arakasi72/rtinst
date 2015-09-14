@@ -37,12 +37,14 @@ ask_version() {
       echo "1. libtorrent 0.13.2/rtorrent 0.9.2"
       echo "2. libtorrent 0.13.3/rtorrent 0.9.3"
       echo "3. libtorrent 0.13.4/rtorrent 0.9.4"
-      echo "4. Quit"
+      echo "4. libtorrent 0.13.6/rtorrent 0.9.6"
+      echo "5. Quit"
       read -p "Select an option " answer
       case $answer in [1] ) libvers="libtorrent-0.13.2" && rtvers="rtorrent-0.9.2" && return 0 ;;
                       [2] ) libvers="libtorrent-0.13.3" && rtvers="rtorrent-0.9.3" && return 0 ;;
                       [3] ) libvers="libtorrent-0.13.4" && rtvers="rtorrent-0.9.4" && return 0 ;;
-                      [4] ) exit ;;
+                      [4] ) libvers="libtorrent-0.13.4" && rtvers="rtorrent-0.9.6" && return 0 ;;
+                      [5] ) exit ;;
                           * ) echo "Enter 1-4";;
       esac
     done
