@@ -45,7 +45,7 @@ ask_version() {
                       [3] ) libvers="libtorrent-0.13.4" && rtvers="rtorrent-0.9.4" && return 0 ;;
                       [4] ) libvers="libtorrent-0.13.4" && rtvers="rtorrent-0.9.6" && return 0 ;;
                       [5] ) exit ;;
-                          * ) echo "Enter 1-4";;
+                          * ) echo "Enter 1-5";;
       esac
     done
 }
