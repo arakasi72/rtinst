@@ -1,8 +1,10 @@
 #!/bin/bash
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
-rtorrentloc='http://rtorrent.net/downloads/rtorrent-0.9.4.tar.gz'
-libtorrentloc='http://rtorrent.net/downloads/libtorrent-0.13.4.tar.gz'
+rtorrentrel='0.9.6'
+libtorrentrel='0.13.6'
+rtorrentloc='http://rtorrent.net/downloads/rtorrent-'$rtorrentrel'.tar.gz'
+libtorrentloc='http://rtorrent.net/downloads/libtorrent-'$libtorrentrel'.tar.gz'
 xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
 
 FULLREL=$(cat /etc/issue.net)
@@ -443,7 +445,7 @@ if [ $install_rt = 0 ]; then
   make >> $logfile 2>&1
   make install >> $logfile 2>&1
 
-  cd ../libtorrent-0.13.4
+  cd ../libtorrent-$libtorrentrel
   echo "Installing libtorrent" | tee -a $logfile
   ./autogen.sh >> $logfile 2>&1
   if [ $RELNO = "RPi" ]; then
@@ -454,7 +456,7 @@ if [ $install_rt = 0 ]; then
   make -j2 >> $logfile 2>&1
   make install >> $logfile 2>&1
 
-  cd ../rtorrent-0.9.4
+  cd ../rtorrent-$rtorrentrel
   echo "Installing rtorrent" | tee -a $logfile
   ./autogen.sh >> $logfile 2>&1
   ./configure --prefix=/usr --with-xmlrpc-c >> $logfile 2>&1
