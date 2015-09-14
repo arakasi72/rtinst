@@ -43,7 +43,7 @@ ask_version() {
       case $answer in [1] ) libvers="libtorrent-0.13.2" && rtvers="rtorrent-0.9.2" && return 0 ;;
                       [2] ) libvers="libtorrent-0.13.3" && rtvers="rtorrent-0.9.3" && return 0 ;;
                       [3] ) libvers="libtorrent-0.13.4" && rtvers="rtorrent-0.9.4" && return 0 ;;
-                      [4] ) libvers="libtorrent-0.13.4" && rtvers="rtorrent-0.9.6" && return 0 ;;
+                      [4] ) libvers="libtorrent-0.13.6" && rtvers="rtorrent-0.9.6" && return 0 ;;
                       [5] ) exit ;;
                           * ) echo "Enter 1-5";;
       esac
