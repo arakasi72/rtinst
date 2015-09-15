@@ -42,7 +42,6 @@ rtvers=$(echo $verschoice | cut -d/ -f2)
 break
 done
 done
-
 }
 
 confirm_answer() {
