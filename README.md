@@ -95,6 +95,14 @@ to run this:
 
 and enter the user name when asked
 
+######4.3 rtupdate
+
+This script can upgrade or downgrade the libtorrent/rtorrent version installed
+to run this:
+
+	sudo rtupdate
+
+
 ######4.3 rtdload
 
 This script will enable or disable https download
