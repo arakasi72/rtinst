@@ -2,6 +2,7 @@
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 RTFILE=/usr/local/bin/rt
 home="/home/$SUDO_USER"
+duoversion="0.13.2/0.9.2 0.13.3/0.9.3 0.13.4/0.9.4 0.13.6/0.9.6"
 
 installed() {
 hash $1 2>/dev/null
@@ -31,29 +32,23 @@ fi
 }
 
 ask_version() {
-    while true
-      do
-      echo "Select version to upgrade/downgrade to"
-      echo "1. libtorrent 0.13.2/rtorrent 0.9.2"
-      echo "2. libtorrent 0.13.3/rtorrent 0.9.3"
-      echo "3. libtorrent 0.13.4/rtorrent 0.9.4"
-      echo "4. libtorrent 0.13.6/rtorrent 0.9.6"
-      echo "5. Quit"
-      read -p "Select an option " answer
-      case $answer in [1] ) libvers="libtorrent-0.13.2" && rtvers="rtorrent-0.9.2" && return 0 ;;
-                      [2] ) libvers="libtorrent-0.13.3" && rtvers="rtorrent-0.9.3" && return 0 ;;
-                      [3] ) libvers="libtorrent-0.13.4" && rtvers="rtorrent-0.9.4" && return 0 ;;
-                      [4] ) libvers="libtorrent-0.13.6" && rtvers="rtorrent-0.9.6" && return 0 ;;
-                      [5] ) exit ;;
-                          * ) echo "Enter 1-5";;
-      esac
-    done
+while [ -z "$verschoice" ]
+do
+echo "Please select libtorrent/rtorrent version."
+select verschoice in ${duoversion[*]}
+do
+libvers=$(echo $verschoice | cut -d/ -f1)
+rtvers=$(echo $verschoice | cut -d/ -f2)
+break
+done
+done
+
 }
 
 confirm_answer() {
 while true
       do
-      read -p "Sure you wish to install $libvers/$rtvers? " answer
+      read -p "Sure you wish to install libtorrent-"$libvers" and rtorrent-"$rtvers"?" answer
       case $answer in [Yy]* ) return 0 ;;
                       [Nn]* ) exit ;;
                           * ) echo "Enter y or n";;
@@ -96,18 +91,18 @@ fi
 rm -r libtorrent* rtorrent*
 
 echo "Fetching source files"
-curl -# http://rtorrent.net/downloads/$libvers.tar.gz | tar xz
-curl -# http://rtorrent.net/downloads/$rtvers.tar.gz | tar xz
+curl -# http://rtorrent.net/downloads/libtorrent-$libvers.tar.gz | tar xz
+curl -# http://rtorrent.net/downloads/rtorrent-$rtvers.tar.gz | tar xz
 
 echo "Compiling libtorrent"
-cd $home/source/$libvers
+cd $home/source/libtorrent-$libvers
 ./autogen.sh >> /dev/null 2>&1
 ./configure --prefix=/usr >> /dev/null 2>&1
 make -j2 >> /dev/null 2>&1
 make install >> /dev/null 2>&1
 
 echo "Compiling rtorrent"
-cd $home/source/$rtvers
+cd $home/source/rtorrent-$rtvers
 ./autogen.sh >> /dev/null 2>&1
 ./configure --prefix=/usr --with-xmlrpc-c >> /dev/null 2>&1
 make -j2 >> /dev/null 2>&1
