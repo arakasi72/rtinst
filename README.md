@@ -97,8 +97,7 @@ and enter the user name when asked
 
 ######4.3 rtupdate
 
-This script can upgrade or downgrade the libtorrent/rtorrent version installed
-to run this:
+This script can upgrade, (or downgrade), the libtorrent/rtorrent version installed. To run this:
 
 	sudo rtupdate
 
