@@ -4,6 +4,7 @@ RTFILE=/usr/local/bin/rt
 home="/home/$SUDO_USER"
 duoversion="0.13.2/0.9.2 0.13.3/0.9.3 0.13.4/0.9.4 0.13.6/0.9.6"
 FULLREL=$(cat /etc/issue.net)
+RELNO=0
 
 installed() {
 hash $1 2>/dev/null
