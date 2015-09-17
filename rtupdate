@@ -100,9 +100,9 @@ echo "Compiling libtorrent"
 cd $home/source/libtorrent-$libvers
 ./autogen.sh >> /dev/null 2>&1
 if [ $RELNO = "RPi" ]; then
-    ./configure --prefix=/usr --disable-instrumentation >> $logfile 2>&1
+    ./configure --prefix=/usr --disable-instrumentation >> /dev/null 2>&1
   else
-    ./configure --prefix=/usr >> $logfile 2>&1
+    ./configure --prefix=/usr >> /dev/null 2>&1
 fi
 make -j2 >> /dev/null 2>&1
 make install >> /dev/null 2>&1
