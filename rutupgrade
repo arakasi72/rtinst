@@ -90,7 +90,7 @@ if [ $ruflag = 0 ]; then
   fi
 
   echo
-  echo 'Installing the latest version of rutorrent'
+  echo 'Installing the version '$newvers' of rutorrent'
   echo 'Your existing rutorrent folder will be moved to '$HOME'/rutorrent_old'
   echo
   echo 'If you are not happy with the upgrade you can restore the old version, by rerunning this script'
