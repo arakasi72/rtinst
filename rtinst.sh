@@ -269,6 +269,7 @@ get_scripts rtsetpass /usr/local/bin/rtsetpass
 get_scripts rtdload /usr/local/bin/rtdload
 get_scripts rtadduser /usr/local/bin/rtadduser
 get_scripts rtremove /usr/local/bin/rtremove
+get_scripts rutupgrade /usr/local/bin/rutupgrade
 
 get_scripts .rtorrent.rc
 get_scripts ru.config
