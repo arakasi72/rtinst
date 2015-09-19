@@ -101,8 +101,15 @@ This script can upgrade, (or downgrade), the libtorrent/rtorrent version install
 
 	sudo rtupdate
 
+######4.4 rutupgrade
 
-######4.4 rtdload
+This script upgrades Rutorrent. It retains all your config and settings, as well as providing a rollback capability.
+
+To run this:
+
+	sudo rutupgrade
+
+######4.5 rtdload
 
 This script will enable or disable https download
 
@@ -116,14 +123,14 @@ to disable:
 
 The following scripts can be used by any user
 
-######4.5 rtpass
+######4.6 rtpass
 
 This will allow user to change their rutorrent password.
 to run this:
 
 	rtpass
 
-######4.6 rt
+######4.7 rt
 
 This script can stop, start, or restart rtorrent or irssi. Use the arguments stop start or restart, with no arguments it will tell tell you if rtorrent is running or not
 
