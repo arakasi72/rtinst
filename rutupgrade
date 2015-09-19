@@ -1,5 +1,9 @@
 #!/bin/bash
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+
+newvers=$(curl -s https://raw.githubusercontent.com/Novik/ruTorrent/master/js/webui.js | grep -m 1 version: | cut -d \" -f2)
+oldvers=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
+
 ruflag=0
 
 ask_option() {
@@ -36,6 +40,18 @@ echo 'Could not find /var/www/rutorrent, exiting script'
 exit
 fi
 
+#check versions
+if [ $newvers = $oldvers ]; then
+  echo "You have the latest version: "$newvers
+else
+  echo "Installed version: "$oldvers
+  echo "   Latest version: "$newvers
+fi
+
+if ! ( check_user ); then
+  exit
+fi
+
 #check to see if rutorrent_old exists, offer restore or upgrade options
 if [ -d $HOME'/rutorrent_old' ];then
 echo 'Detected '$HOME'/rutorrent_old'
@@ -59,8 +75,6 @@ echo 'Detected '$HOME'/rutorrent_old'
     echo "WARNING: rutorrent_old will be deleted"
 	echo "If you wish to retain this older version you should exit this script, and rename or move it"
     if ( check_user ); then
-      rm -r $HOME/rutorrent_old
-	  echo "rutorrent_old has been deleted"
       ruflag=0
     else
       exit
@@ -69,25 +83,30 @@ echo 'Detected '$HOME'/rutorrent_old'
 fi
 
 if [ $ruflag = 0 ]; then
-echo
-echo 'Installing the latest version of rutorrent'
-echo 'Your existing rutorrent folder will be moved to '$HOME'/rutorrent_old'
-echo
-echo 'If you are not happy with the upgrade you can restore the old version, by rerunning this script'
-echo
 
-mv -f /var/www/rutorrent $HOME/rutorrent_old
+  if [ -d $HOME'/rutorrent_old' ]; then
+    rm -r $HOME/rutorrent_old
+	echo "rutorrent_old has been deleted"
+  fi
 
-echo "Installing Rutorrent"
-git clone https://github.com/Novik/ruTorrent.git /var/www/rutorrent  >> /dev/null 2>&1
-git clone https://github.com/autodl-community/autodl-rutorrent.git /var/www/rutorrent/plugins/autodl-irssi  >> /dev/null 2>&1
+  echo
+  echo 'Installing the latest version of rutorrent'
+  echo 'Your existing rutorrent folder will be moved to '$HOME'/rutorrent_old'
+  echo
+  echo 'If you are not happy with the upgrade you can restore the old version, by rerunning this script'
+  echo
 
-rm -r /var/www/rutorrent/conf  >> /dev/null 2>&1
-cp -r $HOME/rutorrent_old/conf /var/www/rutorrent/conf  >> /dev/null 2>&1
-rm -r /var/www/rutorrent/share >> /dev/null 2>&1
-cp -r $HOME/rutorrent_old/share /var/www/rutorrent/share >> /dev/null 2>&1
-echo "Setting permissions, Starting services"
-chown -R www-data:www-data /var/www
-chmod -R 755 /var/www/rutorrent
+  mv -f /var/www/rutorrent $HOME/rutorrent_old
 
+  echo "Installing Rutorrent"
+  git clone https://github.com/Novik/ruTorrent.git /var/www/rutorrent  >> /dev/null 2>&1
+  git clone https://github.com/autodl-community/autodl-rutorrent.git /var/www/rutorrent/plugins/autodl-irssi  >> /dev/null 2>&1
+
+  rm -r /var/www/rutorrent/conf  >> /dev/null 2>&1
+  cp -r $HOME/rutorrent_old/conf /var/www/rutorrent/conf  >> /dev/null 2>&1
+  rm -r /var/www/rutorrent/share >> /dev/null 2>&1
+  cp -r $HOME/rutorrent_old/share /var/www/rutorrent/share >> /dev/null 2>&1
+  echo "Setting permissions, Starting services"
+  chown -R www-data:www-data /var/www
+  chmod -R 755 /var/www/rutorrent
 fi
