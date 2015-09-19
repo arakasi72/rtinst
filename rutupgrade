@@ -1,0 +1,93 @@
+#!/bin/bash
+PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+ruflag=0
+
+ask_option() {
+ while true
+    do
+      echo "1. Restore rutorrent_old"
+      echo "2. Upgrade to latest version"
+      read -p "Select 1 or 2: " answer
+      case $answer in [1]* ) return 0 ;;
+                      [2]* ) return 1 ;;
+      esac
+    done
+}
+
+check_user() {
+while true
+  do
+    read -p "Do you wish to continue? " answer
+    case $answer in [Yy]* ) return 0 ;;
+                    [Nn]* ) return 1 ;;
+                        * ) echo "Enter y or n";;
+    esac
+  done
+}
+
+#check user is root or sudo
+if [ -z "$SUDO_USER" -a  "$LOGNAME" != "root" ]; then
+echo "Must be run from root or using sudo" && exit 1
+fi
+
+#check rutorrent folder exists
+if ! [ -d '/var/www/rutorrent' ]; then
+echo 'Could not find /var/www/rutorrent, exiting script'
+exit
+fi
+
+#check to see if rutorrent_old exists, offer restore or upgrade options
+if [ -d $HOME'/rutorrent_old' ];then
+echo 'Detected '$HOME'/rutorrent_old'
+  if ( ask_option ); then
+    echo "Restoring Old version of rutorrent"
+    echo "WARNING: The current rutorrent will be overwitten by older backup"
+    ruflag=1
+    if ( check_user ); then
+      echo "Restoring"
+      rm -r /var/www/rutorrent
+      mv -f $HOME/rutorrent_old /var/www/rutorrent
+      echo "Setting permissions, Starting services"
+      chown -R www-data:www-data /var/www
+      chmod -R 755 /var/www/rutorrent
+      echo "Done"
+    else
+      exit
+    fi
+  else
+    echo "Rutorrent will be upgraded"
+    echo "WARNING: rutorrent_old will be deleted"
+	echo "If you wish to retain this older version you should exit this script, and rename or move it"
+    if ( check_user ); then
+      rm -r $HOME/rutorrent_old
+	  echo "rutorrent_old has been deleted"
+      ruflag=0
+    else
+      exit
+    fi
+  fi
+fi
+
+if [ $ruflag = 0 ]; then
+echo
+echo 'Installing the latest version of rutorrent'
+echo 'Your existing rutorrent folder will be moved to '$HOME'/rutorrent_old'
+echo
+echo 'If you are not happy with the upgrade you can restore the old version, by rerunning this script'
+echo
+
+mv -f /var/www/rutorrent $HOME/rutorrent_old
+
+echo "Installing Rutorrent"
+git clone https://github.com/Novik/ruTorrent.git /var/www/rutorrent  >> /dev/null 2>&1
+git clone https://github.com/autodl-community/autodl-rutorrent.git /var/www/rutorrent/plugins/autodl-irssi  >> /dev/null 2>&1
+
+rm -r /var/www/rutorrent/conf  >> /dev/null 2>&1
+cp -r $HOME/rutorrent_old/conf /var/www/rutorrent/conf  >> /dev/null 2>&1
+rm -r /var/www/rutorrent/share >> /dev/null 2>&1
+cp -r $HOME/rutorrent_old/share /var/www/rutorrent/share >> /dev/null 2>&1
+echo "Setting permissions, Starting services"
+chown -R www-data:www-data /var/www
+chmod -R 755 /var/www/rutorrent
+
+fi
