@@ -45,4 +45,4 @@ do
   get_scripts $i
 done
 
-echo "Completed"
+echo "Completed scripts download"
