@@ -80,6 +80,8 @@ If you get an error run the following, you will only need to this once, and subs
 
 	wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtgetscripts
 	sudo bash rtgetscripts
+	
+All the scripts can be found in /usr/local/bin
 
 ######4.1 rtadduser
 
