@@ -41,7 +41,7 @@ exit
 fi
 
 #check versions
-if [ $newvers = $oldvers ]; then
+if [ '$newvers' = '$oldvers' ]; then
   echo "You have the latest version: "$newvers
 else
   echo "Installed version: "$oldvers
