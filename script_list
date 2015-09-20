@@ -7,3 +7,4 @@ rtdload
 rtadduser
 rtremove
 rutupgrade
+rtgetscripts
