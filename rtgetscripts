@@ -39,7 +39,6 @@ if [ -f "/var/www/rutorrent/.htpasswd" ]; then
   service nginx reload
 fi
 
-cd $HOME
 for i in "${script_list[@]}"
 do
   rt_get_scripts $i
