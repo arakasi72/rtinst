@@ -74,9 +74,12 @@ To access that information just use the following command
 
 A number of additional scripts will be installed that carry out a variety of useful functions. These will be installed by the main script but if you want to get the latest versions you can run the following:
 
+	sudo rtgetscripts
+
+If you get an error run the following, you will only need to this once, and subsequently the prior command will work
+
 	wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtgetscripts
 	sudo bash rtgetscripts
-	rm rtgetscripts
 
 ######4.1 rtadduser
 
