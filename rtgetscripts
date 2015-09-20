@@ -1,7 +1,7 @@
 #!/bin/bash
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
-script_list=($(curl -s  https://raw.githubusercontent.com/arakasi72/rtinst/develop/script_list))
+script_list=($(curl -s  https://raw.githubusercontent.com/arakasi72/rtinst/master/script_list))
 
 get_scripts() {
 local script_name=$1
