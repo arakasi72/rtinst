@@ -3,7 +3,7 @@ PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 script_list=($(curl -s  https://raw.githubusercontent.com/arakasi72/rtinst/master/script_list))
 
-get_scripts() {
+rt_get_scripts() {
 local script_name=$1
 local attempts=0
 local script_size=0
@@ -42,7 +42,7 @@ fi
 cd $HOME
 for i in "${script_list[@]}"
 do
-  get_scripts $i
+  rt_get_scripts $i
 done
 
 echo "Completed scripts download"
