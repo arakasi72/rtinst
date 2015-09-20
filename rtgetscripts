@@ -47,6 +47,6 @@ done
 
 echo "Completed scripts download"
 
-if [-f '$HOME/rtgetscripts']; then
+if [-f $HOME'/rtgetscripts']; then
   rm -f $HOME/rtgetscripts
 fi
