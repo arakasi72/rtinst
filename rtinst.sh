@@ -260,23 +260,15 @@ echo "Fetching rtinst scripts" | tee -a $logfile
 mkdir -p $home/rtscripts
 cd $home/rtscripts
 
-get_scripts rt /usr/local/bin/rt
-get_scripts rtcheck /usr/local/bin/rtcheck
-get_scripts rtupdate /usr/local/bin/rtupdate
-get_scripts edit_su /usr/local/bin/edit_su
-get_scripts rtpass /usr/local/bin/rtpass
-get_scripts rtsetpass /usr/local/bin/rtsetpass
-get_scripts rtdload /usr/local/bin/rtdload
-get_scripts rtadduser /usr/local/bin/rtadduser
-get_scripts rtremove /usr/local/bin/rtremove
-get_scripts rutupgrade /usr/local/bin/rutupgrade
-get_scripts rtgetscripts /usr/local/bin/rtgetscripts
-
 get_scripts .rtorrent.rc
 get_scripts ru.config
 get_scripts ru.ini
 get_scripts nginxsitedl
 get_scripts nginxsite
+get_scripts edit_su /usr/local/bin/edit_su
+get_scripts rtgetscripts /usr/local/bin/rtgetscripts
+
+rtgetscripts
 
 cd $home
 
