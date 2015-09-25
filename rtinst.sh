@@ -233,6 +233,21 @@ for package_name in $package_list
 
 test -z "$install_list" || apt-get -y install $install_list >> $logfile 2>&1
 
+if [ "${FULLREL#*Debian*}" != "$FULLREL" ]; then
+  cd $home
+  if [ "$(uname -m)" = "x86_64" ]; then
+    curl -s http://www.rarlab.com/rar/rarlinux-x64-5.2.1.tar.gz | tar xz
+  elif [ "$(uname -m)" = "x86_32" ]; then
+    curl -s http://www.rarlab.com/rar/rarlinux-5.2.1.tar.gz | tar xz
+  fi
+  
+  cp $home/rar/rar /bin/rar
+  cp $home/rar/unrar /bin/unrar
+  rm -r $home/rar
+else
+  apt-get -y install unrar
+fi
+
 # if [ $RELNO = 14 ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg-real" 2>/dev/null | grep -c "ok installed") = 0 ]; then
 #   apt-add-repository -y ppa:samrog131/ppa >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~samrog131/+archive/ubuntu/ppa"
 #   apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
