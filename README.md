@@ -32,7 +32,7 @@ Log into your server with a terminal client like Putty. Fill in the following de
 	username: root
 	password: use the password your vendor provided
 
-####3. [Main Script](rtinst.sh)
+####[3. Main Script](rtinst.sh)
 
 Run the script from root, or if you have a sudo user already set up you can run it from there. If for some reason it is interrupted you can run it again to completion. Running the script multiple times will not cause any problems.
 
@@ -99,13 +99,13 @@ to run this:
 
 and enter the user name when asked
 
-######4.3 rtupdate
+######[4.3 rtupdate](rtupdate)
 
 This script can upgrade, (or downgrade), the libtorrent/rtorrent version installed. To run this:
 
 	sudo rtupdate
 
-######4.4 rutupgrade
+######[4.4 rutupgrade](rutupgrade)
 
 This script upgrades Rutorrent. It retains all your config and settings, as well as providing a rollback capability.
 
@@ -113,7 +113,7 @@ To run this:
 
 	sudo rutupgrade
 
-######4.5 rtdload
+######[4.5 rtdload](rtdload)
 
 This script will enable or disable https download
 
@@ -127,14 +127,14 @@ to disable:
 
 The following scripts can be used by any user
 
-######4.6 rtpass
+######[4.6 rtpass](rtpass)
 
 This will allow user to change their rutorrent password.
 to run this:
 
 	rtpass
 
-######4.7 rt
+######[4.7 rt](rt)
 
 This script can stop, start, or restart rtorrent or irssi. Use the arguments stop start or restart, with no arguments it will tell tell you if rtorrent is running or not
 
