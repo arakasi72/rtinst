@@ -82,7 +82,7 @@ If you get an error run the following, you will only need to this once, and subs
 	
 All the scripts are downloaded to /usr/local/bin
 
-######4.1 rtadduser
+######[4.1 rtadduser](rtadduser)
 
 This will add new users. Ensuring there are no conflicts with the existing user ports. You can use it to create brand new users, or reset the config on existing users. If you use it on an existing user, you will NOT lose any torrents, files, of autodl-filters. It will just reset the ports used.
 to run this:
@@ -90,7 +90,7 @@ to run this:
 	sudo rtadduser
 and enter the information asked for.
 
-######4.2 rtremove
+######[4.2 rtremove](rtremove)
 
 WARNING: This will completely remove a user wiping all their config and data, and removing them from the system.
 to run this:
