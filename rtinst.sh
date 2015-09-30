@@ -681,9 +681,9 @@ echo "ftp client should be set to explicit ftp over tls using port $ftpport" | t
 echo
 if [ $DLFLAG = 0 ]; then
   find $home -type d -print0 | xargs -0 chmod 755
-  echo "Access https downloads at https://$SERVERIP/download/$user" | tee -a $home/rtinst.info
-  echo
 fi
+echo "If enabled, access https downloads at https://$SERVERIP/download/$user" | tee -a $home/rtinst.info
+echo
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | tee -a $home/rtinst.info
 echo "rutorrent password set to $WEBPASS" | tee -a $home/rtinst.info
 echo "to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
