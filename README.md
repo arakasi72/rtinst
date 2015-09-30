@@ -36,7 +36,7 @@ Log into your server with a terminal client like Putty. Fill in the following de
 	username: root
 	password: use the password your vendor provided
 
-####3. Main Script
+####3. [Main Script](rtinst.sh)
 
 Run the script from root, or if you have a sudo user already set up you can run it from there. If for some reason it is interrupted you can run it again to completion. Running the script multiple times will not cause any problems.
 
