@@ -1,6 +1,5 @@
 ###rtinst
 ======
-
 NOTE: Please feel free to use any of the code or scripts here, in part or in full, in your own projects. A mention would be appreciated if you use a significant chunk.
 
 ####1. Introduction
@@ -33,7 +32,7 @@ Log into your server with a terminal client like Putty. Fill in the following de
 	username: root
 	password: use the password your vendor provided
 
-####3. Main Script
+####[3. Main Script](rtinst.sh)
 
 Run the script from root, or if you have a sudo user already set up you can run it from there. If for some reason it is interrupted you can run it again to completion. Running the script multiple times will not cause any problems.
 
@@ -83,7 +82,7 @@ If you get an error run the following, you will only need to this once, and subs
 	
 All the scripts are downloaded to /usr/local/bin
 
-######4.1 rtadduser
+######[4.1 rtadduser](rtadduser)
 
 This will add new users. Ensuring there are no conflicts with the existing user ports. You can use it to create brand new users, or reset the config on existing users. If you use it on an existing user, you will NOT lose any torrents, files, of autodl-filters. It will just reset the ports used.
 to run this:
@@ -91,7 +90,7 @@ to run this:
 	sudo rtadduser
 and enter the information asked for.
 
-######4.2 rtremove
+######[4.2 rtremove](rtremove)
 
 WARNING: This will completely remove a user wiping all their config and data, and removing them from the system.
 to run this:
@@ -100,13 +99,13 @@ to run this:
 
 and enter the user name when asked
 
-######4.3 rtupdate
+######[4.3 rtupdate](rtupdate)
 
 This script can upgrade, (or downgrade), the libtorrent/rtorrent version installed. To run this:
 
 	sudo rtupdate
 
-######4.4 rutupgrade
+######[4.4 rutupgrade](rutupgrade)
 
 This script upgrades Rutorrent. It retains all your config and settings, as well as providing a rollback capability.
 
@@ -114,7 +113,7 @@ To run this:
 
 	sudo rutupgrade
 
-######4.5 rtdload
+######[4.5 rtdload](rtdload)
 
 This script will enable or disable https download
 
@@ -128,14 +127,14 @@ to disable:
 
 The following scripts can be used by any user
 
-######4.6 rtpass
+######[4.6 rtpass](rtpass)
 
 This will allow user to change their rutorrent password.
 to run this:
 
 	rtpass
 
-######4.7 rt
+######[4.7 rt](rt)
 
 This script can stop, start, or restart rtorrent or irssi. Use the arguments stop start or restart, with no arguments it will tell tell you if rtorrent is running or not
 
