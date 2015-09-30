@@ -1,9 +1,6 @@
 ###rtinst
 ======
 
-[main script](rtinst.sh)
-
-
 NOTE: Please feel free to use any of the code or scripts here, in part or in full, in your own projects. A mention would be appreciated if you use a significant chunk.
 
 ####1. Introduction
