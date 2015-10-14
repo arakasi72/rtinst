@@ -10,12 +10,8 @@ Services that will be installed and configured are
 	1. vsftpd - ftp server
 	2. libtorrent/rtorrent
 	3. rutorrent
-	4. Nginx
+	4. Nginx (webserver)
 	5. autodl-irssi
-
-I use nginx, it uses less system resources, and I find it easier to configure than apache2.
-
-It uses latest versions of all software at time of posting.
 
 It takes about 10 minutes to run, depending on your server setup.
 
