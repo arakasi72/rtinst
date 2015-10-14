@@ -1,6 +1,5 @@
 ###rtinst
 ======
-
 ####1. Introduction
 Seedbox installation
 
