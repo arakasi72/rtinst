@@ -1,6 +1,8 @@
-#This s an example resource file for rTorrent. Copy to
-# ~/.rtorrent.rc and enable/modify the options as needed. Remember to
-# uncomment the options you wish to enable.
+# This is the rtorrent configuration file installed by arakasi72 rtinst script.
+# This file is installed to ~/.rtorrent.rc
+# Enable/modify the options as needed, uncomment the options you wish to enable.
+# This configuration will work well with most systems, but optimal settings are dependant on specific server setup
+
 # BitTorrent
 max_downloads_global = 0
 max_uploads_global = 0
@@ -8,26 +10,19 @@ min_peers = 30
 max_peers = 150 
 min_peers_seed = -1 
 max_peers_seed = -1
-
 max_uploads = 150
-
 download_rate = 0
 upload_rate = 0
 
 # Directories
 directory = /home/<user name>/rtorrent/downloads
-
 session = /home/<user name>/rtorrent/.session
-
 schedule = watch_directory,5,5,load_start=/home/<user name>/rtorrent/watch/*.torrent
-
-
 
 # Networking
 port_range = 51001-51250 
 # network.scgi.open_port = localhost:5000
 network.scgi.open_port = 127.0.0.1:5000
-# scgi_port = 127.0.0.1:5000
 network.http.ssl_verify_peer.set=0
 port_random = yes
 use_udp_trackers = yes 
