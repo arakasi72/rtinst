@@ -1,4 +1,4 @@
-# This is the rtorrent configuration file installed by arakasi72 rtinst script.
+# This is the rtorrent configuration file installed by rtinst script - https://github.com/arakasi72/rtinst
 # This file is installed to ~/.rtorrent.rc
 # Enable/modify the options as needed, uncomment the options you wish to enable.
 # This configuration will work well with most systems, but optimal settings are dependant on specific server setup
