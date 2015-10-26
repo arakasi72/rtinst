@@ -90,7 +90,7 @@ fi
 
 ask_version
 confirm_answer
-test "${FULLREL#*Raspbian GNU/Linux 7}" != "$FULLREL" && RELNO="RPi"
+test "${FULLREL#*Raspbian*}" != "$FULLREL" && RELNO="RPi"
 
 echo
 echo "Installing $libvers/$rtvers"
