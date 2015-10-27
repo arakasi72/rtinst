@@ -252,7 +252,7 @@ for package_name in $package_list
 
 test -z "$install_list" || apt-get -y install $install_list >> $logfile 2>&1
 
-if [ "${FULLREL#*Debian*}" != "$FULLREL" ] || [ "${FULLREL#*Raspbian*}" != "$FULLREL" ]; then
+if [ "${FULLREL#*Debian*}" != "$FULLREL" ]; then
   cd $home
   if [ "$(uname -m)" = "x86_64" ]; then
     curl -s http://www.rarlab.com/rar/rarlinux-x64-5.2.1.tar.gz | tar xz
@@ -263,7 +263,7 @@ if [ "${FULLREL#*Debian*}" != "$FULLREL" ] || [ "${FULLREL#*Raspbian*}" != "$FUL
   cp $home/rar/rar /bin/rar
   cp $home/rar/unrar /bin/unrar
   rm -r $home/rar
-else
+elif [ "${FULLREL#*Ubuntu*}" != "$FULLREL" ]; then
   apt-get -y install unrar
 fi
 
