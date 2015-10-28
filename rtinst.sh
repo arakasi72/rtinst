@@ -23,7 +23,9 @@ libtorrentloc='http://rtorrent.net/downloads/libtorrent-'$libtorrentrel'.tar.gz'
 xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
 
 FULLREL=$(cat /etc/issue.net)
-RPi='no'
+OSNAME=$(cat /etc/issue.net | cut -d' ' -f1)
+RELNO=$(cat /etc/issue.net | tr -d -c 0-9. | cut -d. -f1)
+
 SERVERIP=$(ip a s eth0 | awk '/inet / {print$2}' | cut -d/ -f1)
 WEBPASS=''
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
@@ -117,18 +119,14 @@ ask_user
 }
 
 # determine system
-test "${FULLREL#*Ubuntu 12.04}" != "$FULLREL" && RELNO=12
-test "${FULLREL#*Ubuntu 13.10}" != "$FULLREL" && RELNO=13
-test "${FULLREL#*Ubuntu 14}" != "$FULLREL" && RELNO=14
-test "${FULLREL#*Ubuntu 15}" != "$FULLREL" && RELNO=15
-test "${FULLREL#*Debian*7}" != "$FULLREL" && RELNO=7
-test "${FULLREL#*Debian*8}" != "$FULLREL" && RELNO=8
-test "${FULLREL#*Raspbian*7}" != "$FULLREL" && RELNO=7
-test "${FULLREL#*Raspbian*8}" != "$FULLREL" && RELNO=8
-test "${FULLREL#*Raspbian*}" != "$FULLREL" && RPi='yes'
-
-test -z "$RELNO" && echo "Unable to determine OS or OS unsupported" && exit
-echo $FULLREL
+if [[ $OSNAME = "Ubuntu" && $RELNO -gt 11 ]] || [[ $OSNAME = "Debian" && $RELNO -gt 6 ]]  || [[ $OSNAME = "Raspbian" && $RELNO -gt 6 ]]; then
+  echo $FULLREL
+else
+ echo $FULLREL
+ echo "Only Ubuntu release 12 and later, and Debian and Raspbian release 7 and later, are supported"
+ echo "Your system does not appear to be supported"
+ exit
+fi
 
 # get options
 while getopts ":dlr" optname
@@ -252,19 +250,18 @@ for package_name in $package_list
 
 test -z "$install_list" || apt-get -y install $install_list >> $logfile 2>&1
 
-if [ "${FULLREL#*Debian*}" != "$FULLREL" ]; then
+if [ $OSNAME = "Debian" ]; then
   cd $home
   if [ "$(uname -m)" = "x86_64" ]; then
     curl -s http://www.rarlab.com/rar/rarlinux-x64-5.2.1.tar.gz | tar xz
   elif [ "$(uname -m)" = "x86_32" ]; then
     curl -s http://www.rarlab.com/rar/rarlinux-5.2.1.tar.gz | tar xz
   fi
-  
   cp $home/rar/rar /bin/rar
   cp $home/rar/unrar /bin/unrar
   rm -r $home/rar
-elif [ "${FULLREL#*Ubuntu*}" != "$FULLREL" ]; then
-  apt-get -y install unrar
+elif [ $OSNAME = "Ubuntu" ]; then
+  apt-get -y install unrar  | tee -a $logfile
 fi
 
 # if [ $RELNO = 14 ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg-real" 2>/dev/null | grep -c "ok installed") = 0 ]; then
@@ -476,7 +473,7 @@ if [ $install_rt = 0 ]; then
   cd ../libtorrent-$libtorrentrel
   echo "Installing libtorrent" | tee -a $logfile
   ./autogen.sh >> $logfile 2>&1
-  if [ $RPi = "yes" ]; then
+  if [ $OSNAME = "Raspbian" ]; then
     ./configure --prefix=/usr --disable-instrumentation >> $logfile 2>&1
   else
     ./configure --prefix=/usr >> $logfile 2>&1
@@ -647,8 +644,6 @@ echo "[options]" > autodl2.cfg
 echo "gui-server-port = $adlport" >> autodl2.cfg
 echo "gui-server-password = $adlpass" >> autodl2.cfg
 
-# sed -i "s/if (\\$\.browser\.msie)/if (navigator\.appName == \'Microsoft Internet Explorer\' \&\& navigator\.userAgent\.match(\/msie 6\/i))/g" /var/www/rutorrent/plugins/autodl-irssi/AutodlFilesDownloader.js
-
 # set permissions
 echo "Setting permissions, Starting services" | tee -a $logfile
 chown -R www-data:www-data /var/www
@@ -664,26 +659,6 @@ rm -r $home/rtscripts
 
 su $user -c '/usr/local/bin/rt restart'
 su $user -c '/usr/local/bin/rt -i restart'
-
-# Next section commented out, as issue this was addressing in autodl seems to be resolved
-#sleep 2
-#sudo -u $user screen -S irssi -p 0 -X stuff "/WINDOW LOG ON $home/ir.log$(printf \\r)"
-#sudo -u $user screen -S irssi -p 0 -X stuff "/autodl update$(printf \\r)"
-#echo -n "updating autodl-irssi"
-#sleep 3
-#while ! ((tail -n1 $home/ir.log | grep -c -q "You are using the latest autodl-trackers") || (tail -n1 $home/ir.log | grep -c -q "Successfully loaded tracker files"))
-#do
-#sleep 1
-#echo -n " ."
-#done
-#echo
-#sudo -u $user screen -S irssi -p 0 -X stuff "/WINDOW LOG OFF$(printf \\r)"
-#sleep 1
-#sudo -u $user screen -S irssi -p 0 -X quit
-#sleep 2
-#su $user -c '/usr/local/bin/rt -i start > /dev/null'
-#rm $home/ir.log
-#echo "autodl-irssi update complete"
 
 if [ -z "$(crontab -u $user -l | grep "$cronline1")" ]; then
     (crontab -u $user -l; echo "$cronline1" ) | crontab -u $user - >> $logfile 2>&1
