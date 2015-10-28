@@ -262,7 +262,7 @@ if [ $OSNAME = "Debian" ]; then
   cp $home/rar/unrar /bin/unrar
   rm -r $home/rar
 elif [ $OSNAME = "Ubuntu" ]; then
-  apt-get -y install unrar  | tee -a $logfile
+  apt-get -y install unrar  >> $logfile 2>&1
 fi
 
 # if [ $RELNO = 14 ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg-real" 2>/dev/null | grep -c "ok installed") = 0 ]; then
