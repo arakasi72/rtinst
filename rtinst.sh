@@ -119,28 +119,17 @@ ask_user
 }
 
 # determine system
-#test "${FULLREL#*Ubuntu 12.04}" != "$FULLREL" && RELNO=12
-#test "${FULLREL#*Ubuntu 13.10}" != "$FULLREL" && RELNO=13
-#test "${FULLREL#*Ubuntu 14}" != "$FULLREL" && RELNO=14
-#test "${FULLREL#*Ubuntu 15}" != "$FULLREL" && RELNO=15
-#test "${FULLREL#*Debian*7}" != "$FULLREL" && RELNO=7
-#test "${FULLREL#*Debian*8}" != "$FULLREL" && RELNO=8
-#test "${FULLREL#*Raspbian*7}" != "$FULLREL" && RELNO=7
-#test "${FULLREL#*Raspbian*8}" != "$FULLREL" && RELNO=8
-#test "${FULLREL#*Raspbian*}" != "$FULLREL" && RPi='yes'
-
-#test -z "$RELNO" && echo "Unable to determine OS or OS unsupported" && exit
-if [ $OSNAME = "Ubuntu" ] && [ $RELNO -lt 12 ]; then
-  echo "Ubuntu versions earlier than 12 are not supported" && exit
-elif [ $OSNAME = "Debian" ] && [ $RELNO -lt 7 ]; then
-  echo "Debian versions earlier than 7 are not supported" && exit
-elif [ $OSNAME = "Raspbian" ] && [ $RELNO -lt 7 ]; then
-  echo "Raspbian versions earlier than 7 are not supported" && exit
+echo "OS: "$OSNAME
+echo "Rel: "$RELNO
+if [[ $OSNAME = "Ubuntu" && $RELNO -gt 11 ]] || [[ $OSNAME = "Debian" && $RELNO -gt 6 ]]  || [[ $OSNAME = "Raspbian" && $RELNO -gt 6 ]]; then
+  echo $FULLREL
 else
-  echo "Only Ubuntu, Debiab, and Raspbian are supported" && exit
-echo $FULLREL
-echo $OSNAME
-echo $RELNO
+ echo $FULLREL
+ echo "Only Ubuntu release 12 and later, and Debian and Raspbian release 7 and later, are supported"
+ echo "Your sytem does not appear to be supported"
+ exit
+fi
+
 # get options
 while getopts ":dlr" optname
   do
