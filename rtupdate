@@ -19,6 +19,7 @@ RTFILE=/usr/local/bin/rt
 home="/home/$SUDO_USER"
 duoversion="0.13.2/0.9.2 0.13.3/0.9.3 0.13.4/0.9.4 0.13.6/0.9.6"
 FULLREL=$(cat /etc/issue.net)
+OSNAME=$(cat /etc/issue.net | cut -d' ' -f1)
 RELNO='0'
 
 installed() {
@@ -87,10 +88,8 @@ else
   exit 1
 fi
 
-
 ask_version
 confirm_answer
-test "${FULLREL#*Raspbian*}" != "$FULLREL" && RELNO="RPi"
 
 echo
 echo "Installing $libvers/$rtvers"
@@ -114,7 +113,7 @@ curl -# http://rtorrent.net/downloads/rtorrent-$rtvers.tar.gz | tar xz
 echo "Compiling libtorrent"
 cd $home/source/libtorrent-$libvers
 ./autogen.sh >> /dev/null 2>&1
-if [ $RELNO = "RPi" ]; then
+if [ $OSNAME = "Raspbian" ]; then
     ./configure --prefix=/usr --disable-instrumentation >> /dev/null 2>&1
   else
     ./configure --prefix=/usr >> /dev/null 2>&1
