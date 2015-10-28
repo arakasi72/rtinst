@@ -124,7 +124,7 @@ if [[ $OSNAME = "Ubuntu" && $RELNO -gt 11 ]] || [[ $OSNAME = "Debian" && $RELNO 
 else
  echo $FULLREL
  echo "Only Ubuntu release 12 and later, and Debian and Raspbian release 7 and later, are supported"
- echo "Your sytem does not appear to be supported"
+ echo "Your system does not appear to be supported"
  exit
 fi
 
