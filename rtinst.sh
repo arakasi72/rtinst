@@ -119,7 +119,7 @@ ask_user
 }
 
 # determine system
-if [[ $OSNAME = "Ubuntu" && $RELNO -gt 11 ]] || [[ $OSNAME = "Debian" && $RELNO -gt 6 ]]  || [[ $OSNAME = "Raspbian" && $RELNO -gt 6 ]]; then
+if [[ $OSNAME = "Ubuntu" && $RELNO -ge 12 ]] || [[ $OSNAME = "Debian" && $RELNO -ge 7 ]]  || [[ $OSNAME = "Raspbian" && $RELNO -ge 7 ]]; then
   echo $FULLREL
 else
  echo $FULLREL
@@ -250,6 +250,7 @@ for package_name in $package_list
 
 test -z "$install_list" || apt-get -y install $install_list >> $logfile 2>&1
 
+#install unrar package
 if [ $OSNAME = "Debian" ]; then
   cd $home
   if [ "$(uname -m)" = "x86_64" ]; then
