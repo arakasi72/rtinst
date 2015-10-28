@@ -119,8 +119,6 @@ ask_user
 }
 
 # determine system
-echo "OS: "$OSNAME
-echo "Rel: "$RELNO
 if [[ $OSNAME = "Ubuntu" && $RELNO -gt 11 ]] || [[ $OSNAME = "Debian" && $RELNO -gt 6 ]]  || [[ $OSNAME = "Raspbian" && $RELNO -gt 6 ]]; then
   echo $FULLREL
 else
