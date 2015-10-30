@@ -265,7 +265,9 @@ elif [ $OSNAME = "Ubuntu" ]; then
   apt-get -y install unrar  >> $logfile 2>&1
 fi
 
+#install ffmpeg
 if ! [ $OSNAME = "Raspbian" ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
+  echo "Installing ffmpeg"
   if [ $RELNO = 14 ]; then
     apt-add-repository -y ppa:mc3man/trusty-media >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~mc3man/+archive/ubuntu/ppa"
     apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
