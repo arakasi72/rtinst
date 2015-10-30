@@ -270,13 +270,13 @@ if ! [ $OSNAME = "Raspbian" ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/de
     apt-add-repository -y ppa:mc3man/trusty-media >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~mc3man/+archive/ubuntu/ppa"
     apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
     apt-get -y install ffmpeg >> $logfile 2>&1
-  elif [ $RELNO = 8 ]
+  elif [ $RELNO = 8 ]; then
     grep "deb http://www.deb-multimedia.org jessie main" /etc/apt/sources.list >> /dev/null || echo "deb http://www.deb-multimedia.org jessie main" >> /etc/apt/sources.list
     apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
     apt-get -y --force-yes install deb-multimedia-keyring >> $logfile 2>&1
     apt-get -y --force-yes install ffmpeg >> $logfile 2>&1
   else
-  apt-get -y install ffmpeg >> $logfile 2>&1
+    apt-get -y install ffmpeg >> $logfile 2>&1
   fi
 fi
 
