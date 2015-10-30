@@ -265,19 +265,21 @@ elif [ $OSNAME = "Ubuntu" ]; then
   apt-get -y install unrar  >> $logfile 2>&1
 fi
 
-# if [ $RELNO = 14 ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg-real" 2>/dev/null | grep -c "ok installed") = 0 ]; then
-#   apt-add-repository -y ppa:samrog131/ppa >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~samrog131/+archive/ubuntu/ppa"
-#   apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
-#   apt-get -y install ffmpeg-real >> $logfile 2>&1
-#   ln -sf /opt/ffmpeg/bin/ffmpeg /usr/bin/ffmpeg
-# elif [ $RELNO = 8 ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
-#   grep "deb http://www.deb-multimedia.org jessie main" /etc/apt/sources.list >> /dev/null || echo "deb http://www.deb-multimedia.org jessie main" >> /etc/apt/sources.list
-#   apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
-#   apt-get -y --force-yes install deb-multimedia-keyring >> $logfile 2>&1
-#   apt-get -y --force-yes install ffmpeg >> $logfile 2>&1
-# elif [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
-#   apt-get -y install ffmpeg >> $logfile 2>&1
-# fi
+if ! [ $OSNAME = "Raspbian" ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
+  if [ $RELNO = 14 ]; then
+    apt-add-repository -y ppa:mc3man/trusty-media >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~mc3man/+archive/ubuntu/ppa"
+    apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
+    apt-get -y install ffmpeg >> $logfile 2>&1
+  elif [ $RELNO = 8 ]
+    grep "deb http://www.deb-multimedia.org jessie main" /etc/apt/sources.list >> /dev/null || echo "deb http://www.deb-multimedia.org jessie main" >> /etc/apt/sources.list
+    apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
+    apt-get -y --force-yes install deb-multimedia-keyring >> $logfile 2>&1
+    apt-get -y --force-yes install ffmpeg >> $logfile 2>&1
+  else
+  apt-get -y install ffmpeg >> $logfile 2>&1
+  fi
+fi
+
 echo "Completed installation of required packages        "
 
 #add user to sudo group if not already
