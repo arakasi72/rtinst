@@ -623,7 +623,7 @@ adlpass=$(genpasswd $(random 12 16))
 
 mkdir -p $home/.irssi/scripts/autorun
 cd $home/.irssi/scripts
-wget --no-check-certificate -O autodl-irssi.zip http://update.autodl-community.com/autodl-irssi-community.zip >> $logfile 2>&1 || error_exit "Unable to download autodl scripts from http://update.autodl-community.com/"
+curl -sL http://git.io/vlcND | grep -Po '(?<="browser_download_url": ")(.*-v[\d.]+.zip)' | xargs wget --quiet -O autodl-irssi.zip
 unzip -o autodl-irssi.zip >> $logfile 2>&1
 rm autodl-irssi.zip
 cp autodl-irssi.pl autorun/
