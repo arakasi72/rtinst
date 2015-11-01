@@ -323,7 +323,7 @@ echo "?>" >> /var/www/rutorrent/conf/users/$user/config.php
 mkdir /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi
 mkdir -p $home/.irssi/scripts/autorun
 cd $home/.irssi/scripts
-wget --no-check-certificate -O autodl-irssi.zip http://update.autodl-community.com/autodl-irssi-community.zip
+curl -sL http://git.io/vlcND | grep -Po '(?<="browser_download_url": ")(.*-v[\d.]+.zip)' | xargs wget --quiet -O autodl-irssi.zip
 unzip -o autodl-irssi.zip
 rm autodl-irssi.zip
 cp autodl-irssi.pl autorun/
