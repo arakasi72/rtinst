@@ -79,7 +79,7 @@ All the scripts are downloaded to /usr/local/bin
 
 ######[4.1 rtwebmin](rtwebmin)
 
-This will install webmin and configure nginx as a reverse proxy allowing you to access webmin using https://<SERVERIP>/webmin
+This will install webmin and configure nginx as a reverse proxy allowing you to access webmin using https:/<SERVERIP>/webmin
 To run this:
 
 	sudo rtwebmin
