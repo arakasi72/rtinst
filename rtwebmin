@@ -1,0 +1,96 @@
+#!/bin/bash
+
+######################################################################
+#
+#  Copyright (c) 2015 arakasi72 (https://github.com/arakasi72)
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: 
+#
+#  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. 
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+#  --> Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+#
+######################################################################
+
+PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+SERVERIP=$(ip a s eth0 | awk '/inet / {print$2}' | cut -d/ -f1)
+
+if ! [ "$LOGNAME" = "root" ]; then
+  echo "Must be run as root, directly or with sudo"
+  exit 1
+fi
+
+if [ $(dpkg-query -W -f='${Status}' webmin 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+  echo "Installing Webmin"
+  echo "deb http://download.webmin.com/download/repository sarge contrib" > /etc/apt/sources.list.d/webmin.list
+  wget -qO - http://www.webmin.com/jcameron-key.asc | apt-key add -
+  apt-get update  >> /dev/null 2>&1
+  apt-get -y install webmin  >> /dev/null 2>&1
+else
+  echo 'Webmin is already installed'
+fi
+
+#changes to the webmin config file
+if [ -z "$(grep ^referers_none= /etc/webmin/config)" ]; then
+  echo "referers_none=1" >> /etc/webmin/config
+else
+  sed -i '/^referers_none=/ c\referers_none=1' /etc/webmin/config
+fi
+
+if [ -z "$(grep ^referers= /etc/webmin/config)" ]; then
+  echo "referers=localhost" >> /etc/webmin/config
+else
+  sed -i '/^referers=/ c\referers=localhost' /etc/webmin/config
+fi
+
+if [ -z "$(grep ^webprefix= /etc/webmin/config)" ]; then
+  echo "webprefix=/webmin" >> /etc/webmin/config
+else
+  sed -i '/^webprefix=/ c\webprefix=\/webmin' /etc/webmin/config
+fi
+
+if [ -z "$(grep ^webprefixnoredir= /etc/webmin/config)" ]; then
+  echo "webprefixnoredir=1" >> /etc/webmin/config
+else
+  sed -i '/^webprefixnoredir=/ c\webprefixnoredir=1' /etc/webmin/config
+fi
+
+if [ -z "$(grep ^referer= /etc/webmin/config)" ]; then
+  echo "referer=1" >> /etc/webmin/config
+else
+  sed -i '/^referer=/ c\referer=1' /etc/webmin/config
+fi
+
+echo "Setting up Nginx Reverse Proxy"
+
+#set up default proxy settings
+echo 'proxy_redirect off;' > /etc/nginx/conf.d/proxy.conf
+echo 'proxy_set_header Host $host;' >> /etc/nginx/conf.d/proxy.conf
+echo 'proxy_set_header X-Real-IP $remote_addr;' >> /etc/nginx/conf.d/proxy.conf
+echo 'proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' >> /etc/nginx/conf.d/proxy.conf
+echo 'proxy_cache off;' >> /etc/nginx/conf.d/proxy.conf
+echo 'proxy_buffering off;' >> /etc/nginx/conf.d/proxy.conf
+
+#include webmin location in main nginx site file
+lineno=$(sed -n '/include \/etc\/nginx\/sites-available\/webmin-loc;/=' /etc/nginx/sites-available/default)
+if [ -z "$lineno" ]; then
+  sed -i '/location \~ \/\\\.ht/ i\        include \/etc\/nginx\/sites-available\/webmin-loc;\n' /etc/nginx/sites-available/default
+else
+  sed -i '/webmin-loc/ c\        include \/etc\/nginx\/sites-available\/webmin-loc;' /etc/nginx/sites-available/default
+fi
+
+#write the webmin nginx location file
+echo 'location /webmin/ {' > /etc/nginx/sites-available/webmin-loc
+echo '       proxy_pass https://localhost:10000/;' >> /etc/nginx/sites-available/webmin-loc
+echo '       proxy_redirect https://$host:10000/ /webmin/;' >> /etc/nginx/sites-available/webmin-loc
+echo '}' >> /etc/nginx/sites-available/webmin-loc
+
+#restart services
+service webmin restart  >> /dev/null 2>&1
+service nginx restart  >> /dev/null 2>&1
+echo "Completed"
+echo
+echo "Webmin can be accessed at https://$SERVERIP/webmin"
+echo "login using root, or sudo user credentials"
