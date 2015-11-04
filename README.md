@@ -79,14 +79,14 @@ All the scripts are downloaded to /usr/local/bin
 ######[4.1 rtwebmin](rtwebmin)
 
 This will install webmin and configure nginx as a reverse proxy allowing you to access webmin using https://<SERVERIP>/webmin
-to run this:
+To run this:
 
 	sudo rtwebmin
 
 ######[4.2 rtadduser](rtadduser)
 
 This will add new users. Ensuring there are no conflicts with the existing user ports. You can use it to create brand new users, or reset the config on existing users. If you use it on an existing user, you will NOT lose any torrents, files, of autodl-filters. It will just reset the ports used.
-to run this:
+To run this:
 
 	sudo rtadduser
 and enter the information asked for.
@@ -94,7 +94,7 @@ and enter the information asked for.
 ######[4.3 rtremove](rtremove)
 
 WARNING: This will completely remove a user wiping all their config and data, and removing them from the system.
-to run this:
+To run this:
 
 	sudo rtremove
 
@@ -118,11 +118,11 @@ To run this:
 
 This script will enable or disable https download
 
-to enable:
+To enable:
 
 	sudo rtdload enable
 
-to disable:
+To disable:
 
 	sudo rtdload disable
 
