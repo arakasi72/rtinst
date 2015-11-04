@@ -12,6 +12,7 @@ Services that will be installed and configured are
 	3. rutorrent
 	4. Nginx (webserver)
 	5. autodl-irssi
+	6. webmin (optional see section 4.1 below)
 
 It takes about 10 minutes to run, depending on your server setup.
 
