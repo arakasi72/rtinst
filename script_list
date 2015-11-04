@@ -7,4 +7,5 @@ rtdload
 rtadduser
 rtremove
 rutupgrade
+rtwebmin
 rtgetscripts
