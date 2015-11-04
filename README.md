@@ -76,7 +76,14 @@ If you get an error run the following, you will only need to this once, and subs
 	
 All the scripts are downloaded to /usr/local/bin
 
-######[4.1 rtadduser](rtadduser)
+######[4.1 rtwebmin](rtwebmin)
+
+This will install webmin and configure nginx as a reverse proxy allowing you to access webmin using https://<SERVERIP>/webmin
+to run this:
+
+	sudo rtwebmin
+
+######[4.2 rtadduser](rtadduser)
 
 This will add new users. Ensuring there are no conflicts with the existing user ports. You can use it to create brand new users, or reset the config on existing users. If you use it on an existing user, you will NOT lose any torrents, files, of autodl-filters. It will just reset the ports used.
 to run this:
@@ -84,7 +91,7 @@ to run this:
 	sudo rtadduser
 and enter the information asked for.
 
-######[4.2 rtremove](rtremove)
+######[4.3 rtremove](rtremove)
 
 WARNING: This will completely remove a user wiping all their config and data, and removing them from the system.
 to run this:
@@ -93,13 +100,13 @@ to run this:
 
 and enter the user name when asked
 
-######[4.3 rtupdate](rtupdate)
+######[4.4 rtupdate](rtupdate)
 
 This script can upgrade, (or downgrade), the libtorrent/rtorrent version installed. To run this:
 
 	sudo rtupdate
 
-######[4.4 rutupgrade](rutupgrade)
+######[4.5 rutupgrade](rutupgrade)
 
 This script upgrades Rutorrent. It retains all your config and settings, as well as providing a rollback capability.
 
@@ -107,7 +114,7 @@ To run this:
 
 	sudo rutupgrade
 
-######[4.5 rtdload](rtdload)
+######[4.6 rtdload](rtdload)
 
 This script will enable or disable https download
 
@@ -121,14 +128,14 @@ to disable:
 
 The following scripts can be used by any user
 
-######[4.6 rtpass](rtpass)
+######[4.7 rtpass](rtpass)
 
 This will allow user to change their rutorrent password.
 to run this:
 
 	rtpass
 
-######[4.7 rt](rt)
+######[4.8 rt](rt)
 
 This script can stop, start, or restart rtorrent or irssi. Use the arguments stop start or restart, with no arguments it will tell tell you if rtorrent is running or not
 
