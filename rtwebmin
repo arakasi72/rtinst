@@ -63,6 +63,12 @@ else
   sed -i '/^referer=/ c\referer=1' /etc/webmin/config
 fi
 
+if [ -z "$(grep ^rssl= /etc/webmin/miniserv.conf)" ]; then
+  echo "ssl=0" >> /etc/webmin/miniserv.conf
+else
+  sed -i '/^ssl=/ c\ssl=0' /etc/webmin/miniserv.conf
+fi
+
 echo "Setting up Nginx Reverse Proxy"
 
 #set up default proxy settings
@@ -81,8 +87,8 @@ sed -i $lineno"i\        include \/etc\/nginx\/sites-available\/webmin-loc;\n" /
 
 #write the webmin nginx location file
 echo 'location /webmin/ {' > /etc/nginx/sites-available/webmin-loc
-echo '       proxy_pass https://localhost:10000/;' >> /etc/nginx/sites-available/webmin-loc
-echo '       proxy_redirect https://$host:10000/ /webmin/;' >> /etc/nginx/sites-available/webmin-loc
+echo '       proxy_pass http://localhost:10000/;' >> /etc/nginx/sites-available/webmin-loc
+echo '       proxy_redirect http://$host:10000/ /webmin/;' >> /etc/nginx/sites-available/webmin-loc
 echo '}' >> /etc/nginx/sites-available/webmin-loc
 
 #restart services
