@@ -74,12 +74,10 @@ echo 'proxy_cache off;' >> /etc/nginx/conf.d/proxy.conf
 echo 'proxy_buffering off;' >> /etc/nginx/conf.d/proxy.conf
 
 #include webmin location in main nginx site file
-lineno=$(sed -n '/include \/etc\/nginx\/sites-available\/webmin-loc;/=' /etc/nginx/sites-available/default)
-if [ -z "$lineno" ]; then
-  sed -i '/location \~ \/\\\.ht/ i\        include \/etc\/nginx\/sites-available\/webmin-loc;\n' /etc/nginx/sites-available/default
-else
-  sed -i '/webmin-loc/ c\        include \/etc\/nginx\/sites-available\/webmin-loc;' /etc/nginx/sites-available/default
-fi
+sed -i '/webmin-loc/d' /etc/nginx/sites-available/default
+sed -i '/^$/N;/^\n$/D'   /etc/nginx/sites-available/default
+lineno=$(grep -Fn 'location ~ /\.ht' /etc/nginx/sites-available/default | cut -d : -f 1 | tail -1)
+sed -i $lineno"i\        include \/etc\/nginx\/sites-available\/webmin-loc;\n" /etc/nginx/sites-available/default
 
 #write the webmin nginx location file
 echo 'location /webmin/ {' > /etc/nginx/sites-available/webmin-loc
