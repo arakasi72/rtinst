@@ -63,7 +63,7 @@ else
   sed -i '/^referer=/ c\referer=1' /etc/webmin/config
 fi
 
-if [ -z "$(grep ^rssl= /etc/webmin/miniserv.conf)" ]; then
+if [ -z "$(grep ^ssl= /etc/webmin/miniserv.conf)" ]; then
   echo "ssl=0" >> /etc/webmin/miniserv.conf
 else
   sed -i '/^ssl=/ c\ssl=0' /etc/webmin/miniserv.conf
