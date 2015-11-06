@@ -49,6 +49,7 @@ until [ $no_err = 0 ]
 
 if ! [ -z "$script_dest" ]; then
   mv -f $script_name $script_dest
+  chmod 755 $script_dest
 fi
 }
 
