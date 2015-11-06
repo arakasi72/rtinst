@@ -97,11 +97,12 @@ confirm_answer
 echo
 echo "Installing $libvers/$rtvers"
 
+cd $HOME
+
 if ! [ -x $RTFILE ]; then
   get_scripts rt /usr/local/bin/rt
 fi
 
-cd $HOME
 if [ -d source ]; then
   cd source
 else
