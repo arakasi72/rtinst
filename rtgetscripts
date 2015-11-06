@@ -16,7 +16,9 @@
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
-script_list=($(curl -s  https://raw.githubusercontent.com/arakasi72/rtinst/master/script_list))
+BLOB=master
+RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$BLOB
+script_list=($(curl -s  $RTDIR/script_list))
 
 rt_get_scripts() {
 local script_name=$1
@@ -33,7 +35,7 @@ while [ $script_size = 0 ]
       echo "If the Github website is down, you can try again later"
       exit 1
     fi
-    wget -q --no-check-certificate --output-document=/usr/local/bin/$script_name https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name
+    wget -q --no-check-certificate --output-document=/usr/local/bin/$script_name $RTDIR/$script_name
     script_size=$(du -b /usr/local/bin/$script_name | cut -f1)
   done
 
@@ -43,15 +45,6 @@ chmod 755 /usr/local/bin/$script_name
 
 if [ -z "$SUDO_USER" -a  "$LOGNAME" != "root" ]; then
 echo "Must be run from root or using sudo" && exit 1
-fi
-
-if [ -f "/var/www/rutorrent/.htpasswd" ]; then
-  mv /var/www/rutorrent/.htpasswd /etc/nginx
-  chown www-data:www-data /etc/nginx/.htpasswd
-  chmod 640 /etc/nginx/.htpasswd
-  sed -i 's/\/var\/www\/rutorrent\/\.htpasswd/\/etc\/nginx\/\.htpasswd/g' /etc/nginx/sites-available/default
-  sed -i 's/\/var\/www\/rutorrent\/\.htpasswd/\/etc\/nginx\/\.htpasswd/g' /etc/nginx/conf.d/rtdload
-  service nginx reload
 fi
 
 for i in "${script_list[@]}"
