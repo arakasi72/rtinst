@@ -22,6 +22,9 @@ rtorrentloc='http://rtorrent.net/downloads/rtorrent-'$rtorrentrel'.tar.gz'
 libtorrentloc='http://rtorrent.net/downloads/libtorrent-'$libtorrentrel'.tar.gz'
 xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
 
+BLOB=master
+RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$BLOB
+
 FULLREL=$(cat /etc/issue.net)
 OSNAME=$(cat /etc/issue.net | cut -d' ' -f1)
 RELNO=$(cat /etc/issue.net | tr -d -c 0-9. | cut -d. -f1)
@@ -85,7 +88,7 @@ while [ $script_size = 0 ]
     if [ $attempts = 20 ]; then
       error_exit "Problem downloading scripts from github - https://github.com/"
     fi
-    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name >> $logfile 2>&1
+    wget --no-check-certificate $RTDIR/$script_name >> $logfile 2>&1
     script_size=$(du -b $script_name | cut -f1)
   done
 
