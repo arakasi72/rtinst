@@ -20,7 +20,7 @@ BLOB=master
 RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$BLOB
 
 RTFILE=/usr/local/bin/rt
-home="/home/$SUDO_USER"
+
 duoversion="0.13.2/0.9.2 0.13.3/0.9.3 0.13.4/0.9.4 0.13.6/0.9.6"
 OSNAME=$(cat /etc/issue.net | cut -d' ' -f1)
 
@@ -77,9 +77,9 @@ while true
 
 }
 
-if [ -z "$SUDO_USER" -o "$SUDO_USER" = "root" ]; then
-  echo "Must be run using sudo"
-  exit
+if ! [ "$LOGNAME" = "root" ]; then
+  echo "Must be run as root, or with sudo"
+  exit 1
 fi
 
 if ( installed rtorrent ); then
@@ -101,7 +101,7 @@ if ! [ -x $RTFILE ]; then
   get_scripts rt /usr/local/bin/rt
 fi
 
-cd $home
+cd $HOME
 if [ -d source ]; then
   cd source
 else
@@ -114,7 +114,7 @@ curl -# http://rtorrent.net/downloads/libtorrent-$libvers.tar.gz | tar xz
 curl -# http://rtorrent.net/downloads/rtorrent-$rtvers.tar.gz | tar xz
 
 echo "Compiling libtorrent"
-cd $home/source/libtorrent-$libvers
+cd $HOME/source/libtorrent-$libvers
 ./autogen.sh >> /dev/null 2>&1
 if [ $OSNAME = "Raspbian" ]; then
     ./configure --prefix=/usr --disable-instrumentation >> /dev/null 2>&1
@@ -125,7 +125,7 @@ make -j2 >> /dev/null 2>&1
 make install >> /dev/null 2>&1
 
 echo "Compiling rtorrent"
-cd $home/source/rtorrent-$rtvers
+cd $HOME/source/rtorrent-$rtvers
 ./autogen.sh >> /dev/null 2>&1
 ./configure --prefix=/usr --with-xmlrpc-c >> /dev/null 2>&1
 make -j2 >> /dev/null 2>&1
@@ -141,7 +141,7 @@ for user in $user_list
     su $user -c 'rt restart >> /dev/null 2>&1'
   done
 
-cd $home
+cd $HOME
 
 echo
 echo "$libvers/$rtvers installed"
