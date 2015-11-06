@@ -16,6 +16,9 @@
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
+BLOB=master
+RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$BLOB
+
 get_scripts() {
 local script_name=$1
 local script_dest=$2
@@ -32,7 +35,7 @@ while [ $script_size = 0 ]
       echo "If the Github website is down, you can try again later"
       exit 1
     fi
-    wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/$script_name
+    wget --no-check-certificate $RTDIR/$script_name
     script_size=$(du -b $script_name | cut -f1)
   done
 
