@@ -18,7 +18,10 @@ PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 BLOB=master
 RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$BLOB
-script_list=($(curl -s $RTDIR/script_list))
+
+check_url() {
+  if [[ `wget -S --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then echo "true"; fi
+}
 
 get_scripts() {
 local script_dest=$1
@@ -30,7 +33,6 @@ local bindest="/usr/local/bin"
 if [ -z $script_name ]; then
   script_name="${script_dest##*/}"
 fi
-
 
 while [ $script_size = 0 ]
   do
@@ -57,6 +59,13 @@ if ! [ "$LOGNAME" = "root" ]; then
 fi
 
 if [ $# = 0 ]; then
+  if [ "$(check_url $RTDIR/script_list)" = "true" ]; then
+    script_list=($(curl -s $RTDIR/script_list))
+  else
+    echo "Could not access github repository"
+    exit
+  fi
+  
   for i in "${script_list[@]}"
   do
     get_scripts /usr/local/bin/$i
@@ -71,5 +80,16 @@ if [ $# = 0 ]; then
   fi
 
 else
-  get_scripts $1 $2
+  if [ -z $2 ]; then
+    scriptnme="${1##*/}"
+  else
+    scriptnme=$2
+  fi
+
+  if [ "$(check_url $RTDIR/$scriptnme)" = "true" ]; then
+    get_scripts $1 $2
+  else
+    echo "could not access $scriptnme on github, check github website"
+  fi
+
 fi
