@@ -48,34 +48,6 @@ random()
     echo $RAND
 }
 
-get_scripts() {
-local script_name=$1
-local script_dest=$2
-local attempts=0
-local script_size=0
-local bindest="/usr/local/bin"
-
-while [ $script_size = 0 ]
-  do
-    rm -f $script_name
-    attempts=$(( $attempts + 1 ))
-    if [ $attempts = 20 ]; then
-      echo "There is a problem downloading the scripts. Please check your network or there may be an issue with the github website"
-      echo "If the Github website is down, you can try again later"
-      exit 1
-    fi
-    wget -q --no-check-certificate $RTDIR/$script_name
-    script_size=$(du -b $script_name | cut -f1)
-  done
-
-if ! [ -z "$script_dest" ]; then
-  mv -f $script_name $script_dest
-  if case $script_dest in *"${bindest}"*) true;; *) false;; esac; then
-    chmod 755 $script_dest
-  fi
-fi
-}
-
 find_port() {
 local port_count=$1
 local port_type=$2
@@ -258,9 +230,11 @@ if [ "$sshaccess" = "0" ]; then
   fi
 fi
 
+rtgetscripts
+
 if [ "$user" = "$SUDO_USER" ]; then
   echo "Will reset $user config, autodl filters and torrents will not be deleted"
-  get_scripts ru.config /var/www/rutorrent/conf/config.php
+  rtgetscripts /var/www/rutorrent/conf/config.php ru.config 
 fi
 
 #remove existing directory if there
@@ -298,17 +272,7 @@ fi
 WEBPASS=$(genpasswd)
 htpasswd -b $passfile $user $WEBPASS
 
-get_scripts .rtorrent.rc $home/.rtorrent.rc
-
-if ! [ -x /usr/local/bin/rt ]; then
-  get_scripts rt /usr/local/bin/rt
-fi
-
-if ! [ -x /usr/local/bin/rtcheck ]; then
-  get_scripts rtcheck /usr/local/bin/rtcheck
-fi
-
-
+rtgetscripts $home/.rtorrent.rc
 
 sed -i "s/<user name>/$user/g" $home/.rtorrent.rc
 sed -i "s/port_range = 51001-51250/port_range = $newrange/g" $home/.rtorrent.rc
