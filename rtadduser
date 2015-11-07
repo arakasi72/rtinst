@@ -17,9 +17,6 @@
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 passfile='/etc/nginx/.htpasswd'
 
-BLOB=master
-RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$BLOB
-
 scgi_port_start=5000
 rpc_start=2
 rtport_start=51001
