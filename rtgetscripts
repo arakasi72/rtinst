@@ -22,14 +22,15 @@ script_list=($(curl -s $RTDIR/script_list))
 
 get_scripts() {
 local script_dest=$1
-local script_name="${script_dest##*/}"
+local script_name=$2
 local attempts=0
 local script_size=0
 local bindest="/usr/local/bin"
 
-if [ -z $script_dest ]; then
-script_dest=$script_name
+if [ -z $script_name ]; then
+  script_name="${script_dest##*/}"
 fi
+
 
 while [ $script_size = 0 ]
   do
