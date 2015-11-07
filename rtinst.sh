@@ -73,33 +73,6 @@ random()
     echo $RAND
 }
 
-#function to fetch the rtinst scripts and files
-get_scripts() {
-local script_name=$1
-local script_dest=$2
-local attempts=0
-local script_size=0
-local bindest="/usr/local/bin"
-
-while [ $script_size = 0 ]
-  do
-    rm -f $script_name
-    attempts=$(( $attempts + 1 ))
-    if [ $attempts = 20 ]; then
-      error_exit "Problem downloading scripts from github - https://github.com/"
-    fi
-    wget --no-check-certificate $RTDIR/$script_name >> $logfile 2>&1
-    script_size=$(du -b $script_name | cut -f1)
-  done
-
-if ! [ -z "$script_dest" ]; then
-  mv -f $script_name $script_dest
-  if case $script_dest in *"${bindest}"*) true;; *) false;; esac; then
-    chmod 755 $script_dest
-  fi
-fi
-}
-
 # function to ask user for y/n response
 ask_user(){
 while true
@@ -296,18 +269,25 @@ fi
 
 # download rt scripts and config files
 echo "Fetching rtinst scripts" | tee -a $logfile
+cd $home
+
+if [ -x /usr/local/bin/rtgetscripts ]; then
+  rtgetscripts
+else
+  rm -f rtgetscripts
+  wget -q --no-check-certificate $RTDIR/rtgetscripts
+  bash rtgetscripts
+fi
+
 mkdir -p $home/rtscripts
 cd $home/rtscripts
 
-get_scripts .rtorrent.rc
-get_scripts ru.config
-get_scripts ru.ini
-get_scripts nginxsitedl
-get_scripts nginxsite
-get_scripts edit_su /usr/local/bin/edit_su
-get_scripts rtgetscripts /usr/local/bin/rtgetscripts
-
-rtgetscripts
+rtgetscripts .rtorrent.rc
+rtgetscripts ru.config
+rtgetscripts ru.ini
+rtgetscripts nginxsitedl
+rtgetscripts nginxsite
+rtgetscripts /usr/local/bin/edit_su
 
 cd $home
 
