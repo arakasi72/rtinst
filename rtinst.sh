@@ -271,13 +271,9 @@ fi
 echo "Fetching rtinst scripts" | tee -a $logfile
 cd $home
 
-if [ -x /usr/local/bin/rtgetscripts ]; then
-  rtgetscripts
-else
-  rm -f rtgetscripts
-  wget -q --no-check-certificate $RTDIR/rtgetscripts
-  bash rtgetscripts
-fi
+rm -f rtgetscripts
+wget -q --no-check-certificate $RTDIR/rtgetscripts
+bash rtgetscripts
 
 #raise file limits
 sed -i '/hard nofile/ d' /etc/security/limits.conf
