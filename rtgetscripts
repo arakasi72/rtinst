@@ -71,5 +71,5 @@ if [ $# = 0 ]; then
   fi
 
 else
-  get_scripts $1
+  get_scripts $1 $2
 fi
