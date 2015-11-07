@@ -279,18 +279,6 @@ else
   bash rtgetscripts
 fi
 
-mkdir -p $home/rtscripts
-cd $home/rtscripts
-
-rtgetscripts .rtorrent.rc
-rtgetscripts ru.config
-rtgetscripts ru.ini
-rtgetscripts nginxsitedl
-rtgetscripts nginxsite
-rtgetscripts /usr/local/bin/edit_su
-
-cd $home
-
 #raise file limits
 sed -i '/hard nofile/ d' /etc/security/limits.conf
 sed -i '/soft nofile/ d' /etc/security/limits.conf
@@ -488,7 +476,7 @@ mkdir -p rtorrent/downloads
 mkdir -p rtorrent/watch
 
 
-mv -f $home/rtscripts/.rtorrent.rc $home/.rtorrent.rc
+rtgetscripts $home/.rtorrent.rc
 sed -i "s/<user name>/$user/g" $home/.rtorrent.rc
 
 # install rutorrent
@@ -522,7 +510,7 @@ git clone https://github.com/Novik/ruTorrent.git rutorrent >> $logfile 2>&1
 
 echo "Configuring Rutorrent" | tee -a $logfile
 rm rutorrent/conf/config.php
-mv $home/rtscripts/ru.config /var/www/rutorrent/conf/config.php
+rtgetscripts /var/www/rutorrent/conf/config.php ru.config
 mkdir -p /var/www/rutorrent/conf/users/$user/plugins
 
 echo "<?php" > /var/www/rutorrent/conf/users/$user/config.php
@@ -533,7 +521,7 @@ echo "\$XMLRPCMountPoint = \"/RPC2\";" >> /var/www/rutorrent/conf/users/$user/co
 echo >> /var/www/rutorrent/conf/users/$user/config.php
 echo "?>" >> /var/www/rutorrent/conf/users/$user/config.php
 
-mv $home/rtscripts/ru.ini /var/www/rutorrent/conf/plugins.ini
+rtgetscripts /var/www/rutorrent/conf/plugins.ini ru.ini
 
 # install nginx
 cd $home
@@ -572,8 +560,8 @@ fi
 
 mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
 
-mv $home/rtscripts/nginxsite /etc/nginx/sites-available/default
-mv $home/rtscripts/nginxsitedl /etc/nginx/conf.d/rtdload
+rtgetscripts /etc/nginx/sites-available/default nginxsite
+rtgetscripts /etc/nginx/conf.d/rtdload nginxsitedl
 
 echo "location ~ \.php$ {" > /etc/nginx/conf.d/php
 echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/php
@@ -640,10 +628,9 @@ chown -R $user:$user $home
 
 cd $home
 
+rtgetscripts /usr/local/bin/edit_su
 edit_su
 rm /usr/local/bin/edit_su
-
-rm -r $home/rtscripts
 
 su $user -c '/usr/local/bin/rt restart'
 su $user -c '/usr/local/bin/rt -i restart'
