@@ -76,13 +76,9 @@ echo "Installing $libvers/$rtvers"
 
 cd $HOME
 
-if [ -x /usr/local/bin/rtgetscripts ]; then
-  rtgetscripts
-else
-  rm -f rtgetscripts
-  wget -q --no-check-certificate $RTDIR/rtgetscripts
-  bash rtgetscripts
-fi
+rm -f rtgetscripts
+wget -q --no-check-certificate $RTDIR/rtgetscripts
+bash rtgetscripts
 
 if [ -d source ]; then
   cd source
