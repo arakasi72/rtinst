@@ -1,0 +1,95 @@
+#!/bin/bash
+
+######################################################################
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+#  --> Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+#
+######################################################################
+
+PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+
+BLOB=develop
+RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$BLOB
+
+check_url() {
+  if [[ `wget -S --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then echo "true"; fi
+}
+
+get_scripts() {
+local script_dest=$1
+local script_name=$2
+local attempts=0
+local script_size=0
+local bindest="/usr/local/bin"
+
+if [ -z $script_name ]; then
+  script_name="${script_dest##*/}"
+fi
+
+while [ $script_size = 0 ]
+  do
+    rm -f $script_dest
+    attempts=$(( $attempts + 1 ))
+    if [ $attempts = 20 ]; then
+      echo "There is a problem downloading from github. Please check your network or there may be an issue with the github website"
+      echo "If the Github website is down, you can try again later"
+      exit 1
+    fi
+    wget -q --no-check-certificate --output-document=$script_dest $RTDIR/$script_name
+    script_size=$(du -b $script_dest | cut -f1)
+  done
+
+if case $script_dest in *"${bindest}"*) true;; *) false;; esac; then
+  chmod 755 $script_dest
+fi
+
+}
+
+if ! [ "$LOGNAME" = "root" ]; then
+  echo "Must be run as root, directly or with sudo"
+  exit 1
+fi
+
+if [ $# = 0 ]; then
+  RTDIR=$RTDIR/scripts
+  if [ "$(check_url $RTDIR/script_list)" = "true" ]; then
+    script_list=($(curl -s $RTDIR/script_list))
+  else
+    echo "Could not access github repository"
+    exit
+  fi
+  
+  for script in "${script_list[@]}"
+  do
+    get_scripts /usr/local/bin/"${script##*/}" $script
+  done
+
+  echo "Completed scripts download"
+
+  RUNDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+  if [ "$RUNDIR" != "/usr/local/bin" ]; then
+    rm -f $RUNDIR/rtgetscripts
+  fi
+
+else
+  RTDIR=$RTDIR/conf
+  if [ -z $2 ]; then
+    scriptnme="${1##*/}"
+  else
+    scriptnme=$2
+  fi
+
+  if [ "$(check_url $RTDIR/$scriptnme)" = "true" ]; then
+    get_scripts $1 $2
+  else
+    echo "could not access $scriptnme on github, check github website"
+  fi
+
+fi
