@@ -68,7 +68,7 @@ if [ $# = 0 ]; then
   
   for i in "${script_list[@]}"
   do
-    get_scripts /usr/local/bin/$i
+    get_scripts /usr/local/bin/$i $i
   done
 
   echo "Completed scripts download"
