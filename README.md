@@ -72,19 +72,19 @@ A number of additional scripts will be installed that carry out a variety of use
 
 If you get an error run the following, you will only need to this once, and subsequently the prior command will work
 
-	wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtgetscripts
+	wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/scripts/rtgetscripts
 	sudo bash rtgetscripts
 	
 All the scripts are downloaded to /usr/local/bin
 
-######[4.1 rtwebmin](rtwebmin)
+######[4.1 rtwebmin](scripts/rtwebmin)
 
 This will install webmin and configure nginx as a reverse proxy allowing you to access webmin using https:/<SERVERIP>/webmin
 To run this:
 
 	sudo rtwebmin
 
-######[4.2 rtadduser](rtadduser)
+######[4.2 rtadduser](scripts/rtadduser)
 
 This will add new users. Ensuring there are no conflicts with the existing user ports. You can use it to create brand new users, or reset the config on existing users. If you use it on an existing user, you will NOT lose any torrents, files, of autodl-filters. It will just reset the ports used.
 To run this:
@@ -92,7 +92,7 @@ To run this:
 	sudo rtadduser
 and enter the information asked for.
 
-######[4.3 rtremove](rtremove)
+######[4.3 rtremove](scripts/rtremove)
 
 WARNING: This will completely remove a user wiping all their config and data, and removing them from the system.
 To run this:
@@ -101,13 +101,13 @@ To run this:
 
 and enter the user name when asked
 
-######[4.4 rtupdate](rtupdate)
+######[4.4 rtupdate](scripts/rtupdate)
 
 This script can upgrade, (or downgrade), the libtorrent/rtorrent version installed. To run this:
 
 	sudo rtupdate
 
-######[4.5 rutupgrade](rutupgrade)
+######[4.5 rutupgrade](scripts/rutupgrade)
 
 This script upgrades Rutorrent. It retains all your config and settings, as well as providing a rollback capability.
 
@@ -115,7 +115,7 @@ To run this:
 
 	sudo rutupgrade
 
-######[4.6 rtdload](rtdload)
+######[4.6 rtdload](scripts/rtdload)
 
 This script will enable or disable https download
 
@@ -129,14 +129,14 @@ To disable:
 
 The following scripts can be used by any user
 
-######[4.7 rtpass](rtpass)
+######[4.7 rtpass](scripts/rtpass)
 
 This will allow user to change their rutorrent password.
 to run this:
 
 	rtpass
 
-######[4.8 rt](rt)
+######[4.8 rt](scripts/rt)
 
 This script can stop, start, or restart rtorrent or irssi. Use the arguments stop start or restart, with no arguments it will tell tell you if rtorrent is running or not
 
