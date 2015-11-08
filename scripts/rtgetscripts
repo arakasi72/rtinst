@@ -16,7 +16,7 @@
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
-BLOB=master
+BLOB=develop
 RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$BLOB
 
 check_url() {
