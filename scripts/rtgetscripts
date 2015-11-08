@@ -50,7 +50,6 @@ while [ $script_size = 0 ]
 if case $script_dest in *"${bindest}"*) true;; *) false;; esac; then
   chmod 755 $script_dest
 fi
-
 }
 
 if ! [ "$LOGNAME" = "root" ]; then
@@ -66,7 +65,7 @@ if [ $# = 0 ]; then
     echo "Could not access github repository"
     exit
   fi
-  
+
   for script in "${script_list[@]}"
   do
     get_scripts /usr/local/bin/"${script##*/}" $script
