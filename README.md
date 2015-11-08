@@ -1,4 +1,11 @@
 ###rtinst
+NOTE 8th Nov 2015 - Reorganised repository. For existing installations run rtgetscripts twice to bring all your scripts up to date. First time will update rtgetscripts, 2nd time will update all scripts
+
+If it has been some time since you did an update you may need to manually download and run rtgetscripts:
+
+	wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/scripts/rtgetscripts
+	sudo bash rtgetscripts
+	
 ======
 ####1. Introduction
 Seedbox installation
