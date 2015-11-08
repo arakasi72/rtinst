@@ -59,6 +59,7 @@ if ! [ "$LOGNAME" = "root" ]; then
 fi
 
 if [ $# = 0 ]; then
+  $RTDIR=$RTDIR/scripts
   if [ "$(check_url $RTDIR/script_list)" = "true" ]; then
     script_list=($(curl -s $RTDIR/script_list))
   else
@@ -80,6 +81,7 @@ if [ $# = 0 ]; then
   fi
 
 else
+  $RTDIR=$RTDIR/conf
   if [ -z $2 ]; then
     scriptnme="${1##*/}"
   else
