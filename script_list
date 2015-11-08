@@ -1,11 +1,1 @@
-scripts/rt
-scripts/rtcheck
-scripts/rtupdate
-scripts/rtpass
-scripts/rtsetpass
-scripts/rtdload
-scripts/rtadduser
-scripts/rtremove
-scripts/rutupgrade
-scripts/rtwebmin
-scripts/rtgetscripts
+rtgetscripts
