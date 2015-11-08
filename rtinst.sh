@@ -22,7 +22,7 @@ rtorrentloc='http://rtorrent.net/downloads/rtorrent-'$rtorrentrel'.tar.gz'
 libtorrentloc='http://rtorrent.net/downloads/libtorrent-'$libtorrentrel'.tar.gz'
 xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
 
-BLOB=develop
+BLOB=master
 RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$BLOB/scripts
 
 FULLREL=$(cat /etc/issue.net)
