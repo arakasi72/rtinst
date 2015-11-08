@@ -18,7 +18,7 @@ server {
                include /etc/nginx/conf.d/cache;
         }
 
-        #include /etc/nginx/conf.d/rtdload;
+        #include /etc/nginx/sites-available/dload-loc;
 
         location ~ /\.ht {
                 deny all;
@@ -47,7 +47,7 @@ server {
                include /etc/nginx/conf.d/cache;
         }
 
-        #include /etc/nginx/conf.d/rtdload;
+        #include /etc/nginx/sites-available/dload-loc;
 
         location ~ /\.ht {
                 deny all;
