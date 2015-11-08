@@ -66,9 +66,9 @@ if [ $# = 0 ]; then
     exit
   fi
   
-  for i in "${script_list[@]}"
+  for script in "${script_list[@]}"
   do
-    get_scripts /usr/local/bin/$i $i
+    get_scripts /usr/local/bin/"${script##*/}" $script
   done
 
   echo "Completed scripts download"
