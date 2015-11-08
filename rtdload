@@ -28,6 +28,7 @@ sed -i '/rtdload/d' /etc/nginx/sites-available/default
 
 if [ "$1" = "enable" ]; then
   if ! [ -f /etc/nginx/sites-available/dload-loc ]; then
+    rtgetscripts
     rtgetscripts /etc/nginx/sites-available/dload-loc nginxsitedl
   fi
 
