@@ -557,7 +557,7 @@ fi
 mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
 
 rtgetscripts /etc/nginx/sites-available/default nginxsite
-rtgetscripts /etc/nginx/conf.d/rtdload nginxsitedl
+rtgetscripts /etc/nginx/sites-available/dload-loc nginxsitedl
 
 echo "location ~ \.php$ {" > /etc/nginx/conf.d/php
 echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/php
@@ -576,7 +576,7 @@ echo "        expires 30d;" >> /etc/nginx/conf.d/cache
 echo "}" >> /etc/nginx/conf.d/cache
 
 if [ $DLFLAG = 0 ]; then
-  sed -i "s/#include \/etc\/nginx\/conf\.d\/rtdload;/include \/etc\/nginx\/conf\.d\/rtdload;/g" /etc/nginx/sites-available/default
+  sed -i "s/#include \/etc\/nginx\/sites-available\/dload-loc;/include \/etc\/nginx\/sites-available\/dload-loc;/g" /etc/nginx/sites-available/default
 fi
 
 sed -i "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
