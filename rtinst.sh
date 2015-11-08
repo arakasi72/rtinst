@@ -575,13 +575,13 @@ echo "location ~* \.(jpg|jpeg|gif|css|png|js|woff|ttf|svg|eot)$ {" > /etc/nginx/
 echo "        expires 30d;" >> /etc/nginx/conf.d/cache
 echo "}" >> /etc/nginx/conf.d/cache
 
-if [ $DLFLAG = 0 ]; then
-  sed -i "s/#include \/etc\/nginx\/sites-available\/dload-loc;/include \/etc\/nginx\/sites-available\/dload-loc;/g" /etc/nginx/sites-available/default
-fi
-
 sed -i "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
 
 service nginx restart && service php5-fpm restart
+
+if [ $DLFLAG = 0 ]; then
+  rtdload enable
+fi
 
 # install autodl-irssi
 echo "Installing autodl-irssi" | tee -a $logfile
