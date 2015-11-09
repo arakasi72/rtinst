@@ -153,8 +153,8 @@ while [ $confirm_name = 1 ]
     addname=$answer
     check_name=1
     if [ "$addname" = "root" ]; then
-      echo "Don't mess with root"
-      exit 1
+      echo "Cannot create root"
+      exit
     fi
 
     while [ $check_name = 1 ]
