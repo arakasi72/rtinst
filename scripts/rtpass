@@ -1,2 +1,8 @@
 #!/bin/bash
+
+if [ "$LOGNAME" = "root" ]; then
+  echo "Cannot be run as root, or with sudo"
+  exit
+fi
+
 sudo rtsetpass $LOGNAME
