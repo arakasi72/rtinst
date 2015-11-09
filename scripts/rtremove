@@ -11,8 +11,9 @@
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 passfile='/etc/nginx/.htpasswd'
 
-if [ -z "$SUDO_USER" -a  "$LOGNAME" != "root" ]; then
-echo "Must be run from root or using sudo" && exit 1
+if ! [ "$LOGNAME" = "root" ]; then
+  echo "Must be run as root, or with sudo"
+  exit 1
 fi
 
 confirm_name=1
@@ -33,13 +34,13 @@ while [ $confirm_name = 1 ]
 done
 
 if [ "$user" = "$SUDO_USER" ]; then
-echo "Cannot delete yourself" && exit 1
+echo "Cannot delete yourself" && exit
 elif [ "$user" = "root" ]; then
-echo "Cannot delete root" && exit 1
+echo "Cannot delete root" && exit
 elif [ -z "$user" ]; then
-echo "User entry is blank" && exit 1
+echo "User entry is blank" && exit
 elif ! id -u $user >/dev/null 2>&1 ; then
-echo "$user does not exist" && exit 1
+echo "$user does not exist" && exit
 fi
 
 echo
