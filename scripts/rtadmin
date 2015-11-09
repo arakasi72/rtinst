@@ -1,0 +1,58 @@
+#!/bin/bash
+
+######################################################################
+#
+#  Copyright (c) 2015 arakasi72 (https://github.com/arakasi72)
+#
+#  --> Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+#
+######################################################################
+
+PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+
+select_task(){
+while true
+  do
+    read answer
+    case $answer in [1] ) echo "Updating..." && rtgetscripts && return 0 ;;
+                    [2] ) rtadduser && return 0 ;;
+                    [3] ) rtremove && return 0 ;;
+                    [4] ) rtdload $rtdflag && return 0 ;;
+                    [5] ) rtupdate && return 0 ;;
+                    [6] ) rutupgrade && return 0 ;;
+                    [7] ) rtwebmin && return 0 ;;
+                   [Qq] ) exit ;;
+                      * ) echo "Enter 1-7 (q to quit)";;
+    esac
+  done
+}
+
+if ! [ "$LOGNAME" = "root" ]; then
+  echo "Must be run as root, or with sudo"
+  exit 1
+fi
+
+rtdgrep1=$(grep dload-loc /etc/nginx/sites-available/default)
+rtdgrep2=$(grep dload-loc /etc/nginx/sites-available/default | grep '#')
+
+if [ -n "$rtdgrep1" -a -z "$rtdgrep2" ]; then
+  rtdflag=disable
+else
+  rtdflag=enable
+fi
+
+clear
+
+echo "For more information go to:"
+echo "https://github.com/arakasi72/rtinst/blob/master/README.md"
+echo "Select from the following options:"
+echo "1.) rtgetscripts - update the rtinst scripts"
+echo "2.) rtadduser - add new user"
+echo "3.) rtremove - delete a user"
+echo "4.) rtdload $rtdflag - $rtdflag http downloads"
+echo "5.) rtupdate - up/down-grade rtorent/libtorrent"
+echo "6.) rutupgrade - upgrade to latest version of RuTorrent"
+echo "7.) rtwebmin - install webmin"
+echo "Enter option or q to quit"
+
+select_task
