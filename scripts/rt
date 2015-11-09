@@ -143,6 +143,11 @@ echo "  restart first stops and then starts $SERVICE"
 exit 0
 }
 
+#exit if run by root
+if [ "$LOGNAME" = "root" ]; then
+  echo "Cannot be run as root, or with sudo"
+  exit
+fi
 
 # Check for options
 while getopts ":hlikad" optname
