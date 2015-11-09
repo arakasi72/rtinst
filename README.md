@@ -1,5 +1,5 @@
 ###rtinst
-NOTE 8th Nov 2015 - Reorganised repository. For existing installations run rtgetscripts twice to bring all your scripts up to date. First time will update rtgetscripts, 2nd time will update all scripts
+**NOTE 8th Nov 2015** - Reorganised repository. For existing installations run rtgetscripts twice to bring all your scripts up to date. First time will update rtgetscripts, 2nd time will update all scripts
 
 If it has been some time since you did an update you may need to manually download and run rtgetscripts:
 
@@ -52,7 +52,7 @@ if you run it with -l option it will create the rtinst.log file with detailed ou
 
 The script will assign a random ssh port for security purposes. It will display this on the screen when it has finished running and write it to ~/rtinst.info
 
-IMPORTANT: NOTE THE NEW SSH PORT AND MAKE SURE YOU CAN SSH INTO YOUR SERVER BEFORE CLOSING THE EXISTING SESSION
+**IMPORTANT: NOTE THE NEW SSH PORT AND MAKE SURE YOU CAN SSH INTO YOUR SERVER BEFORE CLOSING THE EXISTING SESSION**
 
 For security the script assigns ftp to a random port number. You will need to use this port number in your ftp client. It will display the port number at the end of the script, and will also write it to ~/rtinst.info
 
