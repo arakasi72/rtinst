@@ -8,4 +8,5 @@ rtadduser
 rtremove
 rutupgrade
 rtwebmin
+rtadmin
 rtgetscripts
