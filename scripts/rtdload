@@ -20,6 +20,16 @@ fi
 if [ -f /etc/nginx/conf.d/rtdload ]; then rm -f /etc/nginx/conf.d/rtdload; fi
 sed -i '/rtdload/d' /etc/nginx/sites-available/default
 
+if [ $# = 0 ]; then
+  rtdgrep1=$(grep dload-loc /etc/nginx/sites-available/default)
+  rtdgrep2=$(grep dload-loc /etc/nginx/sites-available/default | grep '#')
+  if [ -n "$rtdgrep1" -a -z "$rtdgrep2" ]; then
+    echo "Enabled"
+  else
+    echo "Disabled"
+  fi
+fi
+
 if [ "$1" = "enable" ]; then
   if ! [ -f /etc/nginx/sites-available/dload-loc ]; then
     rtgetscripts
