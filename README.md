@@ -81,14 +81,8 @@ This will install update all the rtinst scripts making sure you have the latest 
 
 	sudo rtgetscripts
 
-######[3.2 rtwebmin](scripts/rtwebmin)
 
-This will install webmin, (if not already installed), and configure nginx as a reverse proxy allowing you to access webmin using https:/<SERVERIP>/webmin
-To run this:
-
-	sudo rtwebmin
-
-######[3.3 rtadduser](scripts/rtadduser)
+######[3.2 rtadduser](scripts/rtadduser)
 
 This will add new users. Ensuring there are no conflicts with the existing user ports. You can use it to create brand new users, or reset the config on existing users. If you use it on an existing user, you will NOT lose any torrents, files, of autodl-filters. It will just reset the ports used.
 To run this:
@@ -96,7 +90,7 @@ To run this:
 	sudo rtadduser
 and enter the information asked for.
 
-######[3.4 rtremove](scripts/rtremove)
+######[3.3 rtremove](scripts/rtremove)
 
 WARNING: This will completely remove a user wiping all their config and data, and removing them from the system.
 To run this:
@@ -104,6 +98,18 @@ To run this:
 	sudo rtremove
 
 and enter the user name when asked
+
+######[3.4 rtdload](scripts/rtdload)
+
+This script will enable or disable https download
+
+To enable:
+
+	sudo rtdload enable
+
+To disable:
+
+	sudo rtdload disable
 
 ######[3.5 rtupdate](scripts/rtupdate)
 
@@ -119,19 +125,12 @@ To run this:
 
 	sudo rutupgrade
 
-######[3.7 rtdload](scripts/rtdload)
+######[3.7 rtwebmin](scripts/rtwebmin)
 
-This script will enable or disable https download
+This will install webmin, (if not already installed), and configure nginx as a reverse proxy allowing you to access webmin using https:/<SERVERIP>/webmin
+To run this:
 
-To enable:
-
-	sudo rtdload enable
-
-To disable:
-
-	sudo rtdload disable
-
-The following scripts can be used by any user
+	sudo rtwebmin
 
 ####4. User Scripts
 
