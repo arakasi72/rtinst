@@ -52,7 +52,7 @@ if ! [ "$LOGNAME" = "root" ]; then
 fi
 
 if [ $# = 0 ]; then
-  echo "Updating"
+  echo -n "Updating"
   RTDIR=$RTDIR/scripts
   if [ "$(check_url $RTDIR/script_list)" = "true" ]; then
     script_list=($(curl -s $RTDIR/script_list))
