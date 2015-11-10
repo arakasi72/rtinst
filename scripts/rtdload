@@ -28,9 +28,8 @@ if [ $# = 0 ]; then
   else
     echo "Disabled"
   fi
-fi
 
-if [ "$1" = "enable" ]; then
+elif [ "$1" = "enable" ]; then
   if ! [ -f /etc/nginx/sites-available/dload-loc ]; then
     rtgetscripts
     rtgetscripts /etc/nginx/sites-available/dload-loc nginxsitedl
