@@ -52,6 +52,7 @@ if ! [ "$LOGNAME" = "root" ]; then
 fi
 
 if [ $# = 0 ]; then
+  echo "Updating"
   RTDIR=$RTDIR/scripts
   if [ "$(check_url $RTDIR/script_list)" = "true" ]; then
     script_list=($(curl -s $RTDIR/script_list))
@@ -62,6 +63,7 @@ if [ $# = 0 ]; then
 
   for script in "${script_list[@]}"
   do
+    echo -n "."
     get_scripts /usr/local/bin/"${script##*/}" $script
   done
 
