@@ -14,7 +14,7 @@ select_task(){
 while true
   do
     read answer
-    case $answer in [1] ) echo "Updating..." && rtgetscripts && return 0 ;;
+    case $answer in [1] ) rtgetscripts && return 0 ;;
                     [2] ) rtadduser && return 0 ;;
                     [3] ) rtremove && return 0 ;;
                     [4] ) rtdload $rtdflag && return 0 ;;
