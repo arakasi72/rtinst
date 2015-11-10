@@ -62,11 +62,11 @@ To access that information just use the following command
 
 	cat ~/rtinst.info
 
-####4. Additional scripts
+####3. Admin Scripts
 
-A number of additional scripts will be installed that carry out a variety of useful functions. These will be installed by the main script but if you want to get the latest versions you can run the following:
+A number of additional scripts will be installed that carry out a variety of useful functions. These will be installed by the main script. So you don't need to remember all the script names you can run rtadmin which will, present a menu to launch the other scripts listed in this section. 
 
-	sudo rtgetscripts
+	sudo rtadmin
 
 If you get an error run the following, you will only need to this once, and subsequently the prior command will work
 
@@ -75,14 +75,20 @@ If you get an error run the following, you will only need to this once, and subs
 	
 All the scripts are downloaded to /usr/local/bin
 
-######[3.1 rtwebmin](scripts/rtwebmin)
+######[3.1 rtgetscripts](scripts/rtwebmin)
+
+This will install update all the rtinst scripts making sure you have the latest versions:
+
+	sudo rtgetscripts
+
+######[3.2 rtwebmin](scripts/rtwebmin)
 
 This will install webmin and configure nginx as a reverse proxy allowing you to access webmin using https:/<SERVERIP>/webmin
 To run this:
 
 	sudo rtwebmin
 
-######[3.2 rtadduser](scripts/rtadduser)
+######[3.3 rtadduser](scripts/rtadduser)
 
 This will add new users. Ensuring there are no conflicts with the existing user ports. You can use it to create brand new users, or reset the config on existing users. If you use it on an existing user, you will NOT lose any torrents, files, of autodl-filters. It will just reset the ports used.
 To run this:
@@ -90,7 +96,7 @@ To run this:
 	sudo rtadduser
 and enter the information asked for.
 
-######[3.3 rtremove](scripts/rtremove)
+######[3.4 rtremove](scripts/rtremove)
 
 WARNING: This will completely remove a user wiping all their config and data, and removing them from the system.
 To run this:
@@ -99,13 +105,13 @@ To run this:
 
 and enter the user name when asked
 
-######[3.4 rtupdate](scripts/rtupdate)
+######[3.5 rtupdate](scripts/rtupdate)
 
 This script can upgrade, (or downgrade), the libtorrent/rtorrent version installed. To run this:
 
 	sudo rtupdate
 
-######[3.5 rutupgrade](scripts/rutupgrade)
+######[3.6 rutupgrade](scripts/rutupgrade)
 
 This script upgrades Rutorrent. It retains all your config and settings, as well as providing a rollback capability.
 
@@ -113,7 +119,7 @@ To run this:
 
 	sudo rutupgrade
 
-######[3.6 rtdload](scripts/rtdload)
+######[3.7 rtdload](scripts/rtdload)
 
 This script will enable or disable https download
 
@@ -127,14 +133,18 @@ To disable:
 
 The following scripts can be used by any user
 
-######[3.7 rtpass](scripts/rtpass)
+####4. User Scripts
+
+The scripts in this section can be run by any user other than root. They cannot be run by root as they are not applicable to root.
+
+######[4.1 rtpass](scripts/rtpass)
 
 This will allow user to change their rutorrent password.
 to run this:
 
 	rtpass
 
-######[3.8 rt](scripts/rt)
+######[4.2 rt](scripts/rt)
 
 This script can stop, start, or restart rtorrent or irssi. Use the arguments stop start or restart, with no arguments it will tell tell you if rtorrent is running or not
 
