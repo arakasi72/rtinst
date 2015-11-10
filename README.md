@@ -111,6 +111,8 @@ To disable:
 
 	sudo rtdload disable
 
+Run with no arguments to return the current status
+
 ######[3.5 rtupdate](scripts/rtupdate)
 
 This script can upgrade, (or downgrade), the libtorrent/rtorrent version installed. To run this:
