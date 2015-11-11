@@ -10,7 +10,13 @@ If it has been some time since you did an update you may need to manually downlo
 ####1. Introduction
 Seedbox installation
 
-It has been tested with clean installs of Ubuntu 12, 13, 14 and 15, and Debian 7 and 8
+It has been tested with clean installs of: 
+	Ubuntu 12
+	Ubuntu 13
+	Ubuntu 14
+	Ubuntu 15
+	Debian 7
+	Debian 8
 
 Services that will be installed and configured are
 
@@ -19,7 +25,7 @@ Services that will be installed and configured are
 	3. rutorrent
 	4. Nginx (webserver)
 	5. autodl-irssi
-	6. webmin (optional see section 4.1 below)
+	6. webmin (optional see section 4.7 below)
 
 It takes about 10 minutes to run, depending on your server setup.
 
