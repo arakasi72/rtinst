@@ -11,6 +11,7 @@
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 lineno=$(sed -n '/dload-loc/=' /etc/nginx/sites-available/default)
+dlstatus=disabled
 
 # function to ask user for y/n response
 ask_user(){
@@ -35,17 +36,24 @@ sed -i '/rtdload/d' /etc/nginx/sites-available/default
 if [ $# = 0 ]; then
   rtdgrep1=$(grep dload-loc /etc/nginx/sites-available/default)
   rtdgrep2=$(grep dload-loc /etc/nginx/sites-available/default | grep '#')
-  if [ -n "$rtdgrep1" -a -z "$rtdgrep2" ]; then
-    dlswitch=disable
-    echo "Http downloads are Enabled"
-  else
-    dlswitch=enable
-    echo "Http downloads are Disabled"
-  fi
 
-  echo "Would you like to $dlswitch http downloads"
-  if ask_user; then
-    rtdload $dlswitch
+  if [ -n "$rtdgrep1" -a -z "$rtdgrep2" ]; then dlstatus=enabled; fi
+
+  if [ -t 1 ]; then
+    if [ $dlstatus = enabled ]; then
+      echo "Http downloads are Enabled"
+      dlswitch=disable
+    elif [ $dlstatus = disabled ]; then
+      echo "Http downloads are Disabled"
+      dlswitch=enable
+    fi
+
+    echo "Would you like to $dlswitch http downloads"
+    if ask_user; then
+      rtdload $dlswitch
+    fi
+  else
+    echo $dlstatus
   fi
 
 elif [ "$1" = "enable" ]; then
