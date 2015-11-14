@@ -110,15 +110,11 @@ and enter the user name when asked
 
 This script will enable or disable https download
 
-To enable:
+To run:
 
-	sudo rtdload enable
+	sudo rtdload
 
-To disable:
-
-	sudo rtdload disable
-
-Run with no arguments to return the current status
+It will tell you the current status, and ask if you want to change it.
 
 ######[3.5 rtupdate](scripts/rtupdate)
 
