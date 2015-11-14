@@ -12,6 +12,18 @@ PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 lineno=$(sed -n '/dload-loc/=' /etc/nginx/sites-available/default)
 
+# function to ask user for y/n response
+ask_user(){
+while true
+  do
+    read answer
+    case $answer in [Yy]* ) return 0 ;;
+                    [Nn]* ) return 1 ;;
+                        * ) echo "Enter y or n";;
+    esac
+  done
+}
+
 if ! [ "$LOGNAME" = "root" ]; then
   echo "Must be run as root, directly or with sudo"
   exit 1
@@ -24,9 +36,16 @@ if [ $# = 0 ]; then
   rtdgrep1=$(grep dload-loc /etc/nginx/sites-available/default)
   rtdgrep2=$(grep dload-loc /etc/nginx/sites-available/default | grep '#')
   if [ -n "$rtdgrep1" -a -z "$rtdgrep2" ]; then
-    echo "Enabled"
+    dlswitch=disable
+    echo "Http downloads are Enabled"
   else
-    echo "Disabled"
+    dlswitch=enable
+    echo "Http downloads are Disabled"
+  fi
+
+  echo "Would you like to $dlswitch http downloads"
+  if ask_user; then
+    rtdload $dlswitch
   fi
 
 elif [ "$1" = "enable" ]; then
