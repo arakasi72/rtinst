@@ -104,8 +104,10 @@ user_list=*
 
 for user in $user_list
   do
-    echo "Restarting rtorrent for $user"
-    su $user -c 'rt restart >> /dev/null 2>&1'
+    if [ ! $user = '*' ]; then
+      echo "Restarting rtorrent for $user"
+      su $user -c 'rt restart >> /dev/null 2>&1'
+    fi
   done
 
 cd $HOME
