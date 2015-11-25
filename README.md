@@ -132,7 +132,7 @@ To run this:
 
 ######[3.7 rtwebmin](scripts/rtwebmin)
 
-This will install webmin, (if not already installed), and configure nginx as a reverse proxy allowing you to access webmin using https:/<SERVERIP>/webmin
+This will install webmin, (if not already installed), and configure nginx as a reverse proxy allowing you to access webmin using https:/SERVERIP/webmin
 To run this:
 
 	sudo rtwebmin
