@@ -48,7 +48,7 @@ if [ $# = 0 ]; then
       dlswitch=enable
     fi
 
-    echo "Would you like to $dlswitch http downloads"
+    echo 'Would you like to $dlswitch http downloads (y/n)?'
     if ask_user; then
       rtdload $dlswitch
     fi
