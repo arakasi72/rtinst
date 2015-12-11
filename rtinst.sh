@@ -512,6 +512,14 @@ echo >> /var/www/rutorrent/conf/users/$user/config.php
 echo "?>" >> /var/www/rutorrent/conf/users/$user/config.php
 
 rtgetscripts /var/www/rutorrent/conf/plugins.ini ru.ini
+if [ $OSNAME = "Raspbian" ]; then
+  sed -i '/\[screenshots\]/,+1d' /var/www/rutorrent/conf/plugins.ini
+  sed -i '/\[unpack\]/,+1d' /var/www/rutorrent/conf/plugins.ini
+  echo '[screenshots]' >> /var/www/rutorrent/conf/plugins.ini
+  echo 'enabled = no' >> /var/www/rutorrent/conf/plugins.ini
+  echo '[unpack]' >> /var/www/rutorrent/conf/plugins.ini
+  echo 'enabled = no' >> /var/www/rutorrent/conf/plugins.ini
+fi
 
 # install nginx
 cd $home
