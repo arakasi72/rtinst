@@ -116,6 +116,8 @@ To run:
 
 It will tell you the current status, and ask if you want to change it.
 
+If enabled you can access at https://SERVER_IP/download/user_name
+
 ######[3.5 rtupdate](scripts/rtupdate)
 
 This script can upgrade, (or downgrade), the libtorrent/rtorrent version installed. To run this:
