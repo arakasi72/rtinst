@@ -23,7 +23,7 @@ FULLREL=$(cat /etc/issue.net)
 OSNAME=$(cat /etc/issue.net | cut -d' ' -f1)
 RELNO=$(cat /etc/issue.net | tr -d -c 0-9. | cut -d. -f1)
 
-SERVERIP=$(ip a s eth0 | awk '/inet / {print$2}' | cut -d/ -f1)
+SERVERIP=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
 WEBPASS=''
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
@@ -275,7 +275,7 @@ sed -i '/soft nofile/ d' /etc/security/limits.conf
 sed -i '$ i\* hard nofile 32768\n* soft nofile 16384' /etc/security/limits.conf
 
 # secure ssh
-echo "Securing SSH" | tee -a $logfile
+echo "Configuring SSH" | tee -a $logfile
 
 portline=$(grep 'Port ' /etc/ssh/sshd_config)
 if [ "$portline" = "Port 22" ]; then
@@ -309,9 +309,9 @@ if ! [ -z "$allowlist" ]; then
 fi
 grep "AllowGroups sudo sshuser" /etc/ssh/sshd_config > /dev/null || echo "AllowGroups sudo sshuser" >> /etc/ssh/sshd_config
 
-service ssh restart
+service ssh restart 1>> $logfile
 sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
-echo "SSH secured. Port set to $sshport"
+echo "SSH port set to $sshport"
 
 # install ftp
 
@@ -414,7 +414,7 @@ fi
 
 openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem >> $logfile 2>&1
 
-service vsftpd restart
+service vsftpd restart 1>> $logfile
 
 ftpport=$(grep 'listen_port=' /etc/vsftpd.conf | sed 's/[^0-9]*//g')
 echo "FTP port set to $ftpport"
