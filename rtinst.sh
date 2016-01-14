@@ -311,7 +311,7 @@ grep "AllowGroups sudo sshuser" /etc/ssh/sshd_config > /dev/null || echo "AllowG
 
 service ssh restart 1>> $logfile
 sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
-echo "SSH configured. Port set to $sshport"
+echo "SSH Port set to $sshport"
 
 # install ftp
 
@@ -414,7 +414,7 @@ fi
 
 openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem >> $logfile 2>&1
 
-service vsftpd restart
+service vsftpd restart 1>> $logfile
 
 ftpport=$(grep 'listen_port=' /etc/vsftpd.conf | sed 's/[^0-9]*//g')
 echo "FTP port set to $ftpport"
