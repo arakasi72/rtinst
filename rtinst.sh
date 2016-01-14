@@ -311,7 +311,7 @@ grep "AllowGroups sudo sshuser" /etc/ssh/sshd_config > /dev/null || echo "AllowG
 
 service ssh restart 1>> $logfile
 sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
-echo "SSH Port set to $sshport"
+echo "SSH port set to $sshport"
 
 # install ftp
 
