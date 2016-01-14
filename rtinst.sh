@@ -275,7 +275,7 @@ sed -i '/soft nofile/ d' /etc/security/limits.conf
 sed -i '$ i\* hard nofile 32768\n* soft nofile 16384' /etc/security/limits.conf
 
 # secure ssh
-echo "Securing SSH" | tee -a $logfile
+echo "Configuring SSH" | tee -a $logfile
 
 portline=$(grep 'Port ' /etc/ssh/sshd_config)
 if [ "$portline" = "Port 22" ]; then
@@ -309,9 +309,9 @@ if ! [ -z "$allowlist" ]; then
 fi
 grep "AllowGroups sudo sshuser" /etc/ssh/sshd_config > /dev/null || echo "AllowGroups sudo sshuser" >> /etc/ssh/sshd_config
 
-service ssh restart
+service ssh restart >> $logfile 2>&1
 sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
-echo "SSH secured. Port set to $sshport"
+echo "SSH configured. Port set to $sshport"
 
 # install ftp
 
