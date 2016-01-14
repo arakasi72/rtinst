@@ -309,7 +309,7 @@ if ! [ -z "$allowlist" ]; then
 fi
 grep "AllowGroups sudo sshuser" /etc/ssh/sshd_config > /dev/null || echo "AllowGroups sudo sshuser" >> /etc/ssh/sshd_config
 
-service ssh restart >> $logfile 2>&1
+service ssh restart 1>> $logfile
 sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
 echo "SSH configured. Port set to $sshport"
 
