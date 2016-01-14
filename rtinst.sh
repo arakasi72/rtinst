@@ -23,7 +23,7 @@ FULLREL=$(cat /etc/issue.net)
 OSNAME=$(cat /etc/issue.net | cut -d' ' -f1)
 RELNO=$(cat /etc/issue.net | tr -d -c 0-9. | cut -d. -f1)
 
-SERVERIP=$(ip a s eth0 | awk '/inet / {print$2}' | cut -d/ -f1)
+SERVERIP=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
 WEBPASS=''
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
