@@ -23,6 +23,8 @@ or if you run it from a non-root sudo user:
 
 **IMPORTANT: NOTE THE NEW SSH PORT AND MAKE SURE YOU CAN SSH INTO YOUR SERVER BEFORE CLOSING THE EXISTING SESSION**
 
+
+
 ####1. Introduction
 Seedbox installation
 
