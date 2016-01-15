@@ -7,6 +7,22 @@ If it has been some time since you did an update you may need to manually downlo
 	sudo bash rtgetscripts
 	
 ======
+####0. 30 Second Guide
+
+Download script
+
+	wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtinst.sh
+
+and then to run it:
+
+	bash rtinst.sh
+
+or if you run it from a non-root sudo user:
+
+	sudo bash rtinst.sh
+
+**IMPORTANT: NOTE THE NEW SSH PORT AND MAKE SURE YOU CAN SSH INTO YOUR SERVER BEFORE CLOSING THE EXISTING SESSION**
+
 ####1. Introduction
 Seedbox installation
 
