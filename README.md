@@ -1,5 +1,5 @@
 ###rtinst
-**NOTE 8th Nov 2015** - Reorganised repository. For existing installations, if it has been some time since you did an update you may need to manually download and run rtgetscripts:
+**NOTE 8th Nov 2015** - Reorganised repository. For existing installations, you will need to manually download and run rtgetscripts:
 
 	wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/scripts/rtgetscripts
 	sudo bash rtgetscripts
