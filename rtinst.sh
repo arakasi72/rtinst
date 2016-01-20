@@ -187,6 +187,12 @@ fi
 
 home="/home/$user"
 
+#Interaction ended message
+echo
+echo "No more user input required, you can complete unattended"
+echo "It will take approx 10 minutes for the script to complete"
+echo
+
 #update amd upgrade system
 if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]; then
   wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list >> $logfile 2>&1 || error_exit "Unable to download sources file from https://help.ubuntu.com/12.04/sample/sources.list"
