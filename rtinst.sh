@@ -230,9 +230,9 @@ test -z "$install_list" || apt-get -y install $install_list >> $logfile 2>&1
 if [ $OSNAME = "Debian" ]; then
   cd $home
   if [ "$(uname -m)" = "x86_64" ]; then
-    curl -s http://www.rarlab.com/rar/rarlinux-x64-5.2.1.tar.gz | tar xz
+    curl -s http://www.rarlab.com/rar/rarlinux-x64-5.3.0.tar.gz | tar xz
   elif [ "$(uname -m)" = "x86_32" ]; then
-    curl -s http://www.rarlab.com/rar/rarlinux-5.2.1.tar.gz | tar xz
+    curl -s http://www.rarlab.com/rar/rarlinux-5.3.0.tar.gz | tar xz
   fi
   cp $home/rar/rar /bin/rar
   cp $home/rar/unrar /bin/unrar
