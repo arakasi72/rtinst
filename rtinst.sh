@@ -28,7 +28,6 @@ WEBPASS=''
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 DLFLAG=1
-PASSFLAG=1
 logfile="/dev/null"
 gotip=0
 install_rt=0
@@ -62,7 +61,7 @@ tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
 set_pass() {
 exec 3>&1 >/dev/tty
 local LOCALPASS=''
-
+local exitvalue=0
 echo "Enter a password (alphanumeric 6+ chars)"
 echo "Leave blank to generate a random one"
 
@@ -74,7 +73,8 @@ do
 #check that password is valid
   if [ -z $password1 ]; then
     echo "Random password generated, will be provided to user at end of script"
-    LOCALPASS=$(genpasswd) && PASSFLAG=0 && break
+    exitvalue=1
+    LOCALPASS=$(genpasswd) && break
   elif [ ${#password1} -lt 6 ]; then
     echo "password needs to be at least 6 chars long" && continue
   elif [[ "$password1" =~ [^a-zA-Z0-9] ]]; then
@@ -95,6 +95,7 @@ done
 
 exec >&3-
 echo $LOCALPASS
+return $exitvalue
 }
 
 #function to determine random number between 2 numbers
@@ -230,7 +231,7 @@ home="/home/$user"
 #set password for rutorrent
 echo "Set Password for RuTorrent web client"
 WEBPASS=$(set_pass)
-
+PASSFLAG=$?
 #Interaction ended message
 echo
 echo "No more user input required, you can complete unattended"
@@ -703,7 +704,7 @@ echo "If enabled, access https downloads at https://$SERVERIP/download/$user" | 
 echo
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | tee -a $home/rtinst.info
 
-if [ $PASSFLAG = 0 ]; then
+if [ $PASSFLAG = 1 ]; then
   echo "rutorrent password set to $WEBPASS" | tee -a $home/rtinst.info
 else
   echo "rutorrent password as set by user" | tee -a $home/rtinst.info
