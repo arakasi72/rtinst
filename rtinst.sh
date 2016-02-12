@@ -703,7 +703,7 @@ echo "If enabled, access https downloads at https://$SERVERIP/download/$user" | 
 echo
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | tee -a $home/rtinst.info
 
-if [ PASSFLAG = 0 ]; then
+if [ $PASSFLAG = 0 ]; then
   echo "rutorrent password set to $WEBPASS" | tee -a $home/rtinst.info
 else
   echo "rutorrent password as set by user" | tee -a $home/rtinst.info
