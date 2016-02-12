@@ -245,14 +245,14 @@ if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]; then
 fi
 
 echo "Updating package lists" | tee $logfile
-apt-get update >> $logfile 2>&1
+apt-get update 2>&1 >>$logfile | tee -a $logfile
 if ! [ $? = 0 ]; then
   error_exit "Problem updating packages."
 fi
 
 echo "Upgrading packages" | tee -a $logfile
 export DEBIAN_FRONTEND=noninteractive
-apt-get -y upgrade >> $logfile 2>&1
+apt-get -y upgrade  2>&1 >>$logfile | tee -a $logfile
 if ! [ $? = 0 ]; then
   error_exit "Problem upgrading packages."
 fi
@@ -268,7 +268,7 @@ for package_name in $package_list
     fi
   done
 
-test -z "$install_list" || apt-get -y install $install_list >> $logfile 2>&1
+test -z "$install_list" || apt-get -y install $install_list  2>&1 >>$logfile | tee -a $logfile
 
 #install unrar package
 if [ $OSNAME = "Debian" ]; then
