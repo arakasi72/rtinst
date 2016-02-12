@@ -28,6 +28,7 @@ WEBPASS=''
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 DLFLAG=1
+PASSFLAG=1
 logfile="/dev/null"
 gotip=0
 install_rt=0
@@ -55,6 +56,45 @@ genpasswd() {
 local genln=$1
 [ -z "$genln" ] && genln=8
 tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
+}
+
+#function to set a user input password
+set_pass() {
+exec 3>&1 >/dev/tty
+local LOCALPASS=''
+
+echo "Enter a password (alphanumeric 6+ chars)"
+echo "Leave blank to generate a random one"
+
+while [ -z $LOCALPASS ]
+do
+  echo "Please enter the new password:"
+  read -s password1
+
+#check that password is valid
+  if [ -z $password1 ]; then
+    echo "Random password generated, will be provided to user at end of script"
+    LOCALPASS=$(genpasswd) && PASSFLAG=0 && break
+  elif [ ${#password1} -lt 6 ]; then
+    echo "password needs to be at least 6 chars long" && continue
+  elif [[ "$password1" =~ [^a-zA-Z0-9] ]]; then
+    echo "only alphanumeric allowed" && continue
+
+  else
+    echo "Enter the new password again:"
+    read -s password2
+
+# Check both passwords match
+    if [ $password1 != $password2 ]; then
+      echo "Passwords do not match"
+    else
+      LOCALPASS=$password1
+    fi
+  fi
+done
+
+exec >&3-
+echo $LOCALPASS
 }
 
 #function to determine random number between 2 numbers
@@ -186,6 +226,10 @@ else
 fi
 
 home="/home/$user"
+
+#set password for rutorrent
+echo "Set Password for RuTorrent web client"
+WEBPASS=$(set_pass)
 
 #Interaction ended message
 echo
@@ -537,7 +581,7 @@ if [ -f "/etc/apache2/ports.conf" ]; then
 fi
 
 echo "Installing nginx" | tee -a $logfile
-WEBPASS=$(genpasswd)
+#WEBPASS=$(genpasswd)
 htpasswd -c -b $passfile $user $WEBPASS >> $logfile 2>&1
 chown www-data:www-data $passfile
 chmod 640 $passfile
@@ -658,7 +702,13 @@ fi
 echo "If enabled, access https downloads at https://$SERVERIP/download/$user" | tee -a $home/rtinst.info
 echo
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | tee -a $home/rtinst.info
-echo "rutorrent password set to $WEBPASS" | tee -a $home/rtinst.info
+
+if [ PASSFLAG = 0 ]; then
+  echo "rutorrent password set to $WEBPASS" | tee -a $home/rtinst.info
+else
+  echo "rutorrent password as set by user" | tee -a $home/rtinst.info
+fi
+
 echo "to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
 echo
 echo "IMPORTANT: SSH Port set to $sshport - Ensure you can login before closing this session"
