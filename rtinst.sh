@@ -62,8 +62,8 @@ set_pass() {
 exec 3>&1 >/dev/tty
 local LOCALPASS=''
 local exitvalue=0
-echo "Enter a password (alphanumeric 6+ chars)"
-echo "Leave blank to generate a random one"
+echo "Enter a password (6+ chars)"
+echo "or leave blank to generate a random one"
 
 while [ -z $LOCALPASS ]
 do
@@ -77,9 +77,6 @@ do
     LOCALPASS=$(genpasswd) && break
   elif [ ${#password1} -lt 6 ]; then
     echo "password needs to be at least 6 chars long" && continue
-  elif [[ "$password1" =~ [^a-zA-Z0-9] ]]; then
-    echo "only alphanumeric allowed" && continue
-
   else
     echo "Enter the new password again:"
     read -s password2
