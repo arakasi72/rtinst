@@ -339,7 +339,6 @@ if [ $(dpkg-query -W -f='${Status}' "vsftpd" 2>/dev/null | grep -c "ok installed
   fi
 
 fi
-echo "Configuring vsftpd" | tee -a $logfile
 
 sed -i '/^#\?anonymous_enable/ c\anonymous_enable=NO' /etc/vsftpd.conf
 sed -i '/^#\?local_enable/ c\local_enable=YES' /etc/vsftpd.conf
