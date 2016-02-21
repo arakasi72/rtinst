@@ -57,6 +57,44 @@ local genln=$1
 tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
 }
 
+#function to set a user input password
+set_pass() {
+exec 3>&1 >/dev/tty
+local LOCALPASS=''
+local exitvalue=0
+echo "Enter a password (6+ chars)"
+echo "or leave blank to generate a random one"
+
+while [ -z $LOCALPASS ]
+do
+  echo "Please enter the new password:"
+  read -s password1
+
+#check that password is valid
+  if [ -z $password1 ]; then
+    echo "Random password generated, will be provided to user at end of script"
+    exitvalue=1
+    LOCALPASS=$(genpasswd) && break
+  elif [ ${#password1} -lt 6 ]; then
+    echo "password needs to be at least 6 chars long" && continue
+  else
+    echo "Enter the new password again:"
+    read -s password2
+
+# Check both passwords match
+    if [ $password1 != $password2 ]; then
+      echo "Passwords do not match"
+    else
+      LOCALPASS=$password1
+    fi
+  fi
+done
+
+exec >&3-
+echo $LOCALPASS
+return $exitvalue
+}
+
 #function to determine random number between 2 numbers
 random()
 {
@@ -187,6 +225,10 @@ fi
 
 home="/home/$user"
 
+#set password for rutorrent
+echo "Set Password for RuTorrent web client"
+WEBPASS=$(set_pass)
+PASSFLAG=$?
 #Interaction ended message
 echo
 echo "No more user input required, you can complete unattended"
@@ -201,14 +243,14 @@ if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]; then
 fi
 
 echo "Updating package lists" | tee $logfile
-apt-get update >> $logfile 2>&1
+apt-get update 2>&1 >>$logfile | tee -a $logfile
 if ! [ $? = 0 ]; then
   error_exit "Problem updating packages."
 fi
 
 echo "Upgrading packages" | tee -a $logfile
 export DEBIAN_FRONTEND=noninteractive
-apt-get -y upgrade >> $logfile 2>&1
+apt-get -y upgrade  2>&1 >>$logfile | tee -a $logfile
 if ! [ $? = 0 ]; then
   error_exit "Problem upgrading packages."
 fi
@@ -224,7 +266,7 @@ for package_name in $package_list
     fi
   done
 
-test -z "$install_list" || apt-get -y install $install_list >> $logfile 2>&1
+test -z "$install_list" || apt-get -y install $install_list  2>&1 >>$logfile | tee -a $logfile
 
 #install unrar package
 if [ $OSNAME = "Debian" ]; then
@@ -536,7 +578,7 @@ if [ -f "/etc/apache2/ports.conf" ]; then
 fi
 
 echo "Installing nginx" | tee -a $logfile
-WEBPASS=$(genpasswd)
+#WEBPASS=$(genpasswd)
 htpasswd -c -b $passfile $user $WEBPASS >> $logfile 2>&1
 chown www-data:www-data $passfile
 chmod 640 $passfile
@@ -657,7 +699,13 @@ fi
 echo "If enabled, access https downloads at https://$SERVERIP/download/$user" | tee -a $home/rtinst.info
 echo
 echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | tee -a $home/rtinst.info
-echo "rutorrent password set to $WEBPASS" | tee -a $home/rtinst.info
+
+if [ $PASSFLAG = 1 ]; then
+  echo "rutorrent password set to $WEBPASS" | tee -a $home/rtinst.info
+else
+  echo "rutorrent password as set by user" | tee -a $home/rtinst.info
+fi
+
 echo "to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
 echo
 echo "IMPORTANT: SSH Port set to $sshport - Ensure you can login before closing this session"
