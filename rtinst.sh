@@ -223,7 +223,7 @@ else
   exit 1
 fi
 
-home="/home/$user"
+home=$(eval echo "~$user")
 
 #set password for rutorrent
 echo "Set Password for RuTorrent web client"
