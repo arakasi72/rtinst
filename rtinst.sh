@@ -600,7 +600,7 @@ sed -i "s/# server_tokens off;/server_tokens off;/g" /etc/nginx/nginx.conf
 sed -i "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/nginx/nginx.conf
 sed -i "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
 grep client_max_body_size /etc/nginx/nginx.conf > /dev/null 2>&1 || sed -i "/server_tokens off;/ a\        client_max_body_size 40m;\n" /etc/nginx/nginx.conf
-sed -i "/upload_max_filesize/ c\upload_max_filesize = 40M" /etc/php5/fpm/php.ini
+sed -i "/upload_max_filesize/ c\upload_max_filesize = 40M" $PHPLOC/fpm/php.ini
 sed -i '/^;\?listen.owner/ c\listen.owner = www-data' $PHPLOC/fpm/pool.d/www.conf
 sed -i '/^;\?listen.group/ c\listen.group = www-data' $PHPLOC/fpm/pool.d/www.conf
 sed -i '/^;\?listen.mode/ c\listen.mode = 0660' $PHPLOC/fpm/pool.d/www.conf
@@ -634,7 +634,7 @@ echo "}" >> /etc/nginx/conf.d/cache
 
 sed -i "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
 
-service nginx restart && service php5-fpm restart
+service nginx restart && service $PHPVER-fpm restart
 
 if [ $DLFLAG = 0 ]; then
   rtdload enable
