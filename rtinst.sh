@@ -624,7 +624,7 @@ echo "location ~ \.php$ {" > /etc/nginx/conf.d/php
 echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/php
 if [ $RELNO = 12 ]; then
   echo "          fastcgi_pass 127.0.0.1:9000;" >> /etc/nginx/conf.d/php
-elif [ $RELNO = 12 ]; then
+elif [ $RELNO = 16 ]; then
   echo "          fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;" >> /etc/nginx/conf.d/php
 else
   echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
