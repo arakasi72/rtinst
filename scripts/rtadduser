@@ -271,7 +271,8 @@ sed -i "s/network\.scgi\.open_port = 127\.0\.0\.1:5000/network\.scgi\.open_port 
 
 echo "<?php" > /var/www/rutorrent/conf/users/$user/config.php
 echo >> /var/www/rutorrent/conf/users/$user/config.php
-echo "\$topDirectory = '$home';" >> /var/www/rutorrent/conf/users/$user/config.php
+echo "\$homeDirectory = \"$home\";" >> /var/www/rutorrent/conf/users/$user/config.php
+echo "\$topDirectory = \"$home\";" >> /var/www/rutorrent/conf/users/$user/config.php
 echo "\$scgi_port = $newscgi;" >> /var/www/rutorrent/conf/users/$user/config.php
 echo "\$XMLRPCMountPoint = \"/RPC$newrpc\";" >> /var/www/rutorrent/conf/users/$user/config.php
 echo >> /var/www/rutorrent/conf/users/$user/config.php
