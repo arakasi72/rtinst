@@ -23,6 +23,14 @@ FULLREL=$(cat /etc/issue.net)
 OSNAME=$(cat /etc/issue.net | cut -d' ' -f1)
 RELNO=$(cat /etc/issue.net | tr -d -c 0-9. | cut -d. -f1)
 
+if [ $RELNO = 16 ]; then
+  PHPVER=php7.0
+  PHPLOC=/etc/php/7.0
+else
+  PHPVER=php5
+  PHPLOC=/etc/php5
+fi
+
 SERVERIP=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
 WEBPASS=''
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
@@ -34,7 +42,7 @@ install_rt=0
 sshport=''
 rudevflag=1
 passfile='/etc/nginx/.htpasswd'
-package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config php5-fpm php5 php5-cli php5-dev php5-curl php5-geoip php5-mcrypt php5-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude php5-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
+package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $PHPVER-fpm $PHPVER $PHPVER-cli $PHPVER-dev $PHPVER-curl $PHPVER-geoip $PHPVER-mcrypt $PHPVER-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude $PHPVER-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
 Install_list=""
 
 #exit on error function
@@ -223,7 +231,7 @@ else
   exit 1
 fi
 
-home="/home/$user"
+home=$(eval echo "~$user")
 
 #set password for rutorrent
 echo "Set Password for RuTorrent web client"
@@ -261,8 +269,12 @@ apt-get clean && apt-get autoclean >> $logfile 2>&1
 echo "Installing required packages" | tee -a $logfile
 for package_name in $package_list
   do
-    if [ $(dpkg-query -W -f='${Status}' $package_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-      install_list="$install_list $package_name"
+    if apt-cache show $package_name >/dev/null 2>&1 ; then
+      if [ $(dpkg-query -W -f='${Status}' $package_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+        install_list="$install_list $package_name"
+      fi
+    else
+      echo $package_name" not found, skipping"
     fi
   done
 
@@ -592,10 +604,10 @@ sed -i "s/# server_tokens off;/server_tokens off;/g" /etc/nginx/nginx.conf
 sed -i "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/nginx/nginx.conf
 sed -i "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
 grep client_max_body_size /etc/nginx/nginx.conf > /dev/null 2>&1 || sed -i "/server_tokens off;/ a\        client_max_body_size 40m;\n" /etc/nginx/nginx.conf
-sed -i "/upload_max_filesize/ c\upload_max_filesize = 40M" /etc/php5/fpm/php.ini
-sed -i '/^;\?listen.owner/ c\listen.owner = www-data' /etc/php5/fpm/pool.d/www.conf
-sed -i '/^;\?listen.group/ c\listen.group = www-data' /etc/php5/fpm/pool.d/www.conf
-sed -i '/^;\?listen.mode/ c\listen.mode = 0660' /etc/php5/fpm/pool.d/www.conf
+sed -i "/upload_max_filesize/ c\upload_max_filesize = 40M" $PHPLOC/fpm/php.ini
+sed -i '/^;\?listen.owner/ c\listen.owner = www-data' $PHPLOC/fpm/pool.d/www.conf
+sed -i '/^;\?listen.group/ c\listen.group = www-data' $PHPLOC/fpm/pool.d/www.conf
+sed -i '/^;\?listen.mode/ c\listen.mode = 0660' $PHPLOC/fpm/pool.d/www.conf
 
 if [ -d "/usr/share/nginx/www" ]; then
   cp /usr/share/nginx/www/* /var/www
@@ -612,6 +624,8 @@ echo "location ~ \.php$ {" > /etc/nginx/conf.d/php
 echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/php
 if [ $RELNO = 12 ]; then
   echo "          fastcgi_pass 127.0.0.1:9000;" >> /etc/nginx/conf.d/php
+elif [ $RELNO = 16 ]; then
+  echo "          fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;" >> /etc/nginx/conf.d/php
 else
   echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
 fi
@@ -626,7 +640,7 @@ echo "}" >> /etc/nginx/conf.d/cache
 
 sed -i "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
 
-service nginx restart && service php5-fpm restart
+service nginx restart && service $PHPVER-fpm restart
 
 if [ $DLFLAG = 0 ]; then
   rtdload enable
@@ -673,9 +687,9 @@ chown -R $user:$user $home
 
 cd $home
 
-rtgetscripts /usr/local/bin/edit_su
-edit_su
-rm /usr/local/bin/edit_su
+if [ -z "$(grep "ALL ALL = NOPASSWD: /usr/local/bin/rtsetpass" /etc/sudoers)" ]; then
+  echo "ALL ALL = NOPASSWD: /usr/local/bin/rtsetpass" | (EDITOR="tee -a" visudo)  > /dev/null 2>&1
+fi
 
 su $user -c '/usr/local/bin/rt restart'
 su $user -c '/usr/local/bin/rt -i restart'
