@@ -269,8 +269,12 @@ apt-get clean && apt-get autoclean >> $logfile 2>&1
 echo "Installing required packages" | tee -a $logfile
 for package_name in $package_list
   do
-    if [ $(dpkg-query -W -f='${Status}' $package_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-      install_list="$install_list $package_name"
+    if apt-cache show $package_name >/dev/null 2>&1 ; then
+      if [ $(dpkg-query -W -f='${Status}' $package_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+        install_list="$install_list $package_name"
+      fi
+    else
+      echo $package_name" not found, skipping"
     fi
   done
 
