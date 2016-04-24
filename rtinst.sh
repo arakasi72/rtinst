@@ -687,9 +687,13 @@ chown -R $user:$user $home
 
 cd $home
 
-rtgetscripts /usr/local/bin/edit_su
-edit_su
-rm /usr/local/bin/edit_su
+if [ -z "$(grep "ALL ALL = NOPASSWD: /usr/local/bin/rtsetpass" /etc/sudoers)" ]$
+  echo "ALL ALL = NOPASSWD: /usr/local/bin/rtsetpass" | (EDITOR="tee -a" visudo)
+fi
+
+#rtgetscripts /usr/local/bin/edit_su
+#edit_su
+#rm /usr/local/bin/edit_su
 
 su $user -c '/usr/local/bin/rt restart'
 su $user -c '/usr/local/bin/rt -i restart'
