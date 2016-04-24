@@ -1,4 +1,7 @@
 ###rtinst
+**NOTE 24th April 2016** - Updated to work with Ubuntu 16
+	
+======
 **NOTE 8th Nov 2015** - Reorganised repository. For existing installations, you will need to manually download and run rtgetscripts:
 
 	wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/scripts/rtgetscripts
@@ -32,6 +35,7 @@ It has been tested with clean installs of:
 	Ubuntu 13
 	Ubuntu 14
 	Ubuntu 15
+	Ubuntu 16
 	Debian 7
 	Debian 8
 
