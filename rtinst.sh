@@ -564,7 +564,8 @@ mkdir -p /var/www/rutorrent/conf/users/$user/plugins
 
 echo "<?php" > /var/www/rutorrent/conf/users/$user/config.php
 echo >> /var/www/rutorrent/conf/users/$user/config.php
-echo "\$topDirectory = '$home';" >> /var/www/rutorrent/conf/users/$user/config.php
+echo "\$homeDirectory = \"$home\";" >> /var/www/rutorrent/conf/users/$user/config.php
+echo "\$topDirectory = \"$home\";" >> /var/www/rutorrent/conf/users/$user/config.php
 echo "\$scgi_port = 5000;" >> /var/www/rutorrent/conf/users/$user/config.php
 echo "\$XMLRPCMountPoint = \"/RPC2\";" >> /var/www/rutorrent/conf/users/$user/config.php
 echo >> /var/www/rutorrent/conf/users/$user/config.php
