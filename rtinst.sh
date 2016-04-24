@@ -688,7 +688,7 @@ chown -R $user:$user $home
 cd $home
 
 if [ -z "$(grep "ALL ALL = NOPASSWD: /usr/local/bin/rtsetpass" /etc/sudoers)" ]; then
-  echo "ALL ALL = NOPASSWD: /usr/local/bin/rtsetpass" | (EDITOR="tee -a" visudo)
+  echo "ALL ALL = NOPASSWD: /usr/local/bin/rtsetpass" | (EDITOR="tee -a" visudo)  > /dev/null 2>&1
 fi
 
 #rtgetscripts /usr/local/bin/edit_su
