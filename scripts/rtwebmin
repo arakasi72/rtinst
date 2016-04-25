@@ -9,7 +9,7 @@
 ######################################################################
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
-SERVERIP=$(ip a s eth0 | awk '/inet / {print$2}' | cut -d/ -f1)
+SERVERIP=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
 
 if ! [ "$LOGNAME" = "root" ]; then
   echo "Must be run as root, directly or with sudo"
