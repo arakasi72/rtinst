@@ -36,6 +36,7 @@ WEBPASS=''
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 DLFLAG=1
+portdefault=1
 logfile="/dev/null"
 gotip=0
 install_rt=0
@@ -145,11 +146,12 @@ else
 fi
 
 # get options
-while getopts ":dlr" optname
+while getopts ":dlt" optname
   do
     case $optname in
       "d" ) DLFLAG=0 ;;
       "l" ) logfile="$HOME/rtinst.log" ;;
+      "t" ) portdefault=0 ;;
         * ) echo "incorrect option, only -d, and -l allowed" && exit 1 ;;
     esac
   done
@@ -338,7 +340,11 @@ sed -i '$ i\* hard nofile 32768\n* soft nofile 16384' /etc/security/limits.conf
 echo "Configuring SSH" | tee -a $logfile
 
 portline=$(grep 'Port ' /etc/ssh/sshd_config)
-if [ "$portline" = "Port 22" ]; then
+
+if [ "$portdefault" = "0" ]; then
+  sshport=22
+  sed -i "/^Port/ c\Port $sshport" /etc/ssh/sshd_config
+elif [ "$portline" = "Port 22" -a "$portdefault" = "1" ]; then
   sshport=$(random 21000 29000)
   sed -i "s/Port 22/Port $sshport/g" /etc/ssh/sshd_config
 fi
