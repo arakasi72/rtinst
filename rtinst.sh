@@ -23,7 +23,7 @@ FULLREL=$(cat /etc/issue.net)
 OSNAME=$(cat /etc/issue.net | cut -d' ' -f1)
 RELNO=$(cat /etc/issue.net | tr -d -c 0-9. | cut -d. -f1)
 
-if [ $RELNO = 16 ]; then
+if [ "$RELNO" = "16" ]; then
   PHPVER=php7.0
   PHPLOC=/etc/php/7.0
 else
@@ -135,7 +135,7 @@ ask_user
 }
 
 # determine system
-if [ $OSNAME = "Ubuntu" -a $RELNO -ge 12 ] || [ $OSNAME = "Debian" -a $RELNO -ge 7 ]  || [ $OSNAME = "Raspbian" -a $RELNO -ge 7 ]; then
+if [ "$OSNAME" = "Ubuntu" -a "$RELNO" -ge "12" ] || [ "$OSNAME" = "Debian" -a "$RELNO" -ge "7" ]  || [ "$OSNAME" = "Raspbian" -a "$RELNO" -ge "7" ]; then
   echo $FULLREL
 else
  echo $FULLREL
