@@ -343,7 +343,7 @@ portline=$(grep 'Port ' /etc/ssh/sshd_config)
 
 if [ "$portdefault" = "0" ]; then
   sshport=22
-  sed -i '/^Port/ c\Port $sshport' /etc/ssh/sshd_config
+  sed -i "/^Port/ c\Port $sshport" /etc/ssh/sshd_config
 elif [ "$portline" = "Port 22" -a "$portdefault" = "1" ]; then
   sshport=$(random 21000 29000)
   sed -i "s/Port 22/Port $sshport/g" /etc/ssh/sshd_config
