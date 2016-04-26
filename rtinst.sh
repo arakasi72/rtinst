@@ -340,7 +340,11 @@ sed -i '$ i\* hard nofile 32768\n* soft nofile 16384' /etc/security/limits.conf
 echo "Configuring SSH" | tee -a $logfile
 
 portline=$(grep 'Port ' /etc/ssh/sshd_config)
-if [ "$portline" = "Port 22" -a "$portdefault" = "1" ]; then
+
+if [ "$portdefault" = "0" ]; then
+  sshport=22
+  sed -i '/^Port/ c\Port $sshport' /etc/ssh/sshd_config
+elif [ "$portline" = "Port 22" -a "$portdefault" = "1" ]; then
   sshport=$(random 21000 29000)
   sed -i "s/Port 22/Port $sshport/g" /etc/ssh/sshd_config
 fi
