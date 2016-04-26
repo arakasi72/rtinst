@@ -146,7 +146,7 @@ else
 fi
 
 # get options
-while getopts ":dlr" optname
+while getopts ":dlt" optname
   do
     case $optname in
       "d" ) DLFLAG=0 ;;
