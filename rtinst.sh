@@ -142,7 +142,7 @@ ask_user
 }
 
 # determine system
-if [ "$OSNAME" = "Ubuntu" -a "$RELNO" -ge "12" ] || [ "$OSNAME" = "Debian" -a "$RELNO" -ge "7" ]  || [ "$OSNAME" = "Raspbian" -a "$RELNO" -ge "7" ]; then
+if ([ $OSNAME = Ubuntu ] && [ $RELNO -ge 12 ]) || ([ $OSNAME = Debian ] && [ $RELNO -ge 7 ])  || ([ $OSNAME = Raspbian ] && [ $RELNO -ge 7 ]); then
   echo $FULLREL
 else
  echo $FULLREL
@@ -350,7 +350,7 @@ portline=$(grep 'Port ' /etc/ssh/sshd_config)
 if [ "$portdefault" = "0" ]; then
   sshport=22
   sed -i "/^Port/ c\Port $sshport" /etc/ssh/sshd_config
-elif [ "$portline" = "Port 22" -a "$portdefault" = "1" ]; then
+elif [ "$portline" = "Port 22" ] && [ "$portdefault" = "1" ]; then
   sshport=$(random 21000 29000)
   sed -i "s/Port 22/Port $sshport/g" /etc/ssh/sshd_config
 fi
