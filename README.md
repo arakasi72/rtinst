@@ -79,6 +79,10 @@ if you run it with -l option it will create the rtinst.log file with detailed ou
 
 The script will assign a random ssh port for security purposes. It will display this on the screen when it has finished running and write it to ~/rtinst.info
 
+if you run it with -t option however it will set the ssh port to the standard 22. 
+
+	bash rtinst.sh -t
+
 **IMPORTANT: NOTE THE NEW SSH PORT AND MAKE SURE YOU CAN SSH INTO YOUR SERVER BEFORE CLOSING THE EXISTING SESSION**
 
 For security the script assigns ftp to a random port number. You will need to use this port number in your ftp client. It will display the port number at the end of the script, and will also write it to ~/rtinst.info
