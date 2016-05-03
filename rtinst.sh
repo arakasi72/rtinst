@@ -142,7 +142,7 @@ ask_user
 }
 
 # determine system
-if ([ $OSNAME = Ubuntu ] && [ $RELNO -ge 12 ]) || ([ $OSNAME = Debian ] && [ $RELNO -ge 7 ])  || ([ $OSNAME = Raspbian ] && [ $RELNO -ge 7 ]); then
+if ([ "$OSNAME" = "Ubuntu" ] && [ $RELNO -ge 12 ]) || ([ "$OSNAME" = "Debian" ] && [ $RELNO -ge 7 ])  || ([ "$OSNAME" = "Raspbian" ] && [ $RELNO -ge 7 ]); then
   echo $FULLREL
 else
  echo $FULLREL
