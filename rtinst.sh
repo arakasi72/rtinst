@@ -19,9 +19,15 @@ xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
 BLOB=master
 RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$BLOB/scripts
 
-FULLREL=$(cat /etc/issue.net)
-OSNAME=$(cat /etc/issue.net | cut -d' ' -f1)
-RELNO=$(cat /etc/issue.net | tr -d -c 0-9. | cut -d. -f1)
+if [ -f /etc/lsb-release ]; then
+  FULLREL=$(lsb_release -sd)
+  OSNAME=$(lsb_release -si)
+  RELNO=$(lsb_release -sr | cut -d. -f1)
+else
+  FULLREL=$(cat /etc/issue.net)
+  OSNAME=$(cat /etc/issue.net | cut -d' ' -f1)
+  RELNO=$(cat /etc/issue.net | tr -d -c 0-9. | cut -d. -f1)
+fi
 
 if [ "$RELNO" = "16" ]; then
   PHPVER=php7.0
