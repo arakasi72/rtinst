@@ -538,7 +538,7 @@ mkdir -p rtorrent/watch
 
 
 rtgetscripts $home/.rtorrent.rc
-sed -i "s/<user home>/$home/g" $home/.rtorrent.rc
+sed -i "s|<user home>|${home}|g" $home/.rtorrent.rc
 sed -i "s/<user name>/$user/g" $home/.rtorrent.rc
 
 # install rutorrent
