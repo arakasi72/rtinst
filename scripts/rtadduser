@@ -80,8 +80,9 @@ while ! [ $no_match = 0 ]
     for i in $user_list
       do
        base_user=$i
-       base_low=$(grep "port_range =" /home/$base_user/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f1)
-       base_high=$(grep "port_range =" /home/$base_user/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f2)
+       base_home=$(eval echo "~$base_user")
+       base_low=$(grep "port_range =" $base_home/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f1)
+       base_high=$(grep "port_range =" $base_home/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f2)
        if [ $low_count -gt $base_high ]; then
          no_match=0
          higher=0
@@ -96,13 +97,14 @@ while ! [ $no_match = 0 ]
        for n in $user_list
          do
            compare_user=$n
+           compare_home=$(eval echo "~$compare_user")
            if [ $no_match=1 ]; then
              break
            fi
 
            if ! [ $base_user = $compare_user ]; then
-             compare_low=$(grep "port_range =" /home/$compare_user/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f1)
-             compare_high=$(grep "port_range =" /home/$compare_user/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f2)
+             compare_low=$(grep "port_range =" $compare_home/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f1)
+             compare_high=$(grep "port_range =" $compare_home/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f2)
 
              if [ $higher = 0 ]; then
                if [ $base_low -gt $compare_high ]; then
@@ -122,7 +124,7 @@ while ! [ $no_match = 0 ]
                no_match=0
              elif [ $low_count -gt $compare_high ]; then
                no_match=0
-             elif [ $compare_high -lt $base_low -a $compare_low -gt $count_high  ]; then
+             elif [ $compare_high -lt $base_low ] && [ $compare_low -gt $count_high  ]; then
                no_match=0
              else
                no_match=1
