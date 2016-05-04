@@ -16,32 +16,32 @@ rtorrentloc='http://rtorrent.net/downloads/rtorrent-'$rtorrentrel'.tar.gz'
 libtorrentloc='http://rtorrent.net/downloads/libtorrent-'$libtorrentrel'.tar.gz'
 xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
 
-BLOB=develop
-RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$BLOB/scripts
+blob=develop
+rtdir=https://raw.githubusercontent.com/arakasi72/rtinst/$blob/scripts
 
 if [ -f /etc/lsb-release ]; then
-  FULLREL=$(lsb_release -sd)
-  OSNAME=$(lsb_release -si)
-  RELNO=$(lsb_release -sr | cut -d. -f1)
+  fullrel=$(lsb_release -sd)
+  osname=$(lsb_release -si)
+  relno=$(lsb_release -sr | cut -d. -f1)
 else
-  FULLREL=$(cat /etc/issue.net)
-  OSNAME=$(cat /etc/issue.net | cut -d' ' -f1)
-  RELNO=$(cat /etc/issue.net | tr -d -c 0-9. | cut -d. -f1)
+  fullrel=$(cat /etc/issue.net)
+  osname=$(cat /etc/issue.net | cut -d' ' -f1)
+  relno=$(cat /etc/issue.net | tr -d -c 0-9. | cut -d. -f1)
 fi
 
-if [ "$RELNO" = "16" ]; then
-  PHPVER=php7.0
-  PHPLOC=/etc/php/7.0
+if [ "$relno" = "16" ]; then
+  phpver=php7.0
+  phploc=/etc/php/7.0
 else
-  PHPVER=php5
-  PHPLOC=/etc/php5
+  phpver=php5
+  phploc=/etc/php5
 fi
 
-SERVERIP=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
-WEBPASS=''
+serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
+webpass=''
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
-DLFLAG=1
+dlflag=1
 portdefault=1
 logfile="/dev/null"
 gotip=0
@@ -49,7 +49,7 @@ install_rt=0
 sshport=''
 rudevflag=1
 passfile='/etc/nginx/.htpasswd'
-package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $PHPVER-fpm $PHPVER $PHPVER-cli $PHPVER-dev $PHPVER-curl $PHPVER-geoip $PHPVER-mcrypt $PHPVER-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude $PHPVER-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
+package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl $phpver-geoip $phpver-mcrypt $phpver-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
 Install_list=""
 
 #exit on error function
@@ -135,17 +135,17 @@ while true
 enter_ip() {
 echo "enter your server's name or IP address"
 echo "e.g. example.com or 213.0.113.113"
-read SERVERIP
-echo "Your Server IP/Name is $SERVERIP"
+read serverip
+echo "Your Server IP/Name is $serverip"
 echo -n "Is this correct y/n? "
 ask_user
 }
 
 # determine system
-if ([ "$OSNAME" = "Ubuntu" ] && [ $RELNO -ge 12 ]) || ([ "$OSNAME" = "Debian" ] && [ $RELNO -ge 7 ])  || ([ "$OSNAME" = "Raspbian" ] && [ $RELNO -ge 7 ]); then
-  echo $FULLREL
+if ([ "$osname" = "Ubuntu" ] && [ $relno -ge 12 ]) || ([ "$osname" = "Debian" ] && [ $relno -ge 7 ])  || ([ "$osname" = "Raspbian" ] && [ $relno -ge 7 ]); then
+  echo $fullrel
 else
- echo $FULLREL
+ echo $fullrel
  echo "Only Ubuntu release 12 and later, and Debian and Raspbian release 7 and later, are supported"
  echo "Your system does not appear to be supported"
  exit
@@ -155,7 +155,7 @@ fi
 while getopts ":dlt" optname
   do
     case $optname in
-      "d" ) DLFLAG=0 ;;
+      "d" ) dlflag=0 ;;
       "l" ) logfile="$HOME/rtinst.log" ;;
       "t" ) portdefault=0 ;;
         * ) echo "incorrect option, only -d, and -l allowed" && exit 1 ;;
@@ -171,7 +171,7 @@ if [ $# -gt 0 ]; then
 fi
 
 # check IP Address
-case $SERVERIP in
+case $serverip in
     127* ) gotip=1 ;;
   local* ) gotip=1 ;;
       "" ) gotip=1 ;;
@@ -181,7 +181,7 @@ if [ $gotip = 1 ]; then
   echo "Unable to determine your IP address"
   gotip=enter_ip
 else
-  echo "Your Server IP/Name is $SERVERIP"
+  echo "Your Server IP/Name is $serverip"
   echo -n "Is this correct y/n? "
   gotip=ask_user
 fi
@@ -191,7 +191,7 @@ until $gotip
       gotip=enter_ip
     done
 
-echo "Your server's IP/Name is set to $SERVERIP"
+echo "Your server's IP/Name is set to $serverip"
 
 #check rtorrent installation
 if which rtorrent; then
@@ -243,7 +243,7 @@ home=$(eval echo "~$user")
 
 #set password for rutorrent
 echo "Set Password for RuTorrent web client"
-WEBPASS=$(set_pass)
+webpass=$(set_pass)
 PASSFLAG=$?
 #Interaction ended message
 echo
@@ -252,7 +252,7 @@ echo "It will take approx 10 minutes for the script to complete"
 echo
 
 #update amd upgrade system
-if [ "$FULLREL" = "Ubuntu 12.04.5 LTS" ]; then
+if [ "$fullrel" = "Ubuntu 12.04.5 LTS" ]; then
   wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list >> $logfile 2>&1 || error_exit "Unable to download sources file from https://help.ubuntu.com/12.04/sample/sources.list"
   cp /etc/apt/sources.list /etc/apt/sources.list.bak
   mv sources.list /etc/apt/sources.list
@@ -289,7 +289,7 @@ for package_name in $package_list
 test -z "$install_list" || apt-get -y install $install_list  2>&1 >>$logfile | tee -a $logfile
 
 #install unrar package
-if [ $OSNAME = "Debian" ]; then
+if [ $osname = "Debian" ]; then
   cd $home
   if [ "$(uname -m)" = "x86_64" ]; then
     curl -s http://www.rarlab.com/rar/rarlinux-x64-5.3.0.tar.gz | tar xz
@@ -299,18 +299,18 @@ if [ $OSNAME = "Debian" ]; then
   cp $home/rar/rar /bin/rar
   cp $home/rar/unrar /bin/unrar
   rm -r $home/rar
-elif [ $OSNAME = "Ubuntu" ]; then
+elif [ $osname = "Ubuntu" ]; then
   apt-get -y install unrar  >> $logfile 2>&1
 fi
 
 #install ffmpeg
-if ! [ $OSNAME = "Raspbian" ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
+if ! [ $osname = "Raspbian" ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
   echo "Installing ffmpeg"
-  if [ $RELNO = 14 ]; then
+  if [ $relno = 14 ]; then
     apt-add-repository -y ppa:mc3man/trusty-media >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~mc3man/+archive/ubuntu/ppa"
     apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
     apt-get -y install ffmpeg >> $logfile 2>&1
-  elif [ $RELNO = 8 ]; then
+  elif [ $relno = 8 ]; then
     grep "deb http://www.deb-multimedia.org jessie main" /etc/apt/sources.list >> /dev/null || echo "deb http://www.deb-multimedia.org jessie main" >> /etc/apt/sources.list
     apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
     apt-get -y --force-yes install deb-multimedia-keyring >> $logfile 2>&1
@@ -334,7 +334,7 @@ echo "Fetching rtinst scripts" | tee -a $logfile
 cd $home
 
 rm -f rtgetscripts
-wget -q --no-check-certificate $RTDIR/rtgetscripts
+wget -q --no-check-certificate $rtdir/rtgetscripts
 bash rtgetscripts
 
 #raise file limits
@@ -392,11 +392,11 @@ ftpport=$(random 41005 48995)
 if [ $(dpkg-query -W -f='${Status}' "vsftpd" 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
   echo "Installing vsftpd" | tee -a $logfile
 
-  if [ $RELNO = 12 ]; then
+  if [ $relno = 12 ]; then
     add-apt-repository -y ppa:thefrontiergroup/vsftpd >> $logfile 2>&1
     apt-get update >> $logfile 2>&1
     apt-get -y install vsftpd >> $logfile 2>&1
-  elif [ $RELNO = 7 ]; then
+  elif [ $relno = 7 ]; then
     echo "deb http://ftp.cyconet.org/debian wheezy-updates main non-free contrib" >> /etc/apt/sources.list.d/wheezy-updates.cyconet2.list
     aptitude update  >> $logfile 2>&1 || error_exit "problem updating package lists"
     aptitude -o Aptitude::Cmdline::ignore-trust-violations=true -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd  >> $logfile 2>&1 || error_exit "Unable to download vsftpd"
@@ -483,7 +483,7 @@ else
   sed -i '/^ssl_ciphers/ c\ssl_ciphers=HIGH' /etc/vsftpd.conf
 fi
 
-openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem >> $logfile 2>&1
+openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem >> $logfile 2>&1
 
 service vsftpd restart 1>> $logfile
 
@@ -510,7 +510,7 @@ if [ $install_rt = 0 ]; then
   cd ../libtorrent-$libtorrentrel
   echo "Installing libtorrent" | tee -a $logfile
   ./autogen.sh >> $logfile 2>&1
-  if [ $OSNAME = "Raspbian" ]; then
+  if [ $osname = "Raspbian" ]; then
     ./configure --prefix=/usr --disable-instrumentation >> $logfile 2>&1
   else
     ./configure --prefix=/usr >> $logfile 2>&1
@@ -585,7 +585,7 @@ echo >> /var/www/rutorrent/conf/users/$user/config.php
 echo "?>" >> /var/www/rutorrent/conf/users/$user/config.php
 
 rtgetscripts /var/www/rutorrent/conf/plugins.ini ru.ini
-if [ $OSNAME = "Raspbian" ]; then
+if [ $osname = "Raspbian" ]; then
   sed -i '/\[screenshots\]/,+1d' /var/www/rutorrent/conf/plugins.ini
   sed -i '/\[unpack\]/,+1d' /var/www/rutorrent/conf/plugins.ini
   echo '[screenshots]' >> /var/www/rutorrent/conf/plugins.ini
@@ -604,12 +604,12 @@ if [ -f "/etc/apache2/ports.conf" ]; then
 fi
 
 echo "Installing nginx" | tee -a $logfile
-#WEBPASS=$(genpasswd)
-htpasswd -c -b $passfile $user $WEBPASS >> $logfile 2>&1
+#webpass=$(genpasswd)
+htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
 chown www-data:www-data $passfile
 chmod 640 $passfile
 
-openssl req -x509 -nodes -days 3650 -subj /CN=$SERVERIP -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
+openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 
 sed -i "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
 sed -i "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
@@ -618,10 +618,10 @@ sed -i "s/# server_tokens off;/server_tokens off;/g" /etc/nginx/nginx.conf
 sed -i "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/nginx/nginx.conf
 sed -i "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
 grep client_max_body_size /etc/nginx/nginx.conf > /dev/null 2>&1 || sed -i "/server_tokens off;/ a\        client_max_body_size 40m;\n" /etc/nginx/nginx.conf
-sed -i "/upload_max_filesize/ c\upload_max_filesize = 40M" $PHPLOC/fpm/php.ini
-sed -i '/^;\?listen.owner/ c\listen.owner = www-data' $PHPLOC/fpm/pool.d/www.conf
-sed -i '/^;\?listen.group/ c\listen.group = www-data' $PHPLOC/fpm/pool.d/www.conf
-sed -i '/^;\?listen.mode/ c\listen.mode = 0660' $PHPLOC/fpm/pool.d/www.conf
+sed -i "/upload_max_filesize/ c\upload_max_filesize = 40M" $phploc/fpm/php.ini
+sed -i '/^;\?listen.owner/ c\listen.owner = www-data' $phploc/fpm/pool.d/www.conf
+sed -i '/^;\?listen.group/ c\listen.group = www-data' $phploc/fpm/pool.d/www.conf
+sed -i '/^;\?listen.mode/ c\listen.mode = 0660' $phploc/fpm/pool.d/www.conf
 
 if [ -d "/usr/share/nginx/www" ]; then
   cp /usr/share/nginx/www/* /var/www
@@ -636,9 +636,9 @@ rtgetscripts /etc/nginx/sites-available/dload-loc nginxsitedl
 
 echo "location ~ \.php$ {" > /etc/nginx/conf.d/php
 echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/php
-if [ $RELNO = 12 ]; then
+if [ $relno = 12 ]; then
   echo "          fastcgi_pass 127.0.0.1:9000;" >> /etc/nginx/conf.d/php
-elif [ $RELNO = 16 ]; then
+elif [ $relno = 16 ]; then
   echo "          fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;" >> /etc/nginx/conf.d/php
 else
   echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
@@ -652,11 +652,11 @@ echo "location ~* \.(jpg|jpeg|gif|css|png|js|woff|ttf|svg|eot)$ {" > /etc/nginx/
 echo "        expires 30d;" >> /etc/nginx/conf.d/cache
 echo "}" >> /etc/nginx/conf.d/cache
 
-sed -i "s/<Server IP>/$SERVERIP/g" /etc/nginx/sites-available/default
+sed -i "s/<Server IP>/$serverip/g" /etc/nginx/sites-available/default
 
-service nginx restart && service $PHPVER-fpm restart
+service nginx restart && service $phpver-fpm restart
 
-if [ $DLFLAG = 0 ]; then
+if [ $dlflag = 0 ]; then
   rtdload enable
 fi
 
@@ -721,15 +721,15 @@ echo "crontab entries made. rtorrent and irssi will start on boot for $user"
 echo
 echo "ftp client should be set to explicit ftp over tls using port $ftpport" | tee $home/rtinst.info
 echo
-if [ $DLFLAG = 0 ]; then
+if [ $dlflag = 0 ]; then
   find $home -type d -print0 | xargs -0 chmod 755
 fi
-echo "If enabled, access https downloads at https://$SERVERIP/download/$user" | tee -a $home/rtinst.info
+echo "If enabled, access https downloads at https://$serverip/download/$user" | tee -a $home/rtinst.info
 echo
-echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | tee -a $home/rtinst.info
+echo "rutorrent can be accessed at https://$serverip/rutorrent" | tee -a $home/rtinst.info
 
 if [ $PASSFLAG = 1 ]; then
-  echo "rutorrent password set to $WEBPASS" | tee -a $home/rtinst.info
+  echo "rutorrent password set to $webpass" | tee -a $home/rtinst.info
 else
   echo "rutorrent password as set by user" | tee -a $home/rtinst.info
 fi
