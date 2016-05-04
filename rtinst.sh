@@ -16,7 +16,7 @@ rtorrentloc='http://rtorrent.net/downloads/rtorrent-'$rtorrentrel'.tar.gz'
 libtorrentloc='http://rtorrent.net/downloads/libtorrent-'$libtorrentrel'.tar.gz'
 xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
 
-blob=develop
+blob=master
 rtdir=https://raw.githubusercontent.com/arakasi72/rtinst/$blob/scripts
 
 if [ -f /etc/lsb-release ]; then
