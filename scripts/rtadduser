@@ -168,13 +168,15 @@ while [ $confirm_name = 1 ]
   done
 
 user=$addname
-home="/home/$user"
+
 if id -u $user >/dev/null 2>&1; then
   echo "$user already exists"
 else
   echo "adding $user"
   adduser --gecos "" $user
 fi
+
+home=$(eval echo "~$user")
 
 if [ -d "/var/www/rutorrent/conf/users/$user" ]; then
   echo "Will reset $user config, filters and torrents will not be deleted"
