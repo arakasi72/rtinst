@@ -18,7 +18,7 @@ sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
 ftpport=$(grep 'listen_port=' /etc/vsftpd.conf | sed 's/[^0-9]*//g')
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
-SERVERIP=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
+serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
 
 #get user list
 cd /var/www/rutorrent/conf/users
@@ -344,10 +344,10 @@ fi
 echo "ftp client should be set to explicit ftp over tls using port $ftpport" | tee -a $home/rtinst.info
 echo
 if [ $dload_flag = 0 ]; then
-echo "https downloads can be accessed at https://$SERVERIP/download/$user" | tee -a $home/rtinst.info
+echo "https downloads can be accessed at https://$serverip/download/$user" | tee -a $home/rtinst.info
 echo
 fi
-echo "rutorrent can be accessed at https://$SERVERIP/rutorrent" | tee -a $home/rtinst.info
+echo "rutorrent can be accessed at https://$serverip/rutorrent" | tee -a $home/rtinst.info
 echo "rutorrent password set to $WEBPASS" | tee -a $home/rtinst.info
 echo "to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
 echo
