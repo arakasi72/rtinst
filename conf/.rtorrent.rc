@@ -15,9 +15,9 @@ download_rate = 0
 upload_rate = 0
 
 # Directories
-directory = /home/<user name>/rtorrent/downloads
-session = /home/<user name>/rtorrent/.session
-schedule = watch_directory,5,5,load_start=/home/<user name>/rtorrent/watch/*.torrent
+directory = <user home>/rtorrent/downloads
+session = <user home>/rtorrent/.session
+schedule = watch_directory,5,5,load_start=<user home>/rtorrent/watch/*.torrent
 
 # Networking
 port_range = 51001-51250 
