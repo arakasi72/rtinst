@@ -373,11 +373,11 @@ allowlist=$(grep AllowUsers /etc/ssh/sshd_config)
 if ! [ -z "$allowlist" ]; then
   for ssh_user in $allowlist
     do
-      if  ! [ "$ssh_user" = "AllowUsers" -o "$(groups $ssh_user 2> /dev/null | grep -E ' sudo(\s|$)')" != "" ]; then
+      if   [ ! "$ssh_user" = "AllowUsers" ] && [ "$(groups $ssh_user 2> /dev/null | grep -E ' sudo(\s|$)')" = "" ]; then
         adduser $ssh_user sshuser
       fi
     done
-  sed -i "s/$allowlist//g" /etc/ssh/sshd_config
+  sed -i "/$allowlist/ d" /etc/ssh/sshd_config
 fi
 grep "AllowGroups sudo sshuser" /etc/ssh/sshd_config > /dev/null || echo "AllowGroups sudo sshuser" >> /etc/ssh/sshd_config
 
