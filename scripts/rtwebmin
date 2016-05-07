@@ -10,10 +10,16 @@
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 SERVERIP=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
+relno=$(lsb_release -sr | cut -d. -f1)
 
 if ! [ "$LOGNAME" = "root" ]; then
   echo "Must be run as root, directly or with sudo"
   exit 1
+fi
+
+if [ $relno = 16 ]; then
+echo "Webmin installation using this script is not currently available on Ubu16"
+exit
 fi
 
 if [ $(dpkg-query -W -f='${Status}' webmin 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
