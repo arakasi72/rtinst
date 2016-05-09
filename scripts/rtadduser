@@ -140,7 +140,7 @@ echo "$low_count-$high_count"
 }
 
 # set and prepare user
-if [ "$LOGNAME" != "root" ]; then
+if ! [ "$LOGNAME" = "root" ]; then
 echo "Must be run from root or using sudo" && exit 1
 fi
 
