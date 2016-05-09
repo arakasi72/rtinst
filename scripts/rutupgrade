@@ -39,7 +39,7 @@ while true
 }
 
 #check user is root or sudo
-if [ -z "$SUDO_USER" -a  "$LOGNAME" != "root" ]; then
+if ! [ "$LOGNAME" = "root" ]; then
 echo "Must be run from root or using sudo" && exit 1
 fi
 
