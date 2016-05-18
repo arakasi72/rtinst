@@ -19,7 +19,7 @@ xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
 blob=master
 rtdir=https://raw.githubusercontent.com/arakasi72/rtinst/$blob/scripts
 
-if [ -f /etc/lsb-release ]; then
+if [ $(dpkg-query -W -f='${Status}' lsb-release 2>/dev/null | grep -c "ok installed") -gt 0 ]; then
   fullrel=$(lsb_release -sd)
   osname=$(lsb_release -si)
   relno=$(lsb_release -sr | cut -d. -f1)
