@@ -17,11 +17,6 @@ if ! [ "$LOGNAME" = "root" ]; then
   exit 1
 fi
 
-if [ $relno = 16 ]; then
-echo "Webmin installation using this script is not currently available on Ubu16"
-exit
-fi
-
 if [ $(dpkg-query -W -f='${Status}' webmin 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
   echo "Installing Webmin"
   echo "deb http://download.webmin.com/download/repository sarge contrib" > /etc/apt/sources.list.d/webmin.list
