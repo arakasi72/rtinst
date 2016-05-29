@@ -49,7 +49,7 @@ install_rt=0
 sshport=''
 rudevflag=1
 passfile='/etc/nginx/.htpasswd'
-package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl $phpver-geoip $phpver-mcrypt $phpver-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
+package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl $phpver-geoip $phpver-mcrypt $phpver-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude $phpver-json  git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
 Install_list=""
 
 #exit on error function
@@ -342,48 +342,6 @@ sed -i '/hard nofile/ d' /etc/security/limits.conf
 sed -i '/soft nofile/ d' /etc/security/limits.conf
 sed -i '$ i\* hard nofile 32768\n* soft nofile 16384' /etc/security/limits.conf
 
-# secure ssh
-echo "Configuring SSH" | tee -a $logfile
-
-portline=$(grep 'Port ' /etc/ssh/sshd_config)
-
-if [ "$portdefault" = "0" ]; then
-  sshport=22
-  sed -i "/^Port/ c\Port $sshport" /etc/ssh/sshd_config
-elif [ "$portline" = "Port 22" ] && [ "$portdefault" = "1" ]; then
-  sshport=$(random 21000 29000)
-  sed -i "s/Port 22/Port $sshport/g" /etc/ssh/sshd_config
-fi
-
-sed -i "s/X11Forwarding yes/X11Forwarding no/g" /etc/ssh/sshd_config
-sed -i '/^PermitRootLogin/ c\PermitRootLogin no' /etc/ssh/sshd_config
-
-usedns=$(grep UseDNS /etc/ssh/sshd_config)
-if [ -z "$usedns" ]; then
-  echo "UseDNS no" >> /etc/ssh/sshd_config
-else
- sed -i "s/$usedns/UseDNS no/g" /etc/ssh/sshd_config
-fi
-
-if [ -z "$(grep sshuser /etc/group)" ]; then
-groupadd sshuser
-fi
-
-allowlist=$(grep AllowUsers /etc/ssh/sshd_config)
-if ! [ -z "$allowlist" ]; then
-  for ssh_user in $allowlist
-    do
-      if   [ ! "$ssh_user" = "AllowUsers" ] && [ "$(groups $ssh_user 2> /dev/null | grep -E ' sudo(\s|$)')" = "" ]; then
-        adduser $ssh_user sshuser
-      fi
-    done
-  sed -i "/$allowlist/ d" /etc/ssh/sshd_config
-fi
-grep "AllowGroups sudo sshuser" /etc/ssh/sshd_config > /dev/null || echo "AllowGroups sudo sshuser" >> /etc/ssh/sshd_config
-
-service ssh restart 1>> $logfile
-sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
-echo "SSH port set to $sshport"
 
 # install ftp
 
@@ -594,71 +552,7 @@ if [ $osname = "Raspbian" ]; then
   echo 'enabled = no' >> /var/www/rutorrent/conf/plugins.ini
 fi
 
-# install nginx
-cd $home
 
-if [ -f "/etc/apache2/ports.conf" ]; then
-  echo "Detected apache2. Changing apache2 port to 81 in /etc/apache2/ports.conf" | tee -a $logfile
-  sed -i "s/Listen 80/Listen 81/g" /etc/apache2/ports.conf
-  service apache2 stop >> $logfile 2>&1
-fi
-
-echo "Installing nginx" | tee -a $logfile
-#webpass=$(genpasswd)
-htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
-chown www-data:www-data $passfile
-chmod 640 $passfile
-
-openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
-
-sed -i "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
-sed -i "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
-sed -i "s/pid \/run\/nginx\.pid;/pid \/var\/run\/nginx\.pid;/g" /etc/nginx/nginx.conf
-sed -i "s/# server_tokens off;/server_tokens off;/g" /etc/nginx/nginx.conf
-sed -i "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/nginx/nginx.conf
-sed -i "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
-grep client_max_body_size /etc/nginx/nginx.conf > /dev/null 2>&1 || sed -i "/server_tokens off;/ a\        client_max_body_size 40m;\n" /etc/nginx/nginx.conf
-sed -i "/upload_max_filesize/ c\upload_max_filesize = 40M" $phploc/fpm/php.ini
-sed -i '/^;\?listen.owner/ c\listen.owner = www-data' $phploc/fpm/pool.d/www.conf
-sed -i '/^;\?listen.group/ c\listen.group = www-data' $phploc/fpm/pool.d/www.conf
-sed -i '/^;\?listen.mode/ c\listen.mode = 0660' $phploc/fpm/pool.d/www.conf
-
-if [ -d "/usr/share/nginx/www" ]; then
-  cp /usr/share/nginx/www/* /var/www
-elif [ -d "/usr/share/nginx/html" ]; then
-  cp /usr/share/nginx/html/* /var/www
-fi
-
-mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
-
-rtgetscripts /etc/nginx/sites-available/default nginxsite
-rtgetscripts /etc/nginx/sites-available/dload-loc nginxsitedl
-
-echo "location ~ \.php$ {" > /etc/nginx/conf.d/php
-echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/php
-if [ $relno = 12 ]; then
-  echo "          fastcgi_pass 127.0.0.1:9000;" >> /etc/nginx/conf.d/php
-elif [ $relno = 16 ]; then
-  echo "          fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;" >> /etc/nginx/conf.d/php
-else
-  echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
-fi
-echo "          fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;" >> /etc/nginx/conf.d/php
-echo "          fastcgi_index index.php;" >> /etc/nginx/conf.d/php
-echo "          include fastcgi_params;" >> /etc/nginx/conf.d/php
-echo "}" >> /etc/nginx/conf.d/php
-
-echo "location ~* \.(jpg|jpeg|gif|css|png|js|woff|ttf|svg|eot)$ {" > /etc/nginx/conf.d/cache
-echo "        expires 30d;" >> /etc/nginx/conf.d/cache
-echo "}" >> /etc/nginx/conf.d/cache
-
-sed -i "s/<Server IP>/$serverip/g" /etc/nginx/sites-available/default
-
-service nginx restart && service $phpver-fpm restart
-
-if [ $dlflag = 0 ]; then
-  rtdload enable
-fi
 
 # install autodl-irssi
 echo "Installing autodl-irssi" | tee -a $logfile
