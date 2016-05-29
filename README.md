@@ -12,7 +12,7 @@
 
 Download script
 
-	wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtinst.sh
+	wget --no-check-certificate https://github.com/scouseman/rtinst/blob/master/rtinst.sh
 
 and then to run it:
 
