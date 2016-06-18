@@ -23,7 +23,7 @@ schedule = watch_directory,5,5,load_start=<user home>/rtorrent/watch/*.torrent
 port_range = 51001-51250 
 # network.scgi.open_port = localhost:5000
 network.scgi.open_port = 127.0.0.1:5000
-network.http.ssl_verify_peer.set=0
+network.http.ssl_verify_peer.set = 0
 port_random = yes
 use_udp_trackers = yes 
 encryption = allow_incoming,enable_retry,prefer_plaintext
