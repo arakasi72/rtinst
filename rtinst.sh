@@ -34,7 +34,7 @@ install_rt=0
 sshport=''
 rudevflag=1
 passfile='/etc/nginx/.htpasswd'
-package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config php5-fpm php5 php5-cli php5-dev php5-curl php5-geoip php5-mcrypt php5-xmlrpc python-scgi tmux screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude php5-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
+package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config php5-fpm php5 php5-cli php5-dev php5-curl php5-geoip php5-mcrypt php5-xmlrpc python-scgi tmux screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude php5-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl xz-utils"
 Install_list=""
 
 #exit on error function
@@ -218,6 +218,9 @@ for package_name in $package_list
     fi
   done
 
+#generate openssl secure dhparam file for SSL Cert
+tmux new-session -d -s "openssl" -c "/root" -n "openssl" "mkdir -p /etc/ssl/private/;openssl dhparam -out /etc/ssl/private/dhparam.pem 4096"
+
 test -z "$install_list" || apt-get -y install $install_list >> $logfile 2>&1
 
 #install unrar package
@@ -235,24 +238,16 @@ elif [ $OSNAME = "Ubuntu" ]; then
   apt-get -y install unrar  >> $logfile 2>&1
 fi
 
-#install ffmpeg
-if ! [ $OSNAME = "Raspbian" ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
-  echo "Installing ffmpeg"
-  if [ $RELNO = 14 ]; then
-    apt-add-repository -y ppa:mc3man/trusty-media >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~mc3man/+archive/ubuntu/ppa"
-    apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
-    apt-get -y install ffmpeg >> $logfile 2>&1
-  elif [ $RELNO = 8 ]; then
-    grep "deb http://www.deb-multimedia.org jessie main" /etc/apt/sources.list >> /dev/null || echo "deb http://www.deb-multimedia.org jessie main" >> /etc/apt/sources.list
-    apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
-    apt-get -y --force-yes install deb-multimedia-keyring >> $logfile 2>&1
-    apt-get -y --force-yes install ffmpeg >> $logfile 2>&1
-  else
-    apt-get -y install ffmpeg >> $logfile 2>&1
-  fi
-fi
+#install ffmpeg (needs xz-utils to extract
+#todo: determine if 32/64
+wget -q http://johnvansickle.com/ffmpeg/builds/ffmpeg-git-64bit-static.tar.xz
+#wget -q http://johnvansickle.com/ffmpeg/builds/ffmpeg-git-32bit-static.tar.xz
+tar xf $home/ffmpeg-git-64bit-static.tar.xz
+cd $home/ffmpeg-git-*;cp ff* /usr/local/bin/;cd ..;rm -rf $home/ffmpeg-git*
 
-echo "Completed installation of required packages        "
+#install youtube-dl
+wget -q https://yt-dl.org/downloads/latest/youtube-dl -O /usr/local/bin/youtube-dl
+chmod a+rx /usr/local/bin/youtube-dl
 
 #add user to sudo group if not already
 if groups $user | grep -q -E ' sudo(\s|$)'; then
