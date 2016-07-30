@@ -1,0 +1,10 @@
+div#logoff {background-image: url(./images/logoff.png);}
+
+div#logoffDlg {width: 410px;}
+div#logoffDlg div.dlg-header {background-image: url(./images/logoff2.png);}
+div#logoffDlg-content {line-height: 16px; margin: 5px; padding: 5px; width: 390px;}
+div#logoffDlg-content div {margin-top: 5px;}
+div#logoffDlg-content div label {width: 80px; display: inline-block;}
+div#logoffDlg-content div span {color: #FF0000;}
+div#logoffDlg-content div select {width: 125px; margin: 0 4px;}
+div#logoffDlg-buttons input {width: 120px;}
