@@ -22,6 +22,6 @@ if ! ( service_running $arg ); then
   if [[ $arg = "rtorrent" && -a $FILE ]]; then
     rm -f $FILE
   fi
-  screen -d -m -S $arg $arg
+  tmux new-session -d -s $arg $arg
 fi
 done
