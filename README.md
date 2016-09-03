@@ -11,6 +11,7 @@ and then to run it:
 
 	sudo bash rtinst.sh
 
+read the rest of the guide for information on additional features and options.
 
 **IMPORTANT: NOTE THE NEW SSH PORT AND MAKE SURE YOU CAN SSH INTO YOUR SERVER BEFORE CLOSING THE EXISTING SESSION**
 
