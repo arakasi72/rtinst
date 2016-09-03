@@ -9,11 +9,8 @@ Download script
 
 and then to run it:
 
-	bash rtinst.sh
-
-or if you run it from a non-root sudo user:
-
 	sudo bash rtinst.sh
+
 
 **IMPORTANT: NOTE THE NEW SSH PORT AND MAKE SURE YOU CAN SSH INTO YOUR SERVER BEFORE CLOSING THE EXISTING SESSION**
 
