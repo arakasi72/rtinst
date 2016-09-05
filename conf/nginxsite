@@ -3,7 +3,7 @@ server {
         #server_name <Server IP>;
         root /var/www;
         
-        return 301 https://$server_name$request_uri;
+        return 301 https://$host$request_uri;
         
         index index.html index.php index.htm;
         
