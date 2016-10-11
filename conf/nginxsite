@@ -7,11 +7,14 @@ server {
         
         index index.html index.php index.htm;
         
+        client_max_body_size 40m;
+        
         location / {
                try_files $uri $uri/ =404;
         }
 
         location /rutorrent {
+               client_max_body_size 40m;
                auth_basic "Restricted";
                auth_basic_user_file /etc/nginx/.htpasswd;
                include /etc/nginx/conf.d/php;
@@ -32,6 +35,8 @@ server {
         root /var/www;
         index index.html index.php index.htm;
 
+        client_max_body_size 40m;
+        
         ssl_certificate /etc/ssl/ruweb.crt;
         ssl_certificate_key /etc/ssl/ruweb.key;
         ssl_session_timeout 5m;
@@ -41,6 +46,7 @@ server {
         }
 
         location /rutorrent {
+               client_max_body_size 40m;
                auth_basic "Restricted";
                auth_basic_user_file /etc/nginx/.htpasswd;
                include /etc/nginx/conf.d/php;
