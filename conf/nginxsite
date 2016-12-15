@@ -3,9 +3,16 @@ server {
         #server_name <Server IP>;
         root /var/www;
         
-        return 301 https://$host$request_uri;
-        
         index index.html index.php index.htm;
+        
+        error_page 403 = @denied;
+        #Below enter IP address or block to allow, eg LAN and/or VPN blocks
+        #allow 10.10.0.0/16;
+        deny all;
+
+        location @denied {
+               return 301 https://$host$request_uri;
+        }
         
         location / {
                try_files $uri $uri/ =404;
