@@ -97,7 +97,7 @@ If you get an error run the following, you will only need to this once, and subs
 	
 All the scripts are downloaded to /usr/local/bin
 
-######[3.1 rtgetscripts](scripts/rtgetscripts)
+######[3.1 rtgetscripts](https://github.com/arakasi72/rtinst/blob/master/scripts/rtgetscripts)
 
 This will install update all the rtinst scripts making sure you have the latest versions:
 
