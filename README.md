@@ -3,6 +3,8 @@
 ======
 #### 30 Second Guide
 
+Ubuntu and Debian Seedbox Installation
+
 Download script
 
 	wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtinst.sh
@@ -35,7 +37,7 @@ Services that will be installed and configured are
 	3. rutorrent
 	4. Nginx (webserver)
 	5. autodl-irssi
-	6. webmin (optional see section 3.7 below)
+	6. webmin (optional see section 3.7 in main guide)
 
 
 For a detailed installation guide, and additional information on all the features, go to: [Guide](https://github.com/arakasi72/rtinst/wiki/Guide)
