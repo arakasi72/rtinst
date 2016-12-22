@@ -11,7 +11,7 @@ and then to run it:
 
 	sudo bash rtinst.sh
 
-read the rest of the guide for information on additional features and options.
+For a detailed installation guide go to: [Guide](https://github.com/arakasi72/rtinst/wiki/Guide)
 
 **IMPORTANT: NOTE THE NEW SSH PORT AND MAKE SURE YOU CAN SSH INTO YOUR SERVER BEFORE CLOSING THE EXISTING SESSION**
 
@@ -41,7 +41,7 @@ It takes about 10 minutes to run, depending on your server setup.
 
 After you have run the script and everything is working, I suggest a reboot, the script does not automate this reboot, you need to do it manually using the reboot command.
 
-For a detailed installation guide go to: [Guide](https://github.com/arakasi72/rtinst/wiki/Guide)
+For a detailed installation guide, and additional information on all the features, go to: [Guide](https://github.com/arakasi72/rtinst/wiki/Guide)
 
 -------------------------------------------------------------------------
 
