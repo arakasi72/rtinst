@@ -19,6 +19,42 @@ directory = <user home>/rtorrent/downloads
 session = <user home>/rtorrent/.session
 schedule = watch_directory,5,5,load_start=<user home>/rtorrent/watch/*.torrent
 
+
+schedule = tied_directory,5,5, start_tied=
+schedule = untied_directory,5,5, stop_untied=
+schedule = untied_directory,6,5, close_untied=
+schedule = untied_directory,7,5, remove_untied=
+
+schedule = filter_active,30,30,"view_filter = active,\"or={d.get_up_rate=,d.get_down_rate=}\""
+schedule = session_save,240,300,session_save=
+
+# Sort the main view by ratio
+view.sort_current = main,greater=d.get_ratio=
+view.sort_new = main,less=d.get_ratio=
+view.sort = main
+
+# Sort the seeding view by the upload rate and only show torrents with peers
+view.sort_current = seeding,greater=d.get_up_rate=
+view.filter = seeding,"and=d.get_complete=,d.get_peers_connected="
+view.sort_new = seeding,less=d.get_up_rate=
+view.sort = seeding
+
+# Sort the leeching view by name
+view.sort_current = leeching,greater=d.get_name=
+view.sort_new = leeching,greater=d.get_name=
+view.sort = leeching
+
+# Filter the active view by connected peers
+view.sort_current = active,less=d.get_name=
+view.sort_new = leeching,less=d.get_name=
+view.filter = active,d.get_peers_connected=
+view.sort = active
+
+schedule = sort_main,11,5,view.sort=main
+schedule = sort_seeding,12,5,view.sort=seeding
+schedule = sort_leeching,13,5,view.sort=leeching
+schedule = sort_active,14,5,view.sort=active
+
 # Networking
 port_range = 51001-51250 
 # network.scgi.open_port = localhost:5000
