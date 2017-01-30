@@ -256,8 +256,8 @@ if ! [ -d "$home/rtorrent/.session" ]; then
 mkdir $home/rtorrent/.session
 fi
 
-if ! [ -d "$home/rtorrent/downloads" ]; then
-mkdir $home/rtorrent/downloads
+if ! [ -d "$home/rtorrent/download" ]; then
+mkdir $home/rtorrent/download
 fi
 
 if ! [ -d "$home/rtorrent/watch" ]; then
