@@ -272,6 +272,7 @@ rtgetscripts $home/.rtorrent.rc
 sed -i "s|<user home>|${home}|g" $home/.rtorrent.rc
 sed -i "s/<user name>/$user/g" $home/.rtorrent.rc
 sed -i "s/port_range = 51001-51250/port_range = $newrange/g" $home/.rtorrent.rc
+sed -i "s/network\.port_range\.set = 51001-51250/network\.port_range\.set = $newrange/g" $home/.rtorrent.rc
 sed -i "s/network\.scgi\.open_port = 127\.0\.0\.1:5000/network\.scgi\.open_port = 127\.0\.0\.1:$newscgi/g" $home/.rtorrent.rc
 
 echo "<?php" > /var/www/rutorrent/conf/users/$user/config.php
