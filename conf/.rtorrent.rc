@@ -3,46 +3,68 @@
 # Enable/modify the options as needed, uncomment the options you wish to enable.
 # This configuration will work well with most systems, but optimal settings are dependant on specific server setup
 
-# BitTorrent
-max_downloads_global = 0
-max_uploads_global = 0
-min_peers = 30 
-max_peers = 150 
-min_peers_seed = -1 
-max_peers_seed = -1
-max_uploads = 150
-download_rate = 0
-upload_rate = 0
+### Set Directories
+method.insert = cfg.basedir,    private|const|string, (cat,"<user home>/rtorrent/")
+method.insert = cfg.watch,      private|const|string, (cat,(cfg.basedir),"watch/")
 
-# Directories
-directory = <user home>/rtorrent/downloads
-session = <user home>/rtorrent/.session
-schedule = watch_directory,5,5,load_start=<user home>/rtorrent/watch/*.torrent
+#method.insert = cfg.logs,       private|const|string, (cat,(cfg.basedir),"log/")
+#method.insert = cfg.logfile,    private|const|string, (cat,(c   fg.logs),"rtorrent-",(system.time),".log")
 
-# Networking
-port_range = 51001-51250 
+session.path.set = (cat,(cfg.basedir),".session")
+directory.default.set = (cat,(cfg.basedir),"download")
+
+schedule = watch_directory,5,5,((load.start,(cat,(cfg.watch),"start/*.torrent")))
+
+### BitTorrent
+# Global upload and download rate in KiB, `0` for unlimited
+throttle.global_down.max_rate.set = 0
+throttle.global_up.max_rate.set = 0
+
+# Maximum number of simultaneous downloads and uploads slots
+throttle.max_downloads.global.set = 150
+throttle.max_uploads.set = 150
+
+# Maximum and minimum number of peers to connect to per torrent while downloading
+throttle.min_peers.normal.set = 30
+throttle.max_peers.normal.set = 150
+
+# Same as above but for seeding completed torrents (seeds per torrent)
+throttle.min_peers.seed.set = -1
+throttle.max_peers.seed.set = -1
+
+### Networking
+network.port_range.set = 51001-51250
+network.port_random.set = yes
+dht.mode.set = disable
+protocol.pex.set = no
+trackers.use_udp.set = yes
+
 # network.scgi.open_port = localhost:5000
 network.scgi.open_port = 127.0.0.1:5000
 network.http.ssl_verify_peer.set = 0
-port_random = yes
-use_udp_trackers = yes 
-encryption = allow_incoming,enable_retry,prefer_plaintext
-network.max_open_files.set = 4096 
-network.max_open_sockets.set = 1536 
-network.http.max_open.set = 48 
-network.send_buffer.size.set = 4M 
+protocol.encryption.set = allow_incoming,enable_retry,prefer_plaintext
+
+network.max_open_files.set = 4096
+network.max_open_sockets.set = 1536
+network.http.max_open.set = 48
+network.send_buffer.size.set = 4M
 network.receive_buffer.size.set = 4M
-dht = disable
-peer_exchange = no
 
-
-# Memory Settings
-check_hash = no
-# hash_read_ahead = 30
-# hash_interval = 5
-# hash_max_tries = 5
+### Memory Settings
+pieces.hash.on_completion.set = no
 pieces.preload.type.set = 1
-max_memory_usage = 3500M
+pieces.memory.max.set = 3500M
 
-# The following line initialises rutorrent plugins without needing to open the web interface
+### Logging:
+#   Levels = critical error warn notice info debug
+#   Groups = connection_* dht_* peer_* rpc_* storage_* thread_* tracker_* torrent_*
+#print = (cat,"Logging to ",(cfg.logfile))
+#log.open_file = "log", (cfg.logfile)
+#log.add_output = "info", "log"
+#log.add_output = "tracker_debug", "log"
+
+
+### The following line initialises rutorrent plugins without needing to open the web interface
 execute = {sh,-c,/usr/bin/php /var/www/rutorrent/php/initplugins.php <user name> &}
+
+#EOF
