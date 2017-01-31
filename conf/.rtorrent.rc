@@ -13,7 +13,7 @@ method.insert = cfg.watch,      private|const|string, (cat,(cfg.basedir),"watch/
 session.path.set = (cat,(cfg.basedir),".session")
 directory.default.set = (cat,(cfg.basedir),"download")
 
-schedule = watch_directory,5,5,((load.start,(cat,(cfg.watch),"start/*.torrent")))
+schedule = watch_directory,5,5,((load.start,(cat,(cfg.watch),"*.torrent")))
 
 ### BitTorrent
 # Global upload and download rate in KiB, `0` for unlimited
