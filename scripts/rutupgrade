@@ -110,9 +110,6 @@ if [ $ruflag = 0 ]; then
   echo "Installing Rutorrent "$newvers
   git clone https://github.com/Novik/ruTorrent.git /var/www/rutorrent  >> /dev/null 2>&1
   git clone https://github.com/autodl-community/autodl-rutorrent.git /var/www/rutorrent/plugins/autodl-irssi  >> /dev/null 2>&1
-  
-  #temp check hash fix
-  sed -i "s/\"get_bind\"\, \"get_check_hash\"/\"get_check_hash\"\, \"get_bind\"/g" /var/www/rutorrent/plugins/httprpc/action.php
 
   rm -r /var/www/rutorrent/conf  >> /dev/null 2>&1
   cp -r $HOME/rutorrent_old/conf /var/www/rutorrent/conf  >> /dev/null 2>&1
