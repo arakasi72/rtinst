@@ -81,8 +81,8 @@ while ! [ $no_match = 0 ]
       do
        base_user=$i
        base_home=$(eval echo "~$base_user")
-       base_low=$(grep "port_range =" $base_home/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f1)
-       base_high=$(grep "port_range =" $base_home/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f2)
+       base_low=$(grep "port_range" $base_home/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f1)
+       base_high=$(grep "port_range" $base_home/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f2)
        if [ $low_count -gt $base_high ]; then
          no_match=0
          higher=0
@@ -103,8 +103,8 @@ while ! [ $no_match = 0 ]
            fi
 
            if ! [ $base_user = $compare_user ]; then
-             compare_low=$(grep "port_range =" $compare_home/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f1)
-             compare_high=$(grep "port_range =" $compare_home/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f2)
+             compare_low=$(grep "port_range" $compare_home/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f1)
+             compare_high=$(grep "port_range" $compare_home/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f2)
 
              if [ $higher = 0 ]; then
                if [ $base_low -gt $compare_high ]; then
@@ -256,8 +256,8 @@ if ! [ -d "$home/rtorrent/.session" ]; then
 mkdir $home/rtorrent/.session
 fi
 
-if ! [ -d "$home/rtorrent/downloads" ]; then
-mkdir $home/rtorrent/downloads
+if ! [ -d "$home/rtorrent/download" ]; then
+mkdir $home/rtorrent/download
 fi
 
 if ! [ -d "$home/rtorrent/watch" ]; then
@@ -272,6 +272,7 @@ rtgetscripts $home/.rtorrent.rc
 sed -i "s|<user home>|${home}|g" $home/.rtorrent.rc
 sed -i "s/<user name>/$user/g" $home/.rtorrent.rc
 sed -i "s/port_range = 51001-51250/port_range = $newrange/g" $home/.rtorrent.rc
+sed -i "s/network\.port_range\.set = 51001-51250/network\.port_range\.set = $newrange/g" $home/.rtorrent.rc
 sed -i "s/network\.scgi\.open_port = 127\.0\.0\.1:5000/network\.scgi\.open_port = 127\.0\.0\.1:$newscgi/g" $home/.rtorrent.rc
 
 echo "<?php" > /var/www/rutorrent/conf/users/$user/config.php

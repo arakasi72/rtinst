@@ -535,7 +535,7 @@ echo "Configuring rtorrent" | tee -a $logfile
 cd $home
 
 mkdir -p rtorrent/.session
-mkdir -p rtorrent/downloads
+mkdir -p rtorrent/download
 mkdir -p rtorrent/watch
 
 
