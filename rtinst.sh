@@ -577,9 +577,6 @@ rm rutorrent/conf/config.php
 rtgetscripts /var/www/rutorrent/conf/config.php ru.config
 mkdir -p /var/www/rutorrent/conf/users/$user/plugins
 
-#temp check hash fix
-sed -i "s/\"get_bind\"\, \"get_check_hash\"/\"get_check_hash\"\, \"get_bind\"/g" /var/www/rutorrent/plugins/httprpc/action.php
-
 echo "<?php" > /var/www/rutorrent/conf/users/$user/config.php
 echo >> /var/www/rutorrent/conf/users/$user/config.php
 echo "\$homeDirectory = \"$home\";" >> /var/www/rutorrent/conf/users/$user/config.php
