@@ -42,6 +42,8 @@ Services that will be installed and configured are
 
 For a detailed installation guide, and additional information on all the features, go to: [Guide](https://github.com/arakasi72/rtinst/wiki/Guide)
 
+To see latest updates to the script go to [Change Log](https://github.com/arakasi72/rtinst/wiki/Change-Log)
+
 -------------------------------------------------------------------------
 
  Copyright (c) 2015 arakasi72 (https://github.com/arakasi72)
