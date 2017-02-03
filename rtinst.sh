@@ -143,6 +143,11 @@ echo -n "Is this correct y/n? "
 ask_user
 }
 
+#check it is being run as root
+if ! [ "$LOGNAME" = "root" ]; then
+echo "Must be run from root or using sudo" && exit 1
+fi
+
 # determine system
 if ([ "$osname" = "Ubuntu" ] && [ $relno -ge 12 ]) || ([ "$osname" = "Debian" ] && [ $relno -ge 7 ])  || ([ "$osname" = "Raspbian" ] && [ $relno -ge 7 ]); then
   echo $fullrel
