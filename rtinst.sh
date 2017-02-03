@@ -14,7 +14,7 @@ rtorrentrel='0.9.6'
 libtorrentrel='0.13.6'
 rtorrentloc='http://rtorrent.net/downloads/rtorrent-'$rtorrentrel'.tar.gz'
 libtorrentloc='http://rtorrent.net/downloads/libtorrent-'$libtorrentrel'.tar.gz'
-xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/super_stable'
+xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
 
 blob=master
 rtdir=https://raw.githubusercontent.com/arakasi72/rtinst/$blob/scripts
@@ -505,7 +505,7 @@ if [ $install_rt = 0 ]; then
 
   cd xmlrpc
   echo "Installing xmlrpc" | tee -a $logfile
-  ./configure --prefix=/usr --enable-libxml2-backend --disable-libwww-client --disable-wininet-client --disable-abyss-server --disable-cgi-server >> $logfile 2>&1
+  ./configure --prefix=/usr --disable-cplusplus >> $logfile 2>&1
   make >> $logfile 2>&1
   make install >> $logfile 2>&1
 
