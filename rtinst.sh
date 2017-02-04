@@ -214,7 +214,7 @@ if which rtorrent; then
 fi
 
 # set and prepare user
-if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "root"; }; then
+if [ -z "$SUDO_USER" ]; then
   echo "Enter the name of the user to install to"
   echo "This will be your primary user"
   echo "It can be an existing user or a new user"
@@ -239,11 +239,8 @@ if test "$SUDO_USER" = "root" || { test -z "$SUDO_USER" &&  test "$LOGNAME" = "r
     adduser --gecos "" $user
   fi
 
-elif ! [ -z "$SUDO_USER" ]; then
-  user=$SUDO_USER
 else
-  echo "Script must be run using sudo or root"
-  exit 1
+  user=$SUDO_USER
 fi
 
 home=$(eval echo "~$user")
