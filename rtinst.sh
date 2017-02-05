@@ -49,7 +49,7 @@ logfile="/dev/null"
 gotip=0
 install_rt=0
 sshport=''
-rudevflag=1
+rudevflag=0
 passfile='/etc/nginx/.htpasswd'
 package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl $geoipver $phpver-mcrypt $phpver-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
 Install_list=""
@@ -555,24 +555,23 @@ if [ -d "/var/www/rutorrent" ]; then
   rm -r /var/www/rutorrent
 fi
 
-# if [ $rudevflag = 1 ]; then
-#   echo "Installing Rutorrent (stable)" | tee -a $logfile
-#   wget --no-check-certificate https://bintray.com/artifact/download/novik65/generic/rutorrent-3.6.tar.gz >> $logfile 2>&1 || error_exit "Unable to download rutorrent files from https://bintray.com/artifact/download/novik65/generic/rutorrent-3.6.tar.gz"
-#   wget --no-check-certificate https://bintray.com/artifact/download/novik65/generic/plugins-3.6.tar.gz >> $logfile 2>&1 || error_exit "Unable to download rutorrent plugin files from https://bintray.com/artifact/download/novik65/generic/plugins-3.6.tar.gz"
-#   tar -xzf rutorrent-3.6.tar.gz
-#   tar -xzf plugins-3.6.tar.gz
-#   rm rutorrent-3.6.tar.gz
-#   rm plugins-3.6.tar.gz
-#   rm -r rutorrent/plugins
-#   mv plugins rutorrent
-# else
-#   echo "Installing Rutorrent (development)" | tee -a $logfile
-#   git clone https://github.com/Novik/ruTorrent.git
-#   mv ruTorrent rutorrent
-# fi
+ if [ $rudevflag = 1 ]; then
+   echo "Installing Rutorrent (stable)" | tee -a $logfile
+   wget --no-check-certificate https://bintray.com/artifact/download/novik65/generic/rutorrent-3.6.tar.gz >> $logfile 2>&1 || error_exit "Unable to download rutorrent files from https://bintray.com/artifact/download/novik65/generic/rutorrent-3.6.tar.gz"
+   wget --no-check-certificate https://bintray.com/artifact/download/novik65/generic/plugins-3.6.tar.gz >> $logfile 2>&1 || error_exit "Unable to download rutorrent plugin files from https://bintray.com/artifact/download/novik65/generic/plugins-3.6.tar.gz"
+   tar -xzf rutorrent-3.6.tar.gz
+   tar -xzf plugins-3.6.tar.gz
+   rm rutorrent-3.6.tar.gz
+   rm plugins-3.6.tar.gz
+   rm -r rutorrent/plugins
+   mv plugins rutorrent
+ else
+   echo "Installing Rutorrent (latest build)" | tee -a $logfile
+   git clone https://github.com/Novik/ruTorrent.git rutorrent >> $logfile 2>&1
+ fi
 
-echo "Installing Rutorrent" | tee -a $logfile
-git clone https://github.com/Novik/ruTorrent.git rutorrent >> $logfile 2>&1
+#echo "Installing Rutorrent" | tee -a $logfile
+#git clone https://github.com/Novik/ruTorrent.git rutorrent >> $logfile 2>&1
 
 echo "Configuring Rutorrent" | tee -a $logfile
 rm rutorrent/conf/config.php
