@@ -364,7 +364,7 @@ sed -i '/^PermitRootLogin/ c\PermitRootLogin no' /etc/ssh/sshd_config
 
 usedns=$(grep UseDNS /etc/ssh/sshd_config)
 if [ -z "$usedns" ]; then
-  printf "\nUseDNS no" >> /etc/ssh/sshd_config
+  printf "\nUseDNS no\n" >> /etc/ssh/sshd_config
 else
  sed -i '/^#\?UseDNS/ c\UseDNS=NO' /etc/ssh/sshd_config
 fi
