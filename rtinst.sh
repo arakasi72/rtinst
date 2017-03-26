@@ -366,7 +366,7 @@ usedns=$(grep UseDNS /etc/ssh/sshd_config)
 if [ -z "$usedns" ]; then
   printf "\nUseDNS no\n" >> /etc/ssh/sshd_config
 else
- sed -i '/^#\?UseDNS/ c\UseDNS=NO' /etc/ssh/sshd_config
+ sed -i '/^#\?UseDNS/ c\UseDNS no' /etc/ssh/sshd_config
 fi
 
 if [ -z "$(grep sshuser /etc/group)" ]; then
