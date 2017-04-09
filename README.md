@@ -1,6 +1,5 @@
-###rtinst
-	
-======
+### rtinst
+
 #### 30 Second Guide
 
 Ubuntu and Debian Seedbox Installation
