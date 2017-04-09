@@ -1,4 +1,4 @@
-### rtinst
+## rtinst
 
 #### 30 Second Guide
 
