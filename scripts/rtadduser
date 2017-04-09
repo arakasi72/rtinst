@@ -83,10 +83,10 @@ while ! [ $no_match = 0 ]
        base_home=$(eval echo "~$base_user")
        base_low=$(grep "port_range" $base_home/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f1)
        base_high=$(grep "port_range" $base_home/.rtorrent.rc | sed 's/[^0-9-]*//g' | cut -d- -f2)
-       if [ $low_count -gt $base_high ]; then
+       if [[ $low_count -gt $base_high ]]; then
          no_match=0
          higher=0
-       elif [ $high_count -lt $base_low ]; then
+       elif [[ $high_count -lt $base_low ]]; then
          no_match=0
          higher=1
        else
