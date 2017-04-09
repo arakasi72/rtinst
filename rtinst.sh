@@ -362,11 +362,11 @@ fi
 sed -i "s/X11Forwarding yes/X11Forwarding no/g" /etc/ssh/sshd_config
 sed -i '/^PermitRootLogin/ c\PermitRootLogin no' /etc/ssh/sshd_config
 
-usedns=$(grep UseDNS /etc/ssh/sshd_config)
-if [ -z "$usedns" ]; then
+if [ -z "$(grep UseDNS /etc/ssh/sshd_config)" ]; then
+  echo >> /etc/ssh/sshd_config
   echo "UseDNS no" >> /etc/ssh/sshd_config
 else
- sed -i "s/$usedns/UseDNS no/g" /etc/ssh/sshd_config
+ sed -i '/^#\?UseDNS/ c\UseDNS no' /etc/ssh/sshd_config
 fi
 
 if [ -z "$(grep sshuser /etc/group)" ]; then
