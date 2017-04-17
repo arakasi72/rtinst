@@ -373,7 +373,7 @@ if [ -z "$(grep sshuser /etc/group)" ]; then
 groupadd sshuser
 fi
 
-allowlist=$(grep AllowUsers /etc/ssh/sshd_config)
+allowlist=$(grep ^AllowUsers /etc/ssh/sshd_config)
 if ! [ -z "$allowlist" ]; then
   for ssh_user in $allowlist
     do
