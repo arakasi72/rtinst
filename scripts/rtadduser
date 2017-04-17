@@ -201,7 +201,7 @@ fi
 
 if [ "$sshaccess" = "0" ]; then
   groupadd sshuser
-  allowlist=$(grep AllowUsers /etc/ssh/sshd_config)
+  allowlist=$(grep ^AllowUsers /etc/ssh/sshd_config)
   if ! [ -z "$allowlist" ]; then
     for ssh_user in $allowlist
       do
