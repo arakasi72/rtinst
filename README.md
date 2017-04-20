@@ -8,7 +8,7 @@ Download script
 
 	wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtinst.sh
 
-and then to run it:
+and then to run it (use -t option to keep ssh port at default 22):
 
 	sudo bash rtinst.sh
 
