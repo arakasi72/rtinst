@@ -29,7 +29,7 @@ else
   relno=$(cat /etc/issue.net | tr -d -c 0-9. | cut -d. -f1)
 fi
 
-if [ "$relno" = "16" ]; then
+if [[ "$relno" = "16" || "$relno" = "17" ]]; then
   phpver=php7.0
   phploc=/etc/php/7.0
   geoipver=php-geoip
@@ -649,7 +649,7 @@ echo "location ~ \.php$ {" > /etc/nginx/conf.d/php
 echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/php
 if [ $relno = 12 ]; then
   echo "          fastcgi_pass 127.0.0.1:9000;" >> /etc/nginx/conf.d/php
-elif [ $relno = 16 ]; then
+elif [ "$phpver"="php7.0" ]; then
   echo "          fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;" >> /etc/nginx/conf.d/php
 else
   echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
