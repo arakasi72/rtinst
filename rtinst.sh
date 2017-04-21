@@ -361,6 +361,14 @@ fi
 
 sed -i "s/X11Forwarding yes/X11Forwarding no/g" /etc/ssh/sshd_config
 sed -i '/^PermitRootLogin/ c\PermitRootLogin no' /etc/ssh/sshd_config
+sed -i '/^\s*PasswordAuthentication no/ c\#PasswordAuthentication no' /etc/ssh/sshd_config
+
+if [ -z "$(grep UsePAM /etc/ssh/sshd_config)" ]; then
+  echo >> /etc/ssh/sshd_config
+  echo "UsePAM yes" >> /etc/ssh/sshd_config
+else
+ sed -i '/^#\?UsePAM/ c\UsePAM yes' /etc/ssh/sshd_config
+fi
 
 if [ -z "$(grep UseDNS /etc/ssh/sshd_config)" ]; then
   echo >> /etc/ssh/sshd_config
