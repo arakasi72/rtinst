@@ -26,6 +26,7 @@ It has been tested with clean installs of:
 	Ubuntu 14
 	Ubuntu 15
 	Ubuntu 16
+	Ubuntu 17
 	Debian 7
 	Debian 8
 
