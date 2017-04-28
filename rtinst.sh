@@ -67,6 +67,24 @@ fi
 exit 1
 }
 
+#function to check if string is valid format for an ip address
+valid_ip()
+{
+    local  ip=$1
+    local  stat=1
+
+    if [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+        OIFS=$IFS
+        IFS='.'
+        ip=($ip)
+        IFS=$OIFS
+        [[ ${ip[0]} -le 255 && ${ip[1]} -le 255 \
+            && ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
+        stat=$?
+    fi
+    return $stat
+}
+
 #function to generate random password
 genpasswd() {
 local genln=$1
@@ -620,7 +638,22 @@ htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
 chown www-data:www-data $passfile
 chmod 640 $passfile
 
-openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
+cp /etc/ssl/openssl.cnf /etc/ssl/ruweb.cnf
+echo >> /etc/ssl/ruweb.cnf
+echo "[ v3_ca ]" >> /etc/ssl/ruweb.cnf
+echo "subjectAltName = @alt_names" >> /etc/ssl/ruweb.cnf
+echo >> /etc/ssl/ruweb.cnf
+echo "[ alt_names ]" >> /etc/ssl/ruweb.cnf
+
+if valid_ip $serverip; then
+  echo "IP.1 = $serverip" >> /etc/ssl/ruweb.cnf
+else
+  echo "DNS.1 = $serverip" >> /etc/ssl/ruweb.cnf
+fi
+
+echo >> /etc/ssl/ruweb.cnf
+
+openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 
 sed -i "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
 sed -i "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
