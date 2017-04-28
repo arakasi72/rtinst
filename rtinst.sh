@@ -620,6 +620,8 @@ htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
 chown www-data:www-data $passfile
 chmod 640 $passfile
 
+cp /etc/ssl/openssl.cnf /etc/ssl/ruweb.cnf
+
 openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 
 sed -i "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
