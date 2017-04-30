@@ -415,6 +415,24 @@ service ssh restart 1>> $logfile
 sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
 echo "SSH port set to $sshport"
 
+# Generate certificates
+cp /etc/ssl/openssl.cnf /etc/ssl/ruweb.cnf
+echo >> /etc/ssl/ruweb.cnf
+echo "[ v3_ca ]" >> /etc/ssl/ruweb.cnf
+echo "subjectAltName = @alt_names" >> /etc/ssl/ruweb.cnf
+echo >> /etc/ssl/ruweb.cnf
+echo "[ alt_names ]" >> /etc/ssl/ruweb.cnf
+
+if valid_ip $serverip; then
+  echo "IP.1 = $serverip" >> /etc/ssl/ruweb.cnf
+else
+  echo "DNS.1 = $serverip" >> /etc/ssl/ruweb.cnf
+fi
+
+echo >> /etc/ssl/ruweb.cnf
+
+openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
+
 # install ftp
 
 ftpport=$(random 41005 48995)
@@ -443,7 +461,7 @@ sed -i '/^#\?local_umask/ c\local_umask=022' /etc/vsftpd.conf
 sed -i '/^#\?listen=/ c\listen=YES' /etc/vsftpd.conf
 sed -i 's/^listen_ipv6/#listen_ipv6/g' /etc/vsftpd.conf
 sed -i 's/^rsa_private_key_file/#rsa_private_key_file/g' /etc/vsftpd.conf
-sed -i '/^rsa_cert_file/ c\rsa_cert_file=\/etc\/ssl\/private\/vsftpd\.pem' /etc/vsftpd.conf
+sed -i '/^rsa_cert_file/ c\rsa_cert_file=\/etc\/ssl\/ruweb\.crt' /etc/vsftpd.conf
 
 grep ^listen_port /etc/vsftpd.conf > /dev/null || echo "listen_port=$ftpport" >> /etc/vsftpd.conf
 
@@ -638,22 +656,7 @@ htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
 chown www-data:www-data $passfile
 chmod 640 $passfile
 
-cp /etc/ssl/openssl.cnf /etc/ssl/ruweb.cnf
-echo >> /etc/ssl/ruweb.cnf
-echo "[ v3_ca ]" >> /etc/ssl/ruweb.cnf
-echo "subjectAltName = @alt_names" >> /etc/ssl/ruweb.cnf
-echo >> /etc/ssl/ruweb.cnf
-echo "[ alt_names ]" >> /etc/ssl/ruweb.cnf
 
-if valid_ip $serverip; then
-  echo "IP.1 = $serverip" >> /etc/ssl/ruweb.cnf
-else
-  echo "DNS.1 = $serverip" >> /etc/ssl/ruweb.cnf
-fi
-
-echo >> /etc/ssl/ruweb.cnf
-
-openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 
 sed -i "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
 sed -i "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
