@@ -431,7 +431,7 @@ fi
 
 echo >> /etc/ssl/ruweb.cnf
 
-openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
+openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 
 # install ftp
 
@@ -460,7 +460,7 @@ sed -i '/^#\?write_enable/ c\write_enable=YES' /etc/vsftpd.conf
 sed -i '/^#\?local_umask/ c\local_umask=022' /etc/vsftpd.conf
 sed -i '/^#\?listen=/ c\listen=YES' /etc/vsftpd.conf
 sed -i 's/^listen_ipv6/#listen_ipv6/g' /etc/vsftpd.conf
-sed -i 's/^rsa_private_key_file/#rsa_private_key_file/g' /etc/vsftpd.conf
+sed -i '/^rsa_private_key_file/ c\rsa_private_key_file=\/etc\/ssl\/private\/ruweb\.crt' /etc/vsftpd.conf
 sed -i '/^rsa_cert_file/ c\rsa_cert_file=\/etc\/ssl\/ruweb\.crt' /etc/vsftpd.conf
 
 grep ^listen_port /etc/vsftpd.conf > /dev/null || echo "listen_port=$ftpport" >> /etc/vsftpd.conf
