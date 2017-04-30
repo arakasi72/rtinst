@@ -417,6 +417,7 @@ echo "SSH port set to $sshport"
 
 # Generate certificates
 if [ -z "$(grep -s $serverip /etc/ssl/ruweb.cnf)" ]; then
+  echo "Creating certificate config file"
   cp /etc/ssl/openssl.cnf /etc/ssl/ruweb.cnf
   echo >> /etc/ssl/ruweb.cnf
   echo "[ v3_ca ]" >> /etc/ssl/ruweb.cnf
@@ -430,9 +431,11 @@ if [ -z "$(grep -s $serverip /etc/ssl/ruweb.cnf)" ]; then
     echo "DNS.1 = $serverip" >> /etc/ssl/ruweb.cnf
   fi
   echo >> /etc/ssl/ruweb.cnf
+  echo "Generateing https/ssl certificates"
   openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 
 elif ! [[ -f /etc/ssl/ruweb.crt && -f /etc/ssl/private/ruweb.key ]]; then
+  echo "Generateing https/ssl certificates"
   openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 fi
 
