@@ -416,22 +416,25 @@ sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
 echo "SSH port set to $sshport"
 
 # Generate certificates
-cp /etc/ssl/openssl.cnf /etc/ssl/ruweb.cnf
-echo >> /etc/ssl/ruweb.cnf
-echo "[ v3_ca ]" >> /etc/ssl/ruweb.cnf
-echo "subjectAltName = @alt_names" >> /etc/ssl/ruweb.cnf
-echo >> /etc/ssl/ruweb.cnf
-echo "[ alt_names ]" >> /etc/ssl/ruweb.cnf
+if [ -z "$(grep -s $serverip /etc/ssl/ruweb.cnf)" ]; then
+  cp /etc/ssl/openssl.cnf /etc/ssl/ruweb.cnf
+  echo >> /etc/ssl/ruweb.cnf
+  echo "[ v3_ca ]" >> /etc/ssl/ruweb.cnf
+  echo "subjectAltName = @alt_names" >> /etc/ssl/ruweb.cnf
+  echo >> /etc/ssl/ruweb.cnf
+  echo "[ alt_names ]" >> /etc/ssl/ruweb.cnf
 
-if valid_ip $serverip; then
-  echo "IP.1 = $serverip" >> /etc/ssl/ruweb.cnf
-else
-  echo "DNS.1 = $serverip" >> /etc/ssl/ruweb.cnf
+  if valid_ip $serverip; then
+    echo "IP.1 = $serverip" >> /etc/ssl/ruweb.cnf
+  else
+    echo "DNS.1 = $serverip" >> /etc/ssl/ruweb.cnf
+  fi
+  echo >> /etc/ssl/ruweb.cnf
+  openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
+
+elif ! [[ -f /etc/ssl/ruweb.crt && -f /etc/ssl/private/ruweb.key ]]; then
+  openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 fi
-
-echo >> /etc/ssl/ruweb.cnf
-
-openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 
 # install ftp
 
