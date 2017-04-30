@@ -44,7 +44,7 @@ server {
         client_max_body_size 40m;
         
         ssl_certificate /etc/ssl/ruweb.crt;
-        ssl_certificate_key /etc/ssl/ruweb.key;
+        ssl_certificate_key /etc/ssl/private/ruweb.key;
         ssl_session_timeout 5m;
         
         location / {
