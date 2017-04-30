@@ -460,7 +460,7 @@ sed -i '/^#\?write_enable/ c\write_enable=YES' /etc/vsftpd.conf
 sed -i '/^#\?local_umask/ c\local_umask=022' /etc/vsftpd.conf
 sed -i '/^#\?listen=/ c\listen=YES' /etc/vsftpd.conf
 sed -i 's/^listen_ipv6/#listen_ipv6/g' /etc/vsftpd.conf
-sed -i '/^rsa_private_key_file/ c\rsa_private_key_file=\/etc\/ssl\/private\/ruweb\.crt' /etc/vsftpd.conf
+sed -i '/^rsa_private_key_file/ c\rsa_private_key_file=\/etc\/ssl\/private\/ruweb\.key' /etc/vsftpd.conf
 sed -i '/^rsa_cert_file/ c\rsa_cert_file=\/etc\/ssl\/ruweb\.crt' /etc/vsftpd.conf
 
 grep ^listen_port /etc/vsftpd.conf > /dev/null || echo "listen_port=$ftpport" >> /etc/vsftpd.conf
