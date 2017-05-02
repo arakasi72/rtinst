@@ -537,8 +537,6 @@ else
   sed -i '/^ssl_ciphers/ c\ssl_ciphers=HIGH' /etc/vsftpd.conf
 fi
 
-openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -newkey rsa:2048 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem >> $logfile 2>&1
-
 service vsftpd restart 1>> $logfile
 
 ftpport=$(grep 'listen_port=' /etc/vsftpd.conf | sed 's/[^0-9]*//g')
