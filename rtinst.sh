@@ -153,13 +153,23 @@ while true
 }
 
 enter_ip() {
-echo "enter your server's name or IP address"
-echo "e.g. example.com or 213.0.113.113"
-read serverip
-echo "Your Server IP/Name is $serverip"
-echo -n "Is this correct y/n? "
-ask_user
+local ipset=1
+until [ $ipset = 0 ]
+do
+  echo "enter your server's IP address"
+  echo "e.g. 213.0.113.113"
+  read serverip
+  if valid_ip $serverip ; then
+    echo "Your Server IP is $serverip"
+    echo -n "Is this correct y/n? "
+    ipset=0
+    ask_user
+  else
+    echo "Invalid IP address, please try again"
+  fi
+done
 }
+
 
 #check it is being run as root
 if ! [ "$LOGNAME" = "root" ]; then
@@ -216,7 +226,10 @@ until $gotip
       gotip=enter_ip
     done
 
-echo "Your server's IP/Name is set to $serverip"
+echo "Your server's IP is set to $serverip"
+
+serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
+echo "Your domain is set to $serverdn"
 
 #check rtorrent installation
 if which rtorrent; then
@@ -424,14 +437,12 @@ if [ -z "$(grep -s $serverip /etc/ssl/ruweb.cnf)" ]; then
   echo "subjectAltName = @alt_names" >> /etc/ssl/ruweb.cnf
   echo >> /etc/ssl/ruweb.cnf
   echo "[ alt_names ]" >> /etc/ssl/ruweb.cnf
-
-  if valid_ip $serverip; then
-    echo "IP.1 = $serverip" >> /etc/ssl/ruweb.cnf
-  else
-    echo "DNS.1 = $serverip" >> /etc/ssl/ruweb.cnf
+  echo "IP.1 = $serverip" >> /etc/ssl/ruweb.cnf
+  if [ ! -z "$serverdn" ]; then
+    echo "DNS.1 = $serverdn" >> /etc/ssl/ruweb.cnf
   fi
   echo >> /etc/ssl/ruweb.cnf
-  echo "Generateing https/ssl certificates"
+  echo "Generateing https/ssl certificates - $serverip - $serverdn"
   openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 
 elif ! [[ -f /etc/ssl/ruweb.crt && -f /etc/ssl/private/ruweb.key ]]; then
