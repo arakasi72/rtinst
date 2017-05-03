@@ -229,7 +229,11 @@ until $gotip
 echo "Your server's IP is set to $serverip"
 
 serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
-echo "Your domain is set to $serverdn"
+if [ -z "$serverdn" ]; then
+  echo "Unable to determine domain"
+else
+  echo "Your domain is set to $serverdn"
+fi
 
 #check rtorrent installation
 if which rtorrent; then
@@ -429,7 +433,7 @@ sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
 echo "SSH port set to $sshport"
 
 # Generate certificates
-if [ -z "$(grep -s $serverip /etc/ssl/ruweb.cnf)" ]; then
+if [ -z "$(grep -s $serverip$ /etc/ssl/ruweb.cnf)" ]; then
   echo "Creating certificate config file"
   cp /etc/ssl/openssl.cnf /etc/ssl/ruweb.cnf
   echo >> /etc/ssl/ruweb.cnf
@@ -448,7 +452,23 @@ if [ -z "$(grep -s $serverip /etc/ssl/ruweb.cnf)" ]; then
 elif ! [[ -f /etc/ssl/ruweb.crt && -f /etc/ssl/private/ruweb.key ]]; then
   echo "Generateing https/ssl certificates"
   openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
+
+elif [[ ! -z "$serverdn" && -z "$(grep -s $serverdn /etc/ssl/ruweb.cnf)" ]]; then
+  dnno=1
+  until [ -z "$(grep "DNS.$dnno" /etc/ssl/ruweb.cnf)" ]
+    do
+      dnno=$(( $dnno + 1 ))
+    done
+  if [ $dnno = 1 ]; then
+    sed -i "/\[ alt_names \]/ aDNS.$dnno = $serverdn" /etc/ssl/ruweb.cnf
+  else
+     dnap=$(( $dnno - 1 ))
+     sed  -i "/DNS.$(( $dnno - 1 ))/ aDNS.$dnno = $serverdn" /etc/ssl/ruweb.cnf
+  fi
+  openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 fi
+
+
 
 # install ftp
 
