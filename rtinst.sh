@@ -229,7 +229,11 @@ until $gotip
 echo "Your server's IP is set to $serverip"
 
 serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
-echo "Your domain is set to $serverdn"
+if [ -z "$serverdn" ]; then
+  echo "Unable to determine domain"
+else
+  echo "Your domain is set to $serverdn"
+fi
 
 #check rtorrent installation
 if which rtorrent; then
@@ -429,7 +433,7 @@ sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
 echo "SSH port set to $sshport"
 
 # Generate certificates
-if [ -z "$(grep -s $serverip /etc/ssl/ruweb.cnf)" ]; then
+if [ -z "$(grep -s $serverip$ /etc/ssl/ruweb.cnf)" ]; then
   echo "Creating certificate config file"
   cp /etc/ssl/openssl.cnf /etc/ssl/ruweb.cnf
   echo >> /etc/ssl/ruweb.cnf
