@@ -462,7 +462,6 @@ elif [[ ! -z "$serverdn" && -z "$(grep -s $serverdn /etc/ssl/ruweb.cnf)" ]]; the
   if [ $dnno = 1 ]; then
     sed -i "/\[ alt_names \]/ aDNS.$dnno = $serverdn" /etc/ssl/ruweb.cnf
   else
-     dnap=$(( $dnno - 1 ))
      sed  -i "/DNS.$(( $dnno - 1 ))/ aDNS.$dnno = $serverdn" /etc/ssl/ruweb.cnf
   fi
   openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
