@@ -733,8 +733,6 @@ echo "location ~* \.(jpg|jpeg|gif|css|png|js|woff|ttf|svg|eot)$ {" > /etc/nginx/
 echo "        expires 30d;" >> /etc/nginx/conf.d/cache
 echo "}" >> /etc/nginx/conf.d/cache
 
-sed -i "s/<Server IP>/$serverip/g" /etc/nginx/sites-available/default
-
 service nginx restart && service $phpver-fpm restart
 
 if [ $dlflag = 0 ]; then
