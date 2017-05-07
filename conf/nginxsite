@@ -1,6 +1,5 @@
 server {
         listen 80;
-        #server_name <Server IP>;
         root /var/www;
         
         index index.html index.php index.htm;
@@ -37,7 +36,6 @@ server {
 server {
         listen 443 ssl;
 
-        #server_name <Server IP>;
         root /var/www;
         index index.html index.php index.htm;
 
