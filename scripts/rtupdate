@@ -83,7 +83,7 @@ curl -# http://rtorrent.net/downloads/rtorrent-$rtvers.tar.gz | tar xz
 echo "Compiling libtorrent"
 cd $HOME/source/libtorrent-$libvers
 ./autogen.sh >> /dev/null 2>&1
-if [ $OSNAME = "Raspbian" ]; then
+if [ "$OSNAME" = "Raspbian" ]; then
     ./configure --prefix=/usr --disable-instrumentation >> /dev/null 2>&1
   else
     ./configure --prefix=/usr >> /dev/null 2>&1
