@@ -188,7 +188,7 @@ else
 fi
 
 # get options
-OPTS=$(getopt -n "$0" -o dltru:p: --long "dload,log,ssh-default,rutorrent-stable,user:,password:" -- "$@")
+OPTS=$(getopt -n "$0" -o dltru:p:w: --long "dload,log,ssh-default,rutorrent-stable,user:,password:,webpass:" -- "$@")
 
 eval set -- "$OPTS"
 
@@ -200,6 +200,7 @@ while true; do
     -r | --rutorrent-stable ) rudevflag=1; shift;;
     -u | --user ) user="$2"; shift; shift;;
     -p | --password ) unixpass="$2"; shift; shift;;
+    -w | --webpass ) webpass="$2"; shift; shift;;
     -- ) shift; break ;;
      * ) break ;;
   esac
@@ -294,9 +295,12 @@ fi
 home=$(eval echo "~$user")
 
 #set password for rutorrent
-echo "Set Password for RuTorrent web client"
-webpass=$(set_pass)
-PASSFLAG=$?
+if [ -z "$webpass" ]; then
+  echo "Set Password for RuTorrent web client"
+  webpass=$(set_pass)
+  PASSFLAG=$?
+fi
+
 #Interaction ended message
 echo
 echo "No more user input required, you can complete unattended"
@@ -698,7 +702,7 @@ if [ -f "/etc/apache2/ports.conf" ]; then
 fi
 
 echo "Installing nginx" | tee -a $logfile
-#webpass=$(genpasswd)
+
 htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
 chown www-data:www-data $passfile
 chmod 640 $passfile
