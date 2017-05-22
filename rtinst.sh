@@ -55,6 +55,7 @@ package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl
 Install_list=""
 unixpass=""
 PASSFLAG=0
+forceyes=1
 
 #exit on error function
 error_exit() {
@@ -144,6 +145,10 @@ random()
 
 # function to ask user for y/n response
 ask_user(){
+if [ $forceyes = 0 ]; then
+  return 0
+fi
+
 while true
   do
     read answer
@@ -199,6 +204,7 @@ while true; do
     -l | --log ) logfile="$HOME/rtinst.log"; shift ;;
     -t | --ssh-default ) portdefault=0; shift;;
     -r | --rutorrent-stable ) rudevflag=1; shift;;
+    -y | --force-yes ) forceyes=0; shift;;
     -u | --user ) user="$2"; shift; shift;;
     -p | --password ) unixpass="$2"; shift; shift;;
     -w | --webpass ) webpass="$2"; shift; shift;;
