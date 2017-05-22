@@ -53,6 +53,7 @@ rudevflag=0
 passfile='/etc/nginx/.htpasswd'
 package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl $geoipver $phpver-mcrypt $phpver-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
 Install_list=""
+unixpass=""
 
 #exit on error function
 error_exit() {
@@ -187,7 +188,7 @@ else
 fi
 
 # get options
-OPTS=$(getopt -n "$0" -o dltru: --long "dload,log,ssh-default,rutorrent-stable,user:" -- "$@")
+OPTS=$(getopt -n "$0" -o dltru:p: --long "dload,log,ssh-default,rutorrent-stable,user:,password:" -- "$@")
 
 eval set -- "$OPTS"
 
@@ -198,6 +199,7 @@ while true; do
     -t | --ssh-default ) portdefault=0; shift;;
     -r | --rutorrent-stable ) rudevflag=1; shift;;
     -u | --user ) user="$2"; shift; shift;;
+    -p | --password unixpass="$2"; shift; shift;;
     -- ) shift; break ;;
      * ) break ;;
   esac
@@ -281,7 +283,7 @@ fi
 if id -u $user >/dev/null 2>&1; then
   echo "$user already exists"
 else
-  adduser --gecos "" $user
+  adduser --gecos "" $user -p $unixpass
 fi
 
 home=$(eval echo "~$user")
