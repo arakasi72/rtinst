@@ -194,7 +194,7 @@ else
 fi
 
 # get options
-OPTS=$(getopt -n "$0" -o dltru:p:w: --long "dload,log,ssh-default,rutorrent-stable,user:,password:,webpass:" -- "$@")
+OPTS=$(getopt -n "$0" -o dltryu:p:w: --long "dload,log,ssh-default,rutorrent-stable,force-yes,user:,password:,webpass:" -- "$@")
 
 eval set -- "$OPTS"
 
