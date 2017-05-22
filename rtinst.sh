@@ -199,7 +199,7 @@ while true; do
     -t | --ssh-default ) portdefault=0; shift;;
     -r | --rutorrent-stable ) rudevflag=1; shift;;
     -u | --user ) user="$2"; shift; shift;;
-    -p | --password unixpass="$2"; shift; shift;;
+    -p | --password ) unixpass="$2"; shift; shift;;
     -- ) shift; break ;;
      * ) break ;;
   esac
