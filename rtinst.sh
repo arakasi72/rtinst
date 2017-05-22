@@ -230,8 +230,10 @@ if [ $gotip = 1 ]; then
   echo "Unable to determine your IP address"
   gotip=enter_ip
 else
-  echo "Your Server IP is $serverip"
-  echo -n "Is this correct y/n? "
+  if [ $forceyes =1 ]; then
+    echo "Your Server IP is $serverip"
+    echo -n "Is this correct y/n? "
+  fi
   gotip=ask_user
 fi
 
@@ -251,8 +253,10 @@ fi
 
 #check rtorrent installation
 if which rtorrent; then
-  echo "It appears that rtorrent has been installed."
-  echo -n "Do you wish to skip rtorrent compilation? "
+  if [ $forceyes = 1 ]; then
+    echo "It appears that rtorrent has been installed."
+    echo -n "Do you wish to skip rtorrent compilation? "
+  fi
   if ask_user; then
     install_rt=1
     echo "rtorrent installation will be skipped."
