@@ -187,17 +187,20 @@ else
 fi
 
 # get options
-while getopts ":dlt" optname
-  do
-    case $optname in
-      "d" ) dlflag=0 ;;
-      "l" ) logfile="$HOME/rtinst.log" ;;
-      "t" ) portdefault=0 ;;
-        * ) echo "incorrect option, only -d, and -l allowed" && exit 1 ;;
-    esac
-  done
+OPTS=$(getopt -n "$0" -o dltr --long "dload,log,ssh-default,rutorrent-stable" -- "$@")
 
-shift $(( $OPTIND - 1 ))
+eval set -- "$OPTS"
+
+while true; do
+  case "$1" in
+    -d | --dload ) dlflag=0; shift ;;
+    -l | --log ) logfile="$HOME/rtinst.log"; shift ;;
+    -t | --ssh-default ) portdefault=0; shift;;
+    -r | --rutorrent-stable ) rudevflag=1; shift;;
+    -- ) shift; break ;;
+     * ) break ;;
+  esac
+done
 
 # Check if there is more than 0 argument
 if [ $# -gt 0 ]; then
