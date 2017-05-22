@@ -230,7 +230,7 @@ if [ $gotip = 1 ]; then
   echo "Unable to determine your IP address"
   gotip=enter_ip
 else
-  if [ $forceyes =1 ]; then
+  if [ $forceyes = 1 ]; then
     echo "Your Server IP is $serverip"
     echo -n "Is this correct y/n? "
   fi
