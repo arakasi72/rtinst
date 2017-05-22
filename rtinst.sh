@@ -187,7 +187,7 @@ else
 fi
 
 # get options
-OPTS=$(getopt -n "$0" -o dltr --long "dload,log,ssh-default,rutorrent-stable" -- "$@")
+OPTS=$(getopt -n "$0" -o dltru: --long "dload,log,ssh-default,rutorrent-stable,user:" -- "$@")
 
 eval set -- "$OPTS"
 
@@ -197,6 +197,7 @@ while true; do
     -l | --log ) logfile="$HOME/rtinst.log"; shift ;;
     -t | --ssh-default ) portdefault=0; shift;;
     -r | --rutorrent-stable ) rudevflag=1; shift;;
+    -u | --user ) user="$2"; shift; shift;;
     -- ) shift; break ;;
      * ) break ;;
   esac
@@ -252,33 +253,35 @@ if which rtorrent; then
 fi
 
 # set and prepare user
-if [ -z "$SUDO_USER" ]; then
-  echo "Enter the name of the user to install to"
-  echo "This will be your primary user"
-  echo "It can be an existing user or a new user"
-  echo
+if [ -z "$user" ]; then
+  if [ -z "$SUDO_USER" ]; then
+    echo "Enter the name of the user to install to"
+    echo "This will be your primary user"
+    echo "It can be an existing user or a new user"
+    echo
 
-  confirm_name=1
-  while [ $confirm_name = 1 ]
-    do
-      read -p "Enter user name: " answer
-      addname=$answer
-      echo -n "Confirm that user name is $answer y/n? "
-      if ask_user; then
-        confirm_name=0
-      fi
-    done
+    confirm_name=1
+    while [ $confirm_name = 1 ]
+      do
+        read -p "Enter user name: " answer
+        addname=$answer
+        echo -n "Confirm that user name is $answer y/n? "
+        if ask_user; then
+          confirm_name=0
+        fi
+      done
 
-  user=$addname
+    user=$addname
 
-  if id -u $user >/dev/null 2>&1; then
-    echo "$user already exists"
   else
-    adduser --gecos "" $user
+    user=$SUDO_USER
   fi
+fi
 
+if id -u $user >/dev/null 2>&1; then
+  echo "$user already exists"
 else
-  user=$SUDO_USER
+  adduser --gecos "" $user
 fi
 
 home=$(eval echo "~$user")
