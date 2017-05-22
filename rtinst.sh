@@ -283,7 +283,12 @@ fi
 if id -u $user >/dev/null 2>&1; then
   echo "$user already exists"
 else
-  adduser --gecos "" $user -p $unixpass
+  if [ -z "$unixpass" ]; then
+    adduser --gecos "" $user
+  else
+    adduser --gecos "" $user --disabled-password
+    echo "$user:$unixpass" | sudo chpasswd
+  fi
 fi
 
 home=$(eval echo "~$user")
