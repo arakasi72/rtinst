@@ -8,6 +8,10 @@
 #
 ######################################################################
 
+###############################
+###SET VARIABLES###
+###############################
+
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 rtorrentrel='0.9.6'
@@ -56,6 +60,10 @@ Install_list=""
 unixpass=""
 PASSFLAG=0
 forceyes=1
+
+###############################
+###FUNCTIONS###
+###############################
 
 #exit on error function
 error_exit() {
@@ -159,6 +167,7 @@ while true
   done
 }
 
+# function to enter IP address
 enter_ip() {
 local ipset=1
 until [ $ipset = 0 ]
@@ -177,6 +186,9 @@ do
 done
 }
 
+###############################
+### INITIAL SYSTEM CHECKS ###
+###############################
 
 #check it is being run as root
 if ! [ "$LOGNAME" = "root" ]; then
@@ -244,6 +256,7 @@ until $gotip
 
 echo "Your server's IP is set to $serverip"
 
+# Determine domain name using server ip address
 serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
 if [ -z "$serverdn" ]; then
   echo "Unable to determine domain"
@@ -265,6 +278,10 @@ if which rtorrent; then
     echo "rtorrent will be re-installed"
   fi
 fi
+
+###############################
+### PREPARE SYSTEM ###
+###############################
 
 # set and prepare user
 if [ -z "$user" ]; then
@@ -496,8 +513,9 @@ elif [[ ! -z "$serverdn" && -z "$(grep -s $serverdn /etc/ssl/ruweb.cnf)" ]]; the
 fi
 
 
-
-# install ftp
+###############################
+### INSTALL FTP ###
+###############################
 
 ftpport=$(random 41005 48995)
 
@@ -600,7 +618,10 @@ service vsftpd restart 1>> $logfile
 ftpport=$(grep 'listen_port=' /etc/vsftpd.conf | sed 's/[^0-9]*//g')
 echo "FTP port set to $ftpport"
 
-# install rtorrent
+###############################
+### INSTALL RTORRENT ###
+###############################
+
 if [ $install_rt = 0 ]; then
   cd $home
   mkdir -p source
@@ -651,8 +672,9 @@ rtgetscripts $home/.rtorrent.rc
 sed -i "s|<user home>|${home}|g" $home/.rtorrent.rc
 sed -i "s/<user name>/$user/g" $home/.rtorrent.rc
 
-# install rutorrent
-
+###############################
+### INSTALL RUTORRENT ###
+###############################
 
 mkdir -p /var/www
 cd /var/www
@@ -703,7 +725,10 @@ if [ $osname = "Raspbian" ]; then
   echo 'enabled = no' >> /var/www/rutorrent/conf/plugins.ini
 fi
 
-# install nginx
+###############################
+### INSTALL NGINX ###
+###############################
+
 cd $home
 
 if [ -f "/etc/apache2/ports.conf" ]; then
@@ -767,7 +792,10 @@ if [ $dlflag = 0 ]; then
   rtdload enable
 fi
 
-# install autodl-irssi
+###############################
+### INSTALL AUTODL-IRSSI ###
+###############################
+
 echo "Installing autodl-irssi" | tee -a $logfile
 adlport=$(random 36001 36100)
 adlpass=$(genpasswd $(random 12 16))
@@ -823,6 +851,10 @@ if [ -z  "$(crontab -u $user -l | grep "\*/10 \* \* \* \* /usr/local/bin/rtcheck
     (crontab -u $user -l; echo "$cronline2" ) | crontab -u $user - >> $logfile 2>&1
 fi
 
+
+###############################
+### WRITE RTINST.INFO ###
+###############################
 echo
 echo "crontab entries made. rtorrent and irssi will start on boot for $user"
 echo
