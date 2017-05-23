@@ -320,9 +320,9 @@ echo
 
 #update amd upgrade system
 if [ "$fullrel" = "Ubuntu 12.04.5 LTS" ]; then
-  wget --no-check-certificate https://help.ubuntu.com/12.04/sample/sources.list >> $logfile 2>&1 || error_exit "Unable to download sources file from https://help.ubuntu.com/12.04/sample/sources.list"
+  wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/conf/sources1204 >> $logfile 2>&1 || error_exit "Unable to download sources file from https://help.ubuntu.com/12.04/sample/sources.list"
   cp /etc/apt/sources.list /etc/apt/sources.list.bak
-  mv sources.list /etc/apt/sources.list
+  mv sources1204 /etc/apt/sources.list
 fi
 
 echo "Updating package lists" | tee $logfile
