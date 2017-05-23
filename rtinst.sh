@@ -698,9 +698,6 @@ fi
    git clone https://github.com/Novik/ruTorrent.git rutorrent >> $logfile 2>&1
  fi
 
-#echo "Installing Rutorrent" | tee -a $logfile
-#git clone https://github.com/Novik/ruTorrent.git rutorrent >> $logfile 2>&1
-
 echo "Configuring Rutorrent" | tee -a $logfile
 rm rutorrent/conf/config.php
 rtgetscripts /var/www/rutorrent/conf/config.php ru.config
@@ -827,6 +824,10 @@ cd $home/.autodl
 echo "[options]" > autodl2.cfg
 echo "gui-server-port = $adlport" >> autodl2.cfg
 echo "gui-server-password = $adlpass" >> autodl2.cfg
+
+###############################
+### FINAL TASKS ###
+###############################
 
 # set permissions
 echo "Setting permissions, Starting services" | tee -a $logfile
