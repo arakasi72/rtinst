@@ -53,6 +53,9 @@ rudevflag=0
 passfile='/etc/nginx/.htpasswd'
 package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl $geoipver $phpver-mcrypt $phpver-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
 Install_list=""
+unixpass=""
+PASSFLAG=0
+forceyes=1
 
 #exit on error function
 error_exit() {
@@ -142,6 +145,10 @@ random()
 
 # function to ask user for y/n response
 ask_user(){
+if [ $forceyes = 0 ]; then
+  return 0
+fi
+
 while true
   do
     read answer
@@ -187,17 +194,24 @@ else
 fi
 
 # get options
-while getopts ":dlt" optname
-  do
-    case $optname in
-      "d" ) dlflag=0 ;;
-      "l" ) logfile="$HOME/rtinst.log" ;;
-      "t" ) portdefault=0 ;;
-        * ) echo "incorrect option, only -d, and -l allowed" && exit 1 ;;
-    esac
-  done
+OPTS=$(getopt -n "$0" -o dltryu:p:w: --long "dload,log,ssh-default,rutorrent-stable,force-yes,user:,password:,webpass:" -- "$@")
 
-shift $(( $OPTIND - 1 ))
+eval set -- "$OPTS"
+
+while true; do
+  case "$1" in
+    -d | --dload ) dlflag=0; shift ;;
+    -l | --log ) logfile="$HOME/rtinst.log"; shift ;;
+    -t | --ssh-default ) portdefault=0; shift;;
+    -r | --rutorrent-stable ) rudevflag=1; shift;;
+    -y | --force-yes ) forceyes=0; shift;;
+    -u | --user ) user="$2"; shift; shift;;
+    -p | --password ) unixpass="$2"; shift; shift;;
+    -w | --webpass ) webpass="$2"; shift; shift;;
+    -- ) shift; break ;;
+     * ) break ;;
+  esac
+done
 
 # Check if there is more than 0 argument
 if [ $# -gt 0 ]; then
@@ -216,8 +230,10 @@ if [ $gotip = 1 ]; then
   echo "Unable to determine your IP address"
   gotip=enter_ip
 else
-  echo "Your Server IP is $serverip"
-  echo -n "Is this correct y/n? "
+  if [ $forceyes = 1 ]; then
+    echo "Your Server IP is $serverip"
+    echo -n "Is this correct y/n? "
+  fi
   gotip=ask_user
 fi
 
@@ -237,8 +253,10 @@ fi
 
 #check rtorrent installation
 if which rtorrent; then
-  echo "It appears that rtorrent has been installed."
-  echo -n "Do you wish to skip rtorrent compilation? "
+  if [ $forceyes = 1 ]; then
+    echo "It appears that rtorrent has been installed."
+    echo -n "Do you wish to skip rtorrent compilation? "
+  fi
   if ask_user; then
     install_rt=1
     echo "rtorrent installation will be skipped."
@@ -249,41 +267,51 @@ if which rtorrent; then
 fi
 
 # set and prepare user
-if [ -z "$SUDO_USER" ]; then
-  echo "Enter the name of the user to install to"
-  echo "This will be your primary user"
-  echo "It can be an existing user or a new user"
-  echo
+if [ -z "$user" ]; then
+  if [ -z "$SUDO_USER" ]; then
+    echo "Enter the name of the user to install to"
+    echo "This will be your primary user"
+    echo "It can be an existing user or a new user"
+    echo
 
-  confirm_name=1
-  while [ $confirm_name = 1 ]
-    do
-      read -p "Enter user name: " answer
-      addname=$answer
-      echo -n "Confirm that user name is $answer y/n? "
-      if ask_user; then
-        confirm_name=0
-      fi
-    done
+    confirm_name=1
+    while [ $confirm_name = 1 ]
+      do
+        read -p "Enter user name: " answer
+        addname=$answer
+        echo -n "Confirm that user name is $answer y/n? "
+        if ask_user; then
+          confirm_name=0
+        fi
+      done
 
-  user=$addname
+    user=$addname
 
-  if id -u $user >/dev/null 2>&1; then
-    echo "$user already exists"
   else
-    adduser --gecos "" $user
+    user=$SUDO_USER
   fi
+fi
 
+if id -u $user >/dev/null 2>&1; then
+  echo "$user already exists"
 else
-  user=$SUDO_USER
+  if [ -z "$unixpass" ]; then
+    adduser --gecos "" $user
+  else
+    adduser --gecos "" $user --disabled-password
+    echo "$user:$unixpass" | sudo chpasswd
+  fi
 fi
 
 home=$(eval echo "~$user")
 
 #set password for rutorrent
-echo "Set Password for RuTorrent web client"
-webpass=$(set_pass)
-PASSFLAG=$?
+if [ -z "$webpass" ]; then
+  echo "Set Password for RuTorrent web client"
+  webpass=$(set_pass)
+  PASSFLAG=$?
+fi
+
 #Interaction ended message
 echo
 echo "No more user input required, you can complete unattended"
@@ -685,7 +713,7 @@ if [ -f "/etc/apache2/ports.conf" ]; then
 fi
 
 echo "Installing nginx" | tee -a $logfile
-#webpass=$(genpasswd)
+
 htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
 chown www-data:www-data $passfile
 chmod 640 $passfile
