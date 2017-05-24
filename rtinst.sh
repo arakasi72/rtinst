@@ -33,7 +33,7 @@ else
   relno=$(cat /etc/issue.net | tr -d -c 0-9. | cut -d. -f1)
 fi
 
-if [[ "$relno" = "16" || "$relno" = "17" ]]; then
+if [ "$relno" = "16" ] || [ "$relno" = "17" ]; then
   phpver=php7.0
   phploc=/etc/php/7.0
   geoipver=php-geoip
