@@ -733,8 +733,6 @@ htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
 chown www-data:www-data $passfile
 chmod 640 $passfile
 
-
-
 sed -i "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
 sed -i "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
 sed -i "s/pid \/run\/nginx\.pid;/pid \/var\/run\/nginx\.pid;/g" /etc/nginx/nginx.conf
@@ -830,13 +828,16 @@ chown -R $user:$user $home
 
 cd $home
 
+#allows users to change their rutorrent passwords
 if [ -z "$(grep "ALL ALL = NOPASSWD: /usr/local/bin/rtsetpass" /etc/sudoers)" ]; then
   echo "ALL ALL = NOPASSWD: /usr/local/bin/rtsetpass" | (EDITOR="tee -a" visudo)  > /dev/null 2>&1
 fi
 
+# restart rtorrent and irssi
 su $user -c '/usr/local/bin/rt restart'
 su $user -c '/usr/local/bin/rt -i restart'
 
+# set up crontab entries
 if [ -z "$(crontab -u $user -l | grep "$cronline1")" ]; then
     (crontab -u $user -l; echo "$cronline1" ) | crontab -u $user - >> $logfile 2>&1
 fi
