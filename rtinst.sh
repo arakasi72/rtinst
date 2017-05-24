@@ -153,10 +153,6 @@ random()
 
 # function to ask user for y/n response
 ask_user(){
-if [ $forceyes = 0 ]; then
-  return 0
-fi
-
 while true
   do
     read answer
@@ -232,27 +228,16 @@ if [ $# -gt 0 ]; then
 fi
 
 # check IP Address
-case $serverip in
-    127* ) gotip=1 ;;
-  local* ) gotip=1 ;;
-      "" ) gotip=1 ;;
-esac
-
-if [ $gotip = 1 ]; then
-  echo "Unable to determine your IP address"
-  gotip=enter_ip
-else
-  if [ $forceyes = 1 ]; then
-    echo "Your Server IP is $serverip"
-    echo -n "Is this correct y/n? "
-  fi
+if [ $forceyes = 1 ]; then
+  echo "Your Server IP is $serverip"
+  echo -n "Is this correct y/n? "
   gotip=ask_user
-fi
 
-until $gotip
+  until $gotip
     do
       gotip=enter_ip
     done
+fi
 
 echo "Your server's IP is set to $serverip"
 
@@ -269,13 +254,16 @@ if which rtorrent; then
   if [ $forceyes = 1 ]; then
     echo "It appears that rtorrent has been installed."
     echo -n "Do you wish to skip rtorrent compilation? "
-  fi
-  if ask_user; then
+    if ask_user; then
+      install_rt=1
+      echo "rtorrent installation will be skipped."
+    else
+      install_rt=0
+      echo "rtorrent will be re-installed"
+    fi
+  else
     install_rt=1
     echo "rtorrent installation will be skipped."
-  else
-    skip_rt=0
-    echo "rtorrent will be re-installed"
   fi
 fi
 
@@ -323,6 +311,11 @@ fi
 home=$(eval echo "~$user")
 
 #set password for rutorrent
+if [ -z "$webpass" ] && [ $forceyes = 0 ]; then
+  webpass=$(genpasswd)
+  PASSFLAG=1
+fi
+
 if [ -z "$webpass" ]; then
   echo "Set Password for RuTorrent web client"
   webpass=$(set_pass)
