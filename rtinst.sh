@@ -81,19 +81,18 @@ exit 1
 #function to check if string is valid format for an ip address
 valid_ip()
 {
-    local  ip=$1
-    local  stat=1
+ip=${1:-1.2.3.4}
 
-    if [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
-        OIFS=$IFS
-        IFS='.'
-        ip=($ip)
-        IFS=$OIFS
-        [[ ${ip[0]} -le 255 && ${ip[1]} -le 255 \
-            && ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
-        stat=$?
+if expr "$ip" : '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$' >/dev/null; then
+  for i in 1 2 3 4; do
+    if [ $(echo "$ip" | cut -d. -f$i) -gt 255 ]; then
+      return 1
     fi
-    return $stat
+  done
+  return 0
+else
+  return 1
+fi
 }
 
 #function to generate random password
