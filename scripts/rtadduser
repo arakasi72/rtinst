@@ -8,6 +8,10 @@
 #
 ######################################################################
 
+###############################
+### SET VARIABLES ###
+###############################
+
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 passfile='/etc/nginx/.htpasswd'
 
@@ -24,6 +28,10 @@ check_ssh=1
 #get user list
 cd /var/www/rutorrent/conf/users
 user_list=*
+
+###############################
+### FUNCTIONS ###
+###############################
 
 genpasswd() {
 local genln=$1
@@ -140,6 +148,10 @@ echo "$low_count-$high_count"
 
 }
 
+###############################
+### INITIAL SYSTEM CHECKS ###
+###############################
+
 # set and prepare user
 if ! [ "$LOGNAME" = "root" ]; then
 echo "Must be run from root or using sudo" && exit 1
@@ -166,6 +178,10 @@ if [ "$user" = "root" ]; then
       echo "Cannot create root"
       exit
 fi
+
+###############################
+### ADD USER ###
+###############################
 
 if [ -z "$user" ]; then
   echo "Enter the name of the user to add"
@@ -235,6 +251,10 @@ if [ "$user" = "$SUDO_USER" ]; then
   echo "Will reset $user config, autodl filters and torrents will not be deleted"
   rtgetscripts /var/www/rutorrent/conf/config.php ru.config 
 fi
+
+###############################
+### CONFIGURE APPLICATIONS ###
+###############################
 
 #remove existing directory if there
 if [ -d "/var/www/rutorrent/conf/users/$user" ]; then
