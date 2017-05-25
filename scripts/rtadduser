@@ -228,29 +228,7 @@ fi
    done
 
 if [ "$sshaccess" = "0" ]; then
-  groupadd sshuser
-  allowlist=$(grep ^AllowUsers /etc/ssh/sshd_config)
-  if ! [ -z "$allowlist" ]; then
-    for ssh_user in $allowlist
-      do
-        if ! [ "$ssh_user" = "AllowUsers" ]; then
-          adduser $ssh_user sshuser
-        fi
-      done
-    perl -pi -e "s/$allowlist//g" /etc/ssh/sshd_config
-    service ssh restart
-  fi
-
-  groupslist=$(grep AllowGroups /etc/ssh/sshd_config)
-  echo $groupslist
-  if [ -z "$groupslist" ]; then
-    echo "AllowGroups sudo sshuser" | tee -a /etc/ssh/sshd_config > /dev/null
-    service ssh restart
-  fi
-
-  if [ -z "$(groups $user | grep "sshuser")" ]; then
       adduser $user sshuser
-  fi
 fi
 
 if [ "$user" = "$SUDO_USER" ]; then
