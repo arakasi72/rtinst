@@ -33,7 +33,7 @@ else
   relno=$(cat /etc/issue.net | tr -d -c 0-9. | cut -d. -f1)
 fi
 
-if [[ "$relno" = "16" || "$relno" = "17" ]]; then
+if [ "$relno" = "16" ] || [ "$relno" = "17" ]; then
   phpver=php7.0
   phploc=/etc/php/7.0
   geoipver=php-geoip
@@ -81,19 +81,18 @@ exit 1
 #function to check if string is valid format for an ip address
 valid_ip()
 {
-    local  ip=$1
-    local  stat=1
+ip=${1:-1.2.3.4}
 
-    if [[ $ip =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
-        OIFS=$IFS
-        IFS='.'
-        ip=($ip)
-        IFS=$OIFS
-        [[ ${ip[0]} -le 255 && ${ip[1]} -le 255 \
-            && ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
-        stat=$?
+if expr "$ip" : '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$' >/dev/null; then
+  for i in 1 2 3 4; do
+    if [ $(echo "$ip" | cut -d. -f$i) -gt 255 ]; then
+      return 1
     fi
-    return $stat
+  done
+  return 0
+else
+  return 1
+fi
 }
 
 #function to generate random password
@@ -105,7 +104,6 @@ tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
 
 #function to set a user input password
 set_pass() {
-exec 3>&1 >/dev/tty
 local LOCALPASS=''
 local exitvalue=0
 echo "Enter a password (6+ chars)"
@@ -114,8 +112,10 @@ echo "or leave blank to generate a random one"
 while [ -z $LOCALPASS ]
 do
   echo "Please enter the new password:"
-  read -s password1
-
+  stty -echo
+  read password1
+  stty echo
+  
 #check that password is valid
   if [ -z $password1 ]; then
     echo "Random password generated, will be provided to user at end of script"
@@ -125,7 +125,9 @@ do
     echo "password needs to be at least 6 chars long" && continue
   else
     echo "Enter the new password again:"
-    read -s password2
+    stty -echo
+    read password2
+    stty echo
 
 # Check both passwords match
     if [ $password1 != $password2 ]; then
@@ -136,8 +138,7 @@ do
   fi
 done
 
-exec >&3-
-echo $LOCALPASS
+webpass=$LOCALPASS
 return $exitvalue
 }
 
@@ -153,10 +154,6 @@ random()
 
 # function to ask user for y/n response
 ask_user(){
-if [ $forceyes = 0 ]; then
-  return 0
-fi
-
 while true
   do
     read answer
@@ -232,27 +229,16 @@ if [ $# -gt 0 ]; then
 fi
 
 # check IP Address
-case $serverip in
-    127* ) gotip=1 ;;
-  local* ) gotip=1 ;;
-      "" ) gotip=1 ;;
-esac
-
-if [ $gotip = 1 ]; then
-  echo "Unable to determine your IP address"
-  gotip=enter_ip
-else
-  if [ $forceyes = 1 ]; then
-    echo "Your Server IP is $serverip"
-    echo -n "Is this correct y/n? "
-  fi
+if [ $forceyes = 1 ]; then
+  echo "Your Server IP is $serverip"
+  echo -n "Is this correct y/n? "
   gotip=ask_user
-fi
 
-until $gotip
+  until $gotip
     do
       gotip=enter_ip
     done
+fi
 
 echo "Your server's IP is set to $serverip"
 
@@ -269,13 +255,16 @@ if which rtorrent; then
   if [ $forceyes = 1 ]; then
     echo "It appears that rtorrent has been installed."
     echo -n "Do you wish to skip rtorrent compilation? "
-  fi
-  if ask_user; then
+    if ask_user; then
+      install_rt=1
+      echo "rtorrent installation will be skipped."
+    else
+      install_rt=0
+      echo "rtorrent will be re-installed"
+    fi
+  else
     install_rt=1
     echo "rtorrent installation will be skipped."
-  else
-    skip_rt=0
-    echo "rtorrent will be re-installed"
   fi
 fi
 
@@ -323,9 +312,14 @@ fi
 home=$(eval echo "~$user")
 
 #set password for rutorrent
+if [ -z "$webpass" ] && [ $forceyes = 0 ]; then
+  webpass=$(genpasswd)
+  PASSFLAG=1
+fi
+
 if [ -z "$webpass" ]; then
   echo "Set Password for RuTorrent web client"
-  webpass=$(set_pass)
+  set_pass
   PASSFLAG=$?
 fi
 
@@ -493,11 +487,11 @@ if [ -z "$(grep -s $serverip$ /etc/ssl/ruweb.cnf)" ]; then
   echo "Generateing https/ssl certificates - $serverip - $serverdn"
   openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 
-elif ! [[ -f /etc/ssl/ruweb.crt && -f /etc/ssl/private/ruweb.key ]]; then
+elif [ ! -f /etc/ssl/ruweb.crt ] || [ ! -f /etc/ssl/private/ruweb.key ]; then
   echo "Generateing https/ssl certificates - $serverip - $serverdn"
   openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 
-elif [[ ! -z "$serverdn" && -z "$(grep -s $serverdn /etc/ssl/ruweb.cnf)" ]]; then
+elif [ ! -z "$serverdn" ] && [ -z "$(grep -s $serverdn /etc/ssl/ruweb.cnf)" ]; then
   dnno=1
   until [ -z "$(grep "DNS.$dnno" /etc/ssl/ruweb.cnf)" ]
     do
@@ -740,8 +734,6 @@ htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
 chown www-data:www-data $passfile
 chmod 640 $passfile
 
-
-
 sed -i "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
 sed -i "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
 sed -i "s/pid \/run\/nginx\.pid;/pid \/var\/run\/nginx\.pid;/g" /etc/nginx/nginx.conf
@@ -837,13 +829,16 @@ chown -R $user:$user $home
 
 cd $home
 
+#allows users to change their rutorrent passwords
 if [ -z "$(grep "ALL ALL = NOPASSWD: /usr/local/bin/rtsetpass" /etc/sudoers)" ]; then
   echo "ALL ALL = NOPASSWD: /usr/local/bin/rtsetpass" | (EDITOR="tee -a" visudo)  > /dev/null 2>&1
 fi
 
+# restart rtorrent and irssi
 su $user -c '/usr/local/bin/rt restart'
 su $user -c '/usr/local/bin/rt -i restart'
 
+# set up crontab entries
 if [ -z "$(crontab -u $user -l | grep "$cronline1")" ]; then
     (crontab -u $user -l; echo "$cronline1" ) | crontab -u $user - >> $logfile 2>&1
 fi
