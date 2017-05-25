@@ -380,7 +380,7 @@ echo "https downloads can be accessed at https://$serverip/download/$user" | tee
 echo
 fi
 echo "rutorrent can be accessed at https://$serverip/rutorrent" | tee -a $home/rtinst.info
-echo "rutorrent password set to $WEBPASS" | tee -a $home/rtinst.info
+echo "rutorrent password set to $webpass" | tee -a $home/rtinst.info
 echo "to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
 echo
 echo "The above info is stored at $home/rtinst.info"
