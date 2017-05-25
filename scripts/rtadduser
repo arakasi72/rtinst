@@ -19,6 +19,7 @@ ftpport=$(grep 'listen_port=' /etc/vsftpd.conf | sed 's/[^0-9]*//g')
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
+check_ssh=1
 
 #get user list
 cd /var/www/rutorrent/conf/users
@@ -144,38 +145,66 @@ if ! [ "$LOGNAME" = "root" ]; then
 echo "Must be run from root or using sudo" && exit 1
 fi
 
-echo "Enter the name of the user to add"
-echo "It can be an existing user or a new user"
-echo
+# get options
+OPTS=$(getopt -n "$0" -o snu:p:w: --long "ssh-access,no-ssh,user:,password:,webpass:" -- "$@")
 
-confirm_name=1
-while [ $confirm_name = 1 ]
-  do
-    read -p "Enter user name: " answer
-    addname=$answer
-    check_name=1
-    if [ "$addname" = "root" ]; then
+eval set -- "$OPTS"
+
+while true; do
+  case "$1" in
+    -s | --ssh-access ) check_ssh=0; sshaccess=0; shift;;
+    -n | --no-ssh ) check_ssh=0; sshaccess=1; shift;;
+    -u | --user ) user="$2"; shift; shift;;
+    -p | --password ) unixpass="$2"; shift; shift;;
+    -w | --webpass ) webpass="$2"; shift; shift;;
+    -- ) shift; break ;;
+     * ) break ;;
+  esac
+done
+
+if [ "$user" = "root" ]; then
       echo "Cannot create root"
       exit
-    fi
+fi
 
-    while [ $check_name = 1 ]
-      do
-        read -p "Is $addname correct? " answer
-        case $answer in [Yy]* ) confirm_name=0 && check_name=0  ;;
-                        [Nn]* ) confirm_name=1 && check_name=0  ;;
-                            * ) echo "Enter y or n";;
-        esac
-      done
-  done
+if [ -z "$user" ]; then
+  echo "Enter the name of the user to add"
+  echo "It can be an existing user or a new user"
+  echo
 
-user=$addname
+  confirm_name=1
+  while [ $confirm_name = 1 ]
+    do
+      read -p "Enter user name: " answer
+      addname=$answer
+      check_name=1
+      if [ "$addname" = "root" ]; then
+        echo "Cannot create root"
+        exit
+      fi
+
+      while [ $check_name = 1 ]
+        do
+          read -p "Is $addname correct? " answer
+          case $answer in [Yy]* ) confirm_name=0 && check_name=0  ;;
+                          [Nn]* ) confirm_name=1 && check_name=0  ;;
+                              * ) echo "Enter y or n";;
+          esac
+        done
+    done
+
+  user=$addname
+fi
 
 if id -u $user >/dev/null 2>&1; then
   echo "$user already exists"
 else
-  echo "adding $user"
-  adduser --gecos "" $user
+  if [ -z "$unixpass" ]; then
+    adduser --gecos "" $user
+  else
+    adduser --gecos "" $user --disabled-password
+    echo "$user:$unixpass" | sudo chpasswd
+  fi
 fi
 
 home=$(eval echo "~$user")
@@ -184,7 +213,6 @@ if [ -d "/var/www/rutorrent/conf/users/$user" ]; then
   echo "Will reset $user config, filters and torrents will not be deleted"
 fi
 
-check_ssh=1
 if groups $user | grep -q -E ' sshuser(\s|$)' || groups $user | grep -q -E ' sudo(\s|$)'; then
   echo "ssh already granted"
   check_ssh=0
@@ -225,8 +253,6 @@ if [ "$sshaccess" = "0" ]; then
   fi
 fi
 
-rtgetscripts
-
 if [ "$user" = "$SUDO_USER" ]; then
   echo "Will reset $user config, autodl filters and torrents will not be deleted"
   rtgetscripts /var/www/rutorrent/conf/config.php ru.config 
@@ -264,8 +290,11 @@ if ! [ -d "$home/rtorrent/watch" ]; then
 mkdir $home/rtorrent/watch
 fi
 
-WEBPASS=$(genpasswd)
-htpasswd -b $passfile $user $WEBPASS
+if [ -z "$webpass" ]; then
+  webpass=$(genpasswd)
+fi
+
+htpasswd -b $passfile $user $webpass
 
 rtgetscripts $home/.rtorrent.rc
 
@@ -349,7 +378,7 @@ echo "https downloads can be accessed at https://$serverip/download/$user" | tee
 echo
 fi
 echo "rutorrent can be accessed at https://$serverip/rutorrent" | tee -a $home/rtinst.info
-echo "rutorrent password set to $WEBPASS" | tee -a $home/rtinst.info
+echo "rutorrent password set to $webpass" | tee -a $home/rtinst.info
 echo "to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
 echo
 echo "The above info is stored at $home/rtinst.info"
