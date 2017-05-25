@@ -8,6 +8,10 @@
 #
 ######################################################################
 
+###############################
+### SET VARIABLES ###
+###############################
+
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 passfile='/etc/nginx/.htpasswd'
 
@@ -24,6 +28,10 @@ check_ssh=1
 #get user list
 cd /var/www/rutorrent/conf/users
 user_list=*
+
+###############################
+### FUNCTIONS ###
+###############################
 
 genpasswd() {
 local genln=$1
@@ -140,6 +148,10 @@ echo "$low_count-$high_count"
 
 }
 
+###############################
+### INITIAL SYSTEM CHECKS ###
+###############################
+
 # set and prepare user
 if ! [ "$LOGNAME" = "root" ]; then
 echo "Must be run from root or using sudo" && exit 1
@@ -166,6 +178,10 @@ if [ "$user" = "root" ]; then
       echo "Cannot create root"
       exit
 fi
+
+###############################
+### ADD USER ###
+###############################
 
 if [ -z "$user" ]; then
   echo "Enter the name of the user to add"
@@ -228,35 +244,17 @@ fi
    done
 
 if [ "$sshaccess" = "0" ]; then
-  groupadd sshuser
-  allowlist=$(grep ^AllowUsers /etc/ssh/sshd_config)
-  if ! [ -z "$allowlist" ]; then
-    for ssh_user in $allowlist
-      do
-        if ! [ "$ssh_user" = "AllowUsers" ]; then
-          adduser $ssh_user sshuser
-        fi
-      done
-    perl -pi -e "s/$allowlist//g" /etc/ssh/sshd_config
-    service ssh restart
-  fi
-
-  groupslist=$(grep AllowGroups /etc/ssh/sshd_config)
-  echo $groupslist
-  if [ -z "$groupslist" ]; then
-    echo "AllowGroups sudo sshuser" | tee -a /etc/ssh/sshd_config > /dev/null
-    service ssh restart
-  fi
-
-  if [ -z "$(groups $user | grep "sshuser")" ]; then
       adduser $user sshuser
-  fi
 fi
 
 if [ "$user" = "$SUDO_USER" ]; then
   echo "Will reset $user config, autodl filters and torrents will not be deleted"
   rtgetscripts /var/www/rutorrent/conf/config.php ru.config 
 fi
+
+###############################
+### CONFIGURE APPLICATIONS ###
+###############################
 
 #remove existing directory if there
 if [ -d "/var/www/rutorrent/conf/users/$user" ]; then
