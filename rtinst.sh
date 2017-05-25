@@ -104,7 +104,6 @@ tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
 
 #function to set a user input password
 set_pass() {
-exec 3>&1 >/dev/tty
 local LOCALPASS=''
 local exitvalue=0
 echo "Enter a password (6+ chars)"
@@ -139,8 +138,7 @@ do
   fi
 done
 
-exec >&3-
-echo $LOCALPASS
+webpass=$LOCALPASS
 return $exitvalue
 }
 
@@ -321,7 +319,7 @@ fi
 
 if [ -z "$webpass" ]; then
   echo "Set Password for RuTorrent web client"
-  webpass=$(set_pass)
+  set_pass
   PASSFLAG=$?
 fi
 
