@@ -113,8 +113,10 @@ echo "or leave blank to generate a random one"
 while [ -z $LOCALPASS ]
 do
   echo "Please enter the new password:"
-  read -s password1
-
+  stty -echo
+  read password1
+  stty echo
+  
 #check that password is valid
   if [ -z $password1 ]; then
     echo "Random password generated, will be provided to user at end of script"
@@ -124,7 +126,9 @@ do
     echo "password needs to be at least 6 chars long" && continue
   else
     echo "Enter the new password again:"
-    read -s password2
+    stty -echo
+    read password2
+    stty echo
 
 # Check both passwords match
     if [ $password1 != $password2 ]; then
@@ -485,11 +489,11 @@ if [ -z "$(grep -s $serverip$ /etc/ssl/ruweb.cnf)" ]; then
   echo "Generateing https/ssl certificates - $serverip - $serverdn"
   openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 
-elif ! [[ -f /etc/ssl/ruweb.crt && -f /etc/ssl/private/ruweb.key ]]; then
+elif [ ! -f /etc/ssl/ruweb.crt ] || [ ! -f /etc/ssl/private/ruweb.key ]; then
   echo "Generateing https/ssl certificates - $serverip - $serverdn"
   openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
 
-elif [[ ! -z "$serverdn" && -z "$(grep -s $serverdn /etc/ssl/ruweb.cnf)" ]]; then
+elif [ ! -z "$serverdn" ] && [ -z "$(grep -s $serverdn /etc/ssl/ruweb.cnf)" ]; then
   dnno=1
   until [ -z "$(grep "DNS.$dnno" /etc/ssl/ruweb.cnf)" ]
     do
