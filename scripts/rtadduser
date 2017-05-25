@@ -253,8 +253,6 @@ if [ "$sshaccess" = "0" ]; then
   fi
 fi
 
-#rtgetscripts
-
 if [ "$user" = "$SUDO_USER" ]; then
   echo "Will reset $user config, autodl filters and torrents will not be deleted"
   rtgetscripts /var/www/rutorrent/conf/config.php ru.config 
