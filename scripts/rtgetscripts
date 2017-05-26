@@ -54,8 +54,8 @@ fi
 if [ $# = 0 ]; then
   echo -n "Updating"
   RTDIR=$RTDIR/scripts
-  if [ "$(check_url $RTDIR/script_list)" = "true" ]; then
-    script_list=($(curl -s $RTDIR/script_list))
+  if [ "$(check_url https://github.com/arakasi72/rtinst/tree/master/scripts)" = "true" ]; then
+    script_list=($(svn ls https://github.com/arakasi72/rtinst/trunk/scripts))
   else
     echo "Could not access github repository"
     exit
