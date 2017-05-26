@@ -12,7 +12,7 @@ PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 blob=master
 RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$blob
-scriptdir=https://github.com/arakasi72/rtinst/trunk/scripts
+ls_script=https://github.com/arakasi72/rtinst/trunk/scripts
 
 check_url() {
   if [[ `wget -S --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then echo "true"; fi
@@ -56,7 +56,7 @@ if [ $# = 0 ]; then
   echo -n "Updating"
   RTDIR=$RTDIR/scripts
   if [ "$(check_url https://github.com/arakasi72/rtinst)" = "true" ]; then
-    script_list=($(svn ls $scriptdir))
+    script_list=($(svn ls $ls_script))
   else
     echo "Could not access github repository"
     exit
