@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$LOGNAME" = "root" ]; then
+if [ "$(id -u)" = "0" ]; then
   echo "Cannot be run as root, or with sudo"
   exit
 fi
