@@ -46,7 +46,7 @@ if case $script_dest in *"${bindest}"*) true;; *) false;; esac; then
 fi
 }
 
-if ! [ "$LOGNAME" = "root" ]; then
+if [ "$(id -u)" != "0" ]; then
   echo "Must be run as root, directly or with sudo"
   exit 1
 fi
