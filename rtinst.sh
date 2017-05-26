@@ -81,7 +81,7 @@ exit 1
 #function to check if string is valid format for an ip address
 valid_ip()
 {
-ip=${1:-1.2.3.4}
+local ip=${1:-1.2.3.4}
 
 if expr "$ip" : '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$' >/dev/null; then
   for i in 1 2 3 4; do
