@@ -11,7 +11,7 @@
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 passfile='/etc/nginx/.htpasswd'
 
-if ! [ "$LOGNAME" = "root" ]; then
+if [ "$(id -u)" != "0" ]; then
   echo "Must be run as root, or with sudo"
   exit 1
 fi
