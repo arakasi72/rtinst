@@ -82,7 +82,7 @@ exit 1
 valid_ip()
 {
 local ip=${1:-1.2.3.4}
-
+local i
 if expr "$ip" : '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$' >/dev/null; then
   for i in 1 2 3 4; do
     if [ $(echo "$ip" | cut -d. -f$i) -gt 255 ]; then
@@ -106,6 +106,8 @@ tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
 set_pass() {
 local LOCALPASS=''
 local exitvalue=0
+local password1
+local password2
 echo "Enter a password (6+ chars)"
 echo "or leave blank to generate a random one"
 
@@ -154,6 +156,7 @@ random()
 
 # function to ask user for y/n response
 ask_user(){
+local answer
 while true
   do
     read answer
