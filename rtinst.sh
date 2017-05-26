@@ -254,7 +254,7 @@ else
 fi
 
 #check rtorrent installation
-if which rtorrent; then
+if which rtorrent >> /dev/null 2>&1; then
   if [ $forceyes = 1 ]; then
     echo "It appears that rtorrent has been installed."
     echo -n "Do you wish to skip rtorrent compilation? "
