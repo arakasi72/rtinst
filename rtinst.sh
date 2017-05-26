@@ -423,7 +423,11 @@ sed -i '/hard nofile/ d' /etc/security/limits.conf
 sed -i '/soft nofile/ d' /etc/security/limits.conf
 sed -i '$ i\* hard nofile 32768\n* soft nofile 16384' /etc/security/limits.conf
 
-# secure ssh
+
+###############################
+### CONFIGURE SSH ###
+###############################
+
 echo "Configuring SSH" | tee -a $logfile
 
 portline=$(grep 'Port ' /etc/ssh/sshd_config)
@@ -474,7 +478,10 @@ service ssh restart 1>> $logfile
 sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
 echo "SSH port set to $sshport"
 
-# Generate https/ssl certificates
+###############################
+### SSL CERTIFICATES ###
+###############################
+
 if [ -z "$(grep -s $serverip$ /etc/ssl/ruweb.cnf)" ]; then
   cp /etc/ssl/openssl.cnf /etc/ssl/ruweb.cnf
   echo >> /etc/ssl/ruweb.cnf
