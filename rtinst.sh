@@ -191,8 +191,8 @@ done
 ###############################
 
 #check it is being run as root
-if ! [ "$LOGNAME" = "root" ]; then
-echo "Must be run from root or using sudo" && exit 1
+if [ "$(id -u)" != "0" ]; then
+  echo "Must be run from root or using sudo" && exit 1
 fi
 
 # determine system
