@@ -12,7 +12,7 @@ PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 SERVERIP=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
 relno=$(lsb_release -sr | cut -d. -f1)
 
-if ! [ "$LOGNAME" = "root" ]; then
+if [ "$(id -u)" != "0" ]; then
   echo "Must be run as root, directly or with sudo"
   exit 1
 fi
