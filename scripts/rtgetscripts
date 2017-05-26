@@ -64,8 +64,10 @@ if [ $# = 0 ]; then
 
   for script in "${script_list[@]}"
   do
-    echo -n "."
-    get_scripts /usr/local/bin/"${script##*/}" $script
+    if [ "$script" != "script_list" ]; then
+      echo -n "."
+      get_scripts /usr/local/bin/"${script##*/}" $script
+    fi
   done
   echo
   echo "Completed scripts download"
