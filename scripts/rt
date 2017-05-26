@@ -144,7 +144,7 @@ exit 0
 }
 
 #exit if run by root
-if [ "$LOGNAME" = "root" ]; then
+if [ "$(id -u)" = "0" ]; then
   echo "Cannot be run as root, or with sudo"
   exit
 fi
