@@ -25,7 +25,7 @@ while true
   done
 }
 
-if ! [ "$LOGNAME" = "root" ]; then
+if [ "$(id -u)" != "0" ]; then
   echo "Must be run as root, directly or with sudo"
   exit 1
 fi
