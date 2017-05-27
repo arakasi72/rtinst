@@ -23,15 +23,13 @@ xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
 blob=master
 rtdir=https://raw.githubusercontent.com/arakasi72/rtinst/$blob/scripts
 
-if [ $(dpkg-query -W -f='${Status}' lsb-release 2>/dev/null | grep -c "ok installed") -gt 0 ]; then
-  fullrel=$(lsb_release -sd)
-  osname=$(lsb_release -si)
-  relno=$(lsb_release -sr | cut -d. -f1)
-else
-  fullrel=$(cat /etc/issue.net)
-  osname=$(cat /etc/issue.net | cut -d' ' -f1)
-  relno=$(cat /etc/issue.net | tr -d -c 0-9. | cut -d. -f1)
+if [ $(dpkg-query -W -f='${Status}' lsb-release 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+apt-get -yqq install lsb-release
 fi
+
+fullrel=$(lsb_release -sd)
+osname=$(lsb_release -si)
+relno=$(lsb_release -sr | cut -d. -f1)
 
 if [ "$relno" = "16" ] || [ "$relno" = "17" ]; then
   phpver=php7.0
