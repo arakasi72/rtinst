@@ -56,18 +56,17 @@ if [ $# = 0 ]; then
   echo -n "Updating"
   RTDIR=$RTDIR/scripts
   if [ "$(check_url https://github.com/arakasi72/rtinst)" = "true" ]; then
-    script_list=($(svn ls $script_dir))
+    script_list=$(svn ls $script_dir)
+    script_list=$(echo $script_list | sed 's/script_list//g')
   else
     echo "Could not access github repository"
     exit
   fi
 
-  for script in "${script_list[@]}"
+  for script in $script_list
   do
-    if [ "$script" != "script_list" ]; then
       echo -n "."
-      get_scripts /usr/local/bin/"${script##*/}" $script
-    fi
+      get_scripts /usr/local/bin/$script $script
   done
   echo
   echo "Completed scripts download"
