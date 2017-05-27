@@ -24,6 +24,7 @@ blob=master
 rtdir=https://raw.githubusercontent.com/arakasi72/rtinst/$blob/scripts
 
 if [ $(dpkg-query -W -f='${Status}' lsb-release 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+echo "Installing lsb-release"
 apt-get -yqq install lsb-release
 fi
 
