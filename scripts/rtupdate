@@ -23,13 +23,13 @@ hash $1 2>/dev/null
 ask_version() {
 while [ -z "$verschoice" ]
 do
-echo "Please select libtorrent/rtorrent version."
-select verschoice in ${duoversion[*]}
-do
-libvers=$(echo $verschoice | cut -d/ -f1)
-rtvers=$(echo $verschoice | cut -d/ -f2)
-break
-done
+  echo "Please select libtorrent/rtorrent version."
+  select verschoice in ${duoversion[*]}
+  do
+    libvers=$(echo $verschoice | cut -d/ -f1)
+    rtvers=$(echo $verschoice | cut -d/ -f2)
+    break
+  done
 done
 }
 
