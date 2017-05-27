@@ -51,7 +51,9 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 if ( installed rtorrent ); then
-  echo "rtorrent detected"
+  rtorrent_current=$(rtorrent -h | grep -m 1 'version')
+  rtorrent_current=${rtorrent_current#*version }
+  echo "rtorrent $rtorrent_current detected"
   echo
 else
   echo "rtorrent NOT installed"
