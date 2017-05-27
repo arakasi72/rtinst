@@ -255,7 +255,9 @@ fi
 #check rtorrent installation
 if which rtorrent >> /dev/null 2>&1; then
   if [ $forceyes = 1 ]; then
-    echo "It appears that rtorrent has been installed."
+    rtorrent_current=$(rtorrent -h | grep -m 1 'version')
+    rtorrent_current=${rtorrent_current#*version }
+    echo "rtorrent $rtorrent_current has been detected."
     echo -n "Do you wish to skip rtorrent compilation? "
     if ask_user; then
       install_rt=1
