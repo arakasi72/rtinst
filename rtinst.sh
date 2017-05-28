@@ -57,7 +57,7 @@ passfile='/etc/nginx/.htpasswd'
 package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl $geoipver $phpver-mcrypt $phpver-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
 Install_list=""
 unixpass=""
-PASSFLAG=0
+passflag=0
 forceyes=1
 
 ###############################
@@ -103,14 +103,14 @@ tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
 
 #function to set a user input password
 set_pass() {
-local LOCALPASS=''
+local localpass=''
 local exitvalue=0
 local password1
 local password2
 echo "Enter a password (6+ chars)"
 echo "or leave blank to generate a random one"
 
-while [ -z $LOCALPASS ]
+while [ -z $localpass ]
 do
   echo "Please enter the new password:"
   stty -echo
@@ -121,7 +121,7 @@ do
   if [ -z $password1 ]; then
     echo "Random password generated, will be provided to user at end of script"
     exitvalue=1
-    LOCALPASS=$(genpasswd) && break
+    localpass=$(genpasswd) && break
   elif [ ${#password1} -lt 6 ]; then
     echo "password needs to be at least 6 chars long" && continue
   else
@@ -134,12 +134,12 @@ do
     if [ $password1 != $password2 ]; then
       echo "Passwords do not match"
     else
-      LOCALPASS=$password1
+      localpass=$password1
     fi
   fi
 done
 
-webpass=$LOCALPASS
+webpass=$localpass
 return $exitvalue
 }
 
@@ -319,13 +319,13 @@ home=$(eval echo "~$user")
 #set password for rutorrent
 if [ -z "$webpass" ] && [ $forceyes = 0 ]; then
   webpass=$(genpasswd)
-  PASSFLAG=1
+  passflag=1
 fi
 
 if [ -z "$webpass" ]; then
   echo "Set Password for RuTorrent web client"
   set_pass
-  PASSFLAG=$?
+  passflag=$?
 fi
 
 #Interaction ended message
@@ -875,7 +875,7 @@ echo "If enabled, access https downloads at https://$serverip/download/$user" | 
 echo
 echo "rutorrent can be accessed at https://$serverip/rutorrent" | tee -a $home/rtinst.info
 
-if [ $PASSFLAG = 1 ]; then
+if [ $passflag = 1 ]; then
   echo "rutorrent password set to $webpass" | tee -a $home/rtinst.info
 else
   echo "rutorrent password as set by user" | tee -a $home/rtinst.info
