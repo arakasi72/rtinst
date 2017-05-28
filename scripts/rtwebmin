@@ -9,7 +9,7 @@
 ######################################################################
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
-SERVERIP=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
+serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
 relno=$(lsb_release -sr | cut -d. -f1)
 
 if [ "$(id -u)" != "0" ]; then
@@ -91,5 +91,5 @@ service webmin restart  >> /dev/null 2>&1
 service nginx restart  >> /dev/null 2>&1
 echo "Completed"
 echo
-echo "Webmin can be accessed at https://$SERVERIP/webmin"
+echo "Webmin can be accessed at https://$serverip/webmin"
 echo "login using root, or sudo user credentials"
