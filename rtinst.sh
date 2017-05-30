@@ -32,7 +32,7 @@ fullrel=$(lsb_release -sd)
 osname=$(lsb_release -si)
 relno=$(lsb_release -sr | cut -d. -f1)
 
-if [ "$relno" = "16" ] || [ "$relno" = "17" ]; then
+if [ "$relno" = "16" ] || [ "$relno" = "17" ] || [ "$relno" = "9" ]; then
   phpver=php7.0
   phploc=/etc/php/7.0
   geoipver=php-geoip
