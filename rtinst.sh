@@ -450,14 +450,14 @@ if [ -z "$(grep "^[# ]*UsePAM" /etc/ssh/sshd_config)" ]; then
   echo >> /etc/ssh/sshd_config
   echo "UsePAM yes" >> /etc/ssh/sshd_config
 else
- sed -i '/^#\?UsePAM/ c\UsePAM yes' /etc/ssh/sshd_config
+ sed -i '/^\(\s\|#\)*UsePAM/ c\UsePAM yes' /etc/ssh/sshd_config
 fi
 
 if [ -z "$(grep "^[# ]*UseDNS" /etc/ssh/sshd_config)" ]; then
   echo >> /etc/ssh/sshd_config
   echo "UseDNS no" >> /etc/ssh/sshd_config
 else
- sed -i '/^#\?UseDNS/ c\UseDNS no' /etc/ssh/sshd_config
+ sed -i '/^\(\s\|#\)*UseDNS/ c\UseDNS no' /etc/ssh/sshd_config
 fi
 
 if [ -z "$(grep sshuser /etc/group)" ]; then
