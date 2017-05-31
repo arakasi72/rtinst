@@ -432,16 +432,17 @@ sed -i '$ i\* hard nofile 32768\n* soft nofile 16384' /etc/security/limits.conf
 
 echo "Configuring SSH" | tee -a $logfile
 
-oldsshport=$(grep '^ *Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
+oldsshport=$(grep '^[# ]*Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
 
 if [ "$portdefault" = "0" ]; then
   sshport=22
-  sed -i "/^\s*Port / c\Port $sshport" /etc/ssh/sshd_config
 elif [ "$oldsshport" = "22" ] && [ "$portdefault" = "1" ]; then
   sshport=$(random 21000 29000)
-  sed -i "s/^\s*Port 22/Port $sshport/g" /etc/ssh/sshd_config
+else
+  sshport=$oldsshport
 fi
 
+sed -i "/^\(\s\|#\)*Port / c\Port $sshport" /etc/ssh/sshd_config
 sed -i "s/X11Forwarding yes/X11Forwarding no/g" /etc/ssh/sshd_config
 sed -i '/^\s*PermitRootLogin/ c\PermitRootLogin no' /etc/ssh/sshd_config
 sed -i '/^\s*PasswordAuthentication no/ c\#PasswordAuthentication no' /etc/ssh/sshd_config
