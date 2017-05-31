@@ -432,32 +432,32 @@ sed -i '$ i\* hard nofile 32768\n* soft nofile 16384' /etc/security/limits.conf
 
 echo "Configuring SSH" | tee -a $logfile
 
-portline=$(grep 'Port ' /etc/ssh/sshd_config)
+oldsshport=$(grep '^ *Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
 
 if [ "$portdefault" = "0" ]; then
   sshport=22
-  sed -i "/^Port/ c\Port $sshport" /etc/ssh/sshd_config
-elif [ "$portline" = "Port 22" ] && [ "$portdefault" = "1" ]; then
+  sed -i "/^\s*Port / c\Port $sshport" /etc/ssh/sshd_config
+elif [ "$oldsshport" = "22" ] && [ "$portdefault" = "1" ]; then
   sshport=$(random 21000 29000)
-  sed -i "s/Port 22/Port $sshport/g" /etc/ssh/sshd_config
+  sed -i "s/^\s*Port 22/Port $sshport/g" /etc/ssh/sshd_config
 fi
 
 sed -i "s/X11Forwarding yes/X11Forwarding no/g" /etc/ssh/sshd_config
-sed -i '/^PermitRootLogin/ c\PermitRootLogin no' /etc/ssh/sshd_config
+sed -i '/^\s*PermitRootLogin/ c\PermitRootLogin no' /etc/ssh/sshd_config
 sed -i '/^\s*PasswordAuthentication no/ c\#PasswordAuthentication no' /etc/ssh/sshd_config
 
-if [ -z "$(grep UsePAM /etc/ssh/sshd_config)" ]; then
+if [ -z "$(grep "^[# ]*UsePAM" /etc/ssh/sshd_config)" ]; then
   echo >> /etc/ssh/sshd_config
   echo "UsePAM yes" >> /etc/ssh/sshd_config
 else
- sed -i '/^#\?UsePAM/ c\UsePAM yes' /etc/ssh/sshd_config
+ sed -i '/^#\|\s*UsePAM/ c\UsePAM yes' /etc/ssh/sshd_config
 fi
 
-if [ -z "$(grep UseDNS /etc/ssh/sshd_config)" ]; then
+if [ -z "$(grep "^[# ]*UseDNS" /etc/ssh/sshd_config)" ]; then
   echo >> /etc/ssh/sshd_config
   echo "UseDNS no" >> /etc/ssh/sshd_config
 else
- sed -i '/^#\?UseDNS/ c\UseDNS no' /etc/ssh/sshd_config
+ sed -i '/^#\|\s*UseDNS/ c\UseDNS no' /etc/ssh/sshd_config
 fi
 
 if [ -z "$(grep sshuser /etc/group)" ]; then
