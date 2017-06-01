@@ -443,7 +443,7 @@ else
 fi
 
 sed -i "/^\(\s\|#\)*Port / c\Port $sshport" /etc/ssh/sshd_config
-sed -i "s/X11Forwarding yes/X11Forwarding no/g" /etc/ssh/sshd_config
+sed -i "/^\(\s\|#\)*X11Forwarding /c\X11Forwarding no" /etc/ssh/sshd_config
 sed -i '/^\s*PermitRootLogin/ c\PermitRootLogin no' /etc/ssh/sshd_config
 sed -i '/^\s*PasswordAuthentication no/ c\#PasswordAuthentication no' /etc/ssh/sshd_config
 
