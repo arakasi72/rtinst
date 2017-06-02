@@ -252,7 +252,7 @@ fi
 if hash rtorrent >> /dev/null 2>&1; then
   rtorrent_current=$(rtorrent -h | grep -m 1 'version')
   rtorrent_current=${rtorrent_current#*version }
-  if [ $forceyes = 1 ]; then  
+  if [ $forceyes = 1 ]; then
     echo "rtorrent $rtorrent_current has been detected."
     echo -n "Do you wish to skip rtorrent compilation? "
     if ask_user; then
