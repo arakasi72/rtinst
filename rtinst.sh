@@ -49,7 +49,6 @@ cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 dlflag=1
 portdefault=1
 logfile="/dev/null"
-gotip=0
 install_rt=0
 sshport=''
 rudevflag=0
@@ -116,8 +115,8 @@ do
   stty -echo
   read password1
   stty echo
-  
-#check that password is valid
+
+# check that password is valid
   if [ -z $password1 ]; then
     echo "Random password generated, will be provided to user at end of script"
     exitvalue=1
@@ -177,8 +176,8 @@ do
   if valid_ip $serverip ; then
     echo "Your Server IP is $serverip"
     echo -n "Is this correct y/n? "
-    ipset=0
     ask_user
+    ipset=$?
   else
     echo "Invalid IP address, please try again"
   fi
@@ -234,12 +233,9 @@ fi
 if [ $forceyes = 1 ]; then
   echo "Your Server IP is $serverip"
   echo -n "Is this correct y/n? "
-  gotip=ask_user
-
-  until $gotip
-    do
-      gotip=enter_ip
-    done
+    if ! ask_user; then
+      enter_ip
+    fi
 fi
 
 echo "Your server's IP is set to $serverip"
