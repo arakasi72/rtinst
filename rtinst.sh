@@ -543,82 +543,29 @@ if [ $(dpkg-query -W -f='${Status}' "vsftpd" 2>/dev/null | grep -c "ok installed
 
 fi
 
-sed -i '/^#\?anonymous_enable/ c\anonymous_enable=NO' /etc/vsftpd.conf
-sed -i '/^#\?local_enable/ c\local_enable=YES' /etc/vsftpd.conf
-sed -i '/^#\?write_enable/ c\write_enable=YES' /etc/vsftpd.conf
-sed -i '/^#\?local_umask/ c\local_umask=022' /etc/vsftpd.conf
-sed -i '/^#\?listen=/ c\listen=YES' /etc/vsftpd.conf
-sed -i 's/^listen_ipv6/#listen_ipv6/g' /etc/vsftpd.conf
-sed -i '/^rsa_private_key_file/ c\rsa_private_key_file=\/etc\/ssl\/private\/ruweb\.key' /etc/vsftpd.conf
-sed -i '/^rsa_cert_file/ c\rsa_cert_file=\/etc\/ssl\/ruweb\.crt' /etc/vsftpd.conf
+sed -i '/^\(\s\|#\)*anonymous_enable/ c\anonymous_enable=NO' /etc/vsftpd.conf
+sed -i '/^\(\s\|#\)*local_enable/ c\local_enable=YES' /etc/vsftpd.conf
+sed -i '/^\(\s\|#\)*write_enable/ c\write_enable=YES' /etc/vsftpd.conf
+sed -i '/^\(\s\|#\)*local_umask/ c\local_umask=022' /etc/vsftpd.conf
+sed -i '/^\(\s\|#\)*listen=/ c\listen=YES' /etc/vsftpd.conf
+sed -i '/^\(\s\|#\)*rsa_private_key_file/ c\rsa_private_key_file=\/etc\/ssl\/private\/ruweb\.key' /etc/vsftpd.conf
+sed -i '/^\(\s\|#\)*rsa_cert_file/ c\rsa_cert_file=\/etc\/ssl\/ruweb\.crt' /etc/vsftpd.conf
+
+sed -i 's/^\s*listen_ipv6/#listen_ipv6/g' /etc/vsftpd.conf
 
 grep ^listen_port /etc/vsftpd.conf > /dev/null || echo "listen_port=$ftpport" >> /etc/vsftpd.conf
 
-if [ -z "$(grep ^ssl_enable /etc/vsftpd.conf)" ]; then
-  echo "ssl_enable=YES" >> /etc/vsftpd.conf
-else
-  sed -i '/^ssl_enable/ c\ssl_enable=YES' /etc/vsftpd.conf
-fi
-
-if [ -z "$(grep ^chroot_local_user /etc/vsftpd.conf)" ];then
-  echo "chroot_local_user=YES" >> /etc/vsftpd.conf
-else
- sed -i '/^chroot_local_user/ c\chroot_local_user=YES' /etc/vsftpd.conf
-fi
-
-if [ -z "$(grep ^allow_writeable_chroot /etc/vsftpd.conf)" ]; then
-   echo "allow_writeable_chroot=YES" >> /etc/vsftpd.conf
-else
-  sed -i '/^allow_writeable_chroot/ c\allow_writeable_chroot=YES' /etc/vsftpd.conf
-fi
-
-if [ -z "$(grep ^allow_anon_ssl /etc/vsftpd.conf)" ];then
-  echo "allow_anon_ssl=NO" >> /etc/vsftpd.conf
-else
-   sed -i '/^allow_anon_ssl/ c\allow_anon_ssl=NO' /etc/vsftpd.conf
-fi
-
-if [ -z "$(grep ^force_local_data_ssl /etc/vsftpd.conf)" ];then
-  echo "force_local_data_ssl=YES" >> /etc/vsftpd.conf
-else
-  sed -i '/^force_local_data_ssl/ c\force_local_data_ssl=YES' /etc/vsftpd.conf
-fi
-
-if [ -z "$(grep ^force_local_logins_ssl /etc/vsftpd.conf)" ];then
-  echo "force_local_logins_ssl=YES" >> /etc/vsftpd.conf
-else
-  sed -i '/^force_local_logins_ssl/ c\force_local_logins_ssl=YES' /etc/vsftpd.conf
-fi
-
-if [ -z "$(grep ^ssl_sslv2 /etc/vsftpd.conf)" ];then
-  echo "ssl_sslv2=YES" >> /etc/vsftpd.conf
-else
-  sed -i '/^ssl_sslv2/ c\ssl_sslv2=YES' /etc/vsftpd.conf
-fi
-
-if [ -z "$(grep ^ssl_sslv3 /etc/vsftpd.conf)" ];then
-  echo "ssl_sslv3=YES" >> /etc/vsftpd.conf
-else
-  sed -i '/^ssl_sslv3/ c\ssl_sslv3=YES' /etc/vsftpd.conf
-fi
-
-if [ -z "$(grep ^ssl_tlsv1 /etc/vsftpd.conf)" ];then
-  echo "ssl_tlsv1=YES" >> /etc/vsftpd.conf
-else
-  sed -i '/^ssl_tlsv1/ c\ssl_tlsv1=YES' /etc/vsftpd.conf
-fi
-
-if [ -z "$(grep ^require_ssl_reuse /etc/vsftpd.conf)" ];then
-  echo "require_ssl_reuse=NO" >> /etc/vsftpd.conf
-else
-  sed -i '/^require_ssl_reuse/ c\require_ssl_reuse=NO' /etc/vsftpd.conf
-fi
-
-if [ -z "$(grep ^ssl_ciphers /etc/vsftpd.conf)" ];then
-  echo "ssl_ciphers=HIGH" >> /etc/vsftpd.conf
-else
-  sed -i '/^ssl_ciphers/ c\ssl_ciphers=HIGH' /etc/vsftpd.conf
-fi
+grep -Pqs "^\s*ssl_enable" /etc/vsftpd.conf && sed -i '/^\s*ssl_enable/ c\ssl_enable=YES' /etc/vsftpd.conf ||  echo "ssl_enable=YES" >> /etc/vsftpd.conf
+grep -Pqs "^\s*chroot_local_user" /etc/vsftpd.conf &&  sed -i '/^\s*chroot_local_user/ c\chroot_local_user=YES' /etc/vsftpd.conf || echo "chroot_local_user=YES" >> /etc/vsftpd.conf
+grep -Pqs "^\s*allow_writeable_chroot" /etc/vsftpd.conf &&  sed -i '/^\s*allow_writeable_chroot/ c\allow_writeable_chroot=YES' /etc/vsftpd.conf || echo "allow_writeable_chroot=YES" >> /etc/vsftpd.conf
+grep -Pqs "^\s*allow_anon_ssl" /etc/vsftpd.conf && sed -i '/^\s*allow_anon_ssl/ c\allow_anon_ssl=NO' /etc/vsftpd.conf || echo "allow_anon_ssl=NO" >> /etc/vsftpd.conf
+grep -Pqs "^\s*force_local_data_ssl" /etc/vsftpd.conf && sed -i '/^\s*force_local_data_ssl/ c\force_local_data_ssl=YES' /etc/vsftpd.conf || echo "force_local_data_ssl=YES" >> /etc/vsftpd.conf
+grep -Pqs "^\s*force_local_logins_ssl" /etc/vsftpd.conf && sed -i '/^\s*force_local_logins_ssl/ c\force_local_logins_ssl=YES' /etc/vsftpd.conf || echo "force_local_logins_ssl=YES" >> /etc/vsftpd.conf
+grep -Pqs "^\s*ssl_sslv2" /etc/vsftpd.conf &&  sed -i '/^\s*ssl_sslv2/ c\ssl_sslv2=YES' /etc/vsftpd.conf || echo "ssl_sslv2=YES" >> /etc/vsftpd.conf
+grep -Pqs "^\s*ssl_sslv3" /etc/vsftpd.conf &&  sed -i '/^\s*ssl_sslv3/ c\ssl_sslv3=YES' /etc/vsftpd.conf || echo "ssl_sslv3=YES" >> /etc/vsftpd.conf
+grep -Pqs "^\s*ssl_tlsv1" /etc/vsftpd.conf &&  sed -i '/^\s*ssl_tlsv1/ c\ssl_tlsv1=YES' /etc/vsftpd.conf || echo "ssl_tlsv1=YES" >> /etc/vsftpd.conf
+grep -Pqs "^\s*require_ssl_reuse" /etc/vsftpd.conf &&  sed -i '/^\s*require_ssl_reuse/ c\require_ssl_reuse=NO' /etc/vsftpd.conf || echo "require_ssl_reuse=NO" >> /etc/vsftpd.conf
+grep -Pqs "^\s*ssl_ciphers" /etc/vsftpd.conf &&  sed -i '/^\s*ssl_ciphers/ c\ssl_ciphers=HIGH' /etc/vsftpd.conf || echo "ssl_ciphers=HIGH" >> /etc/vsftpd.conf
 
 service vsftpd restart 1>> $logfile
 
