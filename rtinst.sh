@@ -229,9 +229,7 @@ if [ $# -gt 0 ]; then
 fi
 
 # check IP Address
-if [ $forceyes = 1 ]; then
-  enter_ip
-fi
+[ $forceyes = 1 ] && enter_ip
 
 echo "Your server's IP is set to $serverip"
 
