@@ -102,14 +102,13 @@ tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
 
 #function to set a user input password
 set_pass() {
-local localpass=''
 local exitvalue=0
 local password1
 local password2
 echo "Enter a password (6+ chars)"
 echo "or leave blank to generate a random one"
 
-while [ -z $localpass ]
+while [ -z $webpass ]
 do
   echo "Please enter the new password:"
   stty -echo
@@ -120,7 +119,7 @@ do
   if [ -z $password1 ]; then
     echo "Random password generated, will be provided to user at end of script"
     exitvalue=1
-    localpass=$(genpasswd) && break
+    webpass=$(genpasswd) && break
   elif [ ${#password1} -lt 6 ]; then
     echo "password needs to be at least 6 chars long" && continue
   else
@@ -133,12 +132,11 @@ do
     if [ $password1 != $password2 ]; then
       echo "Passwords do not match"
     else
-      localpass=$password1
+      webpass=$password1
     fi
   fi
 done
 
-webpass=$localpass
 return $exitvalue
 }
 
