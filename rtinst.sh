@@ -586,7 +586,7 @@ if [ $install_rt = 0 ]; then
   cd ../rtorrent-$rtorrentrel
   echo "Installing rtorrent" | tee -a $logfile
   ./autogen.sh >> $logfile 2>&1
-  ./configure --prefix=/usr --with-xmlrpc-c >> $logfile 2>&1
+  ./configure --prefix=/usr --with-xmlrpc-c --enable-ipv6>> $logfile 2>&1
   make -j2 >> $logfile 2>&1
   make install >> $logfile 2>&1
   ldconfig >> $logfile 2>&1
