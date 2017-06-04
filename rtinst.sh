@@ -229,7 +229,7 @@ fi
 # check IP Address
 if [ $forceyes = 1 ]; then
   echo "Your Server IP is $serverip"
-  echo "Is this correct y/n? "
+  echo -n "Is this correct y/n? "
   enter_ip
 fi
 
