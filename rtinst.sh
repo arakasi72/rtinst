@@ -167,18 +167,20 @@ while true
 
 # function to enter IP address
 enter_ip() {
-until valid_ip $serverip && ask_user
-do
-    echo "enter your server's IP address"
-    echo "e.g. 213.0.113.113"
-    read serverip
+while true
+  do
     if valid_ip $serverip ; then
       echo "Your Server IP is $serverip"
       echo -n "Is this correct y/n? "
+      ask_user && return 0
     else
       echo "Invalid IP address, please try again"
     fi
-done
+
+    echo "enter your server's IP address"
+    echo "e.g. 213.0.113.113"
+    read serverip
+  done
 }
 
 ###############################
@@ -228,8 +230,6 @@ fi
 
 # check IP Address
 if [ $forceyes = 1 ]; then
-  echo "Your Server IP is $serverip"
-  echo -n "Is this correct y/n? "
   enter_ip
 fi
 
