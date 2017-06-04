@@ -96,7 +96,7 @@ make install >> /dev/null 2>&1
 echo "Compiling rtorrent"
 cd $HOME/source/rtorrent-$rtvers
 ./autogen.sh >> /dev/null 2>&1
-./configure --prefix=/usr --with-xmlrpc-c >> /dev/null 2>&1
+./configure --prefix=/usr --with-xmlrpc-c --enable-ipv6>> /dev/null 2>&1
 make -j2 >> /dev/null 2>&1
 make install >> /dev/null 2>&1
 ldconfig
