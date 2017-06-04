@@ -1,6 +1,6 @@
 ## rtinst
 
-#### 30 Second Guide
+#### 30 Second Guide ATTENTION this version of script use github source and enable ipv6.And just make rtorrent 0.9.6 works.Self use only
 
 Ubuntu and Debian Seedbox Installation
 
