@@ -123,7 +123,7 @@ do
   if [ -z $password1 ]; then
     echo "Random password generated, will be provided to user at end of script"
     exitvalue=1
-    localpass=$(genpasswd) && break
+    localpass=$(genpasswd)
   elif [ ${#password1} -lt 6 ]; then
     echo "password needs to be at least 6 chars long" && continue
   else
