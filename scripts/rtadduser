@@ -65,7 +65,7 @@ while [ $no_match -ne 0 ]
       do
         current_user=$i
         current_port=$(grep $port_type /var/www/rutorrent/conf/users/$current_user/config.php | sed 's/[^0-9]*//g')
-        if [ $current_port -eq $port_count ]; then
+        if [[ $current_port -eq $port_count ]]; then
           no_match=1
           break
         else
