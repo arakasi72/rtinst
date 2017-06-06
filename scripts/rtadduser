@@ -120,7 +120,7 @@ while ! [ $no_match = 0 ]
                  no_match=0
                elif [ $high_count -lt $compare_low ]; then
                  no_match=0
-               elif [ $compare_low -gt $base_high ] && [ $compare_high -lt $count_low  ]; then
+               elif [ $compare_low -gt $base_high ] && [ $compare_high -lt $low_count ]; then
                  no_match=0
                else
                  no_match=1
@@ -133,7 +133,7 @@ while ! [ $no_match = 0 ]
                no_match=0
              elif [ $low_count -gt $compare_high ]; then
                no_match=0
-             elif [ $compare_high -lt $base_low ] && [ $compare_low -gt $count_high  ]; then
+             elif [ $compare_high -lt $base_low ] && [ $compare_low -gt $high_count ]; then
                no_match=0
              else
                no_match=1
