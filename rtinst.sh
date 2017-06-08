@@ -380,21 +380,16 @@ elif [ $osname = "Ubuntu" ]; then
 fi
 
 #install ffmpeg
-if ! [ $osname = "Raspbian" ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
-  echo "Installing ffmpeg"
-  if [ $relno = 14 ]; then
-    apt-add-repository -y ppa:mc3man/trusty-media >> $logfile 2>&1 || error_exit "Problem adding to repository from - https://launchpad.net/~mc3man/+archive/ubuntu/ppa"
-    apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
-    apt-get -y install ffmpeg >> $logfile 2>&1
-  elif [ $relno = 8 ]; then
-    grep "deb http://www.deb-multimedia.org jessie main" /etc/apt/sources.list >> /dev/null || echo "deb http://www.deb-multimedia.org jessie main" >> /etc/apt/sources.list
-    apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
-    apt-get -y --force-yes install deb-multimedia-keyring >> $logfile 2>&1
-    apt-get -y --force-yes install ffmpeg >> $logfile 2>&1
-  else
-    apt-get -y install ffmpeg >> $logfile 2>&1
-  fi
+cd /usr/local/bin/
+if [ "$(uname -m)" = "x86_64" ]; then
+  curl -s http://johnvansickle.com/ffmpeg/builds/ffmpeg-git-64bit-static.tar.xz | tar xJvf - --wildcards --no-anchored 'ffmpeg' 'ffserver' 'ffmpeg-10bit' --strip-components=1
+  elif [ "$(uname -m)" = "x86_32" ]; then
+  curl -s http://johnvansickle.com/ffmpeg/builds/ffmpeg-git-32bit-static.tar.xz | tar xJvf - --wildcards --no-anchored 'ffmpeg' 'ffserver' 'ffmpeg-10bit' --strip-components=1
 fi
+
+#install youtube-dl
+wget https://yt-dl.org/downloads/latest/youtube-dl -O /usr/local/bin/youtube-dl
+chmod a+rx /usr/local/bin/youtube-dl
 
 echo "Completed installation of required packages        "
 
