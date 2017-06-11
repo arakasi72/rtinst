@@ -353,7 +353,7 @@ apt-get clean && apt-get autoclean >> $logfile 2>&1
 echo "Installing required packages" | tee -a $logfile
 for package_name in $package_list
   do
-    if apt-cache show $package_name >/dev/null 2>&1 ; then
+    if [ $(apt-cache show -q=0 $package_name 2>&1 | grep -c "No packages found") -eq 0 ]; then
       if [ $(dpkg-query -W -f='${Status}' $package_name 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
         install_list="$install_list $package_name"
       fi
