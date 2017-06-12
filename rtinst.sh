@@ -566,9 +566,9 @@ if [ $install_rt = 0 ]; then
 
   svn co $xmlrpcloc xmlrpc  >> $logfile 2>&1 || error_exit "Unable to download xmlrpc source files from https://svn.code.sf.net/p/xmlrpc-c/code/stable"
   
-  if [ "$relno" = "9" ]; then
+  if [ $relno -eq 9 ]; then
     git clone -q -b feature-bind --single-branch https://github.com/rakshasa/libtorrent.git libtorrent-$libtorrentrel
-    git clone -q -b feature-bind --single-branch https://github.com/rakshasa/rtorrent.git libtorrent-$libtorrentrel
+    git clone -q -b feature-bind --single-branch https://github.com/rakshasa/rtorrent.git rtorrent-$libtorrentrel
   else
     curl -# $libtorrentloc | tar xz  >> $logfile 2>&1 || error_exit "Unable to download libtorrent source files from http://libtorrent.rakshasa.no/downloads"
     curl -# $rtorrentloc | tar xz  >> $logfile 2>&1 || error_exit "Unable to download rtorrent source files from http://libtorrent.rakshasa.no/downloads"
@@ -591,7 +591,7 @@ if [ $install_rt = 0 ]; then
   make -j2 >> $logfile 2>&1
   make install >> $logfile 2>&1
 
-  cd ../libtorrent-$libtorrentrel
+  cd ../rtorrent-$rtorrentrel
   echo "Installing rtorrent" | tee -a $logfile
   ./autogen.sh >> $logfile 2>&1
   ./configure --prefix=/usr --with-xmlrpc-c >> $logfile 2>&1
