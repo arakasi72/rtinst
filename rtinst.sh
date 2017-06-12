@@ -568,7 +568,7 @@ if [ $install_rt = 0 ]; then
   
   if [ $relno -eq 9 ]; then
     git clone -q -b feature-bind --single-branch https://github.com/rakshasa/libtorrent.git libtorrent-$libtorrentrel
-    git clone -q -b feature-bind --single-branch https://github.com/rakshasa/rtorrent.git rtorrent-$libtorrentrel
+    git clone -q -b feature-bind --single-branch https://github.com/rakshasa/rtorrent.git rtorrent-$rtorrentrel
   else
     curl -# $libtorrentloc | tar xz  >> $logfile 2>&1 || error_exit "Unable to download libtorrent source files from http://libtorrent.rakshasa.no/downloads"
     curl -# $rtorrentloc | tar xz  >> $logfile 2>&1 || error_exit "Unable to download rtorrent source files from http://libtorrent.rakshasa.no/downloads"
