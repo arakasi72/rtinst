@@ -29,7 +29,7 @@ It has been tested with clean installs of:
 	Ubuntu 17
 	Debian 7 "Wheezy"
 	Debian 8 "Jessie"
-	Debian 9 "stretch"
+	Debian 9 "Stretch"
 
 Services that will be installed and configured are
 
