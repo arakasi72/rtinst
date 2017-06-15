@@ -563,6 +563,7 @@ if [ $install_rt = 0 ]; then
   mkdir -p source
   cd source
   echo "Downloading rtorrent source files" | tee -a $logfile
+  rm -rf xmlrpc libtorrent-$libtorrentrel rtorrent-$rtorrentrel
 
   svn co $xmlrpcloc xmlrpc  >> $logfile 2>&1 || error_exit "Unable to download xmlrpc source files from https://svn.code.sf.net/p/xmlrpc-c/code/stable"
 
