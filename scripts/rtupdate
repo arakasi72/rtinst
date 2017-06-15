@@ -76,7 +76,7 @@ if [ -d source ]; then
 else
   mkdir source && cd source
 fi
-rm -r libtorrent* rtorrent*
+rm -r libtorrent* rtorrent* >> /dev/null 2>&1
 
 echo "Fetching source files"
 curl -# http://rtorrent.net/downloads/libtorrent-$libvers.tar.gz | tar xz
