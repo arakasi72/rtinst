@@ -367,16 +367,27 @@ test -z "$install_list" || apt-get -y install $install_list  2>&1 >>$logfile | t
 #install unrar package
 if [ $osname = "Debian" ]; then
   cd $home
-  if [ "$(uname -m)" = "x86_64" ]; then
-    curl -s http://www.rarlab.com/rar/rarlinux-x64-5.4.0.tar.gz | tar xz
-  elif [ "$(uname -m)" = "x86_32" ]; then
-    curl -s http://www.rarlab.com/rar/rarlinux-5.4.0.tar.gz | tar xz
-  fi
+  attempts=0
+  until [ -d rar ] || [ $attempts -gt 20 ]
+  do
+    attempts=$(( $attempts + 1 ))    
+    if [ "$(uname -m)" = "x86_64" ]; then
+      curl -s http://www.rarlab.com/rar/rarlinux-x64-5.4.0.tar.gz | tar xz 2>/dev/null
+    elif [ "$(uname -m)" = "x86_32" ]; then
+      curl -s http://www.rarlab.com/rar/rarlinux-5.4.0.tar.gz | tar xz 2>/dev/null
+    fi
+  done
   cp $home/rar/rar /bin/rar
   cp $home/rar/unrar /bin/unrar
   rm -r $home/rar
 elif [ $osname = "Ubuntu" ]; then
   apt-get -y install unrar  >> $logfile 2>&1
+fi
+
+if hash unrar >> /dev/null 2>&1; then
+  echo "rar/unrar installed
+else
+  echo "rar/unrar install failed"
 fi
 
 #install ffmpeg
