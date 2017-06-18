@@ -385,7 +385,7 @@ elif [ $osname = "Ubuntu" ]; then
 fi
 
 if hash unrar >> /dev/null 2>&1; then
-  echo "rar/unrar installed
+  echo "rar/unrar installed"
 else
   echo "rar/unrar install failed"
 fi
