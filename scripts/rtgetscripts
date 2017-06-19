@@ -15,6 +15,10 @@ if [ "$(id -u)" != "0" ]; then
   exit 1
 fi
 
+if [ ! -d /etc/rtinst]; then
+  git clone https://github.com/arakasi72/rtinst.git /etc/rtinst
+fi
+
 cd /etc/rtinst
 branch=$(git symbolic-ref --short HEAD)
 
