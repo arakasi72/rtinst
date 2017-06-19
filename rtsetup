@@ -24,10 +24,12 @@ fi
 if [ -z $branch ] && [ -d /etc/rtinst ]; then
   cd /etc/rtinst
   branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+  echo $branch
 fi
 
 if [ -z $branch ]; then
   branch=master
+  echo $branch
 fi
 
 rm -r /etc/rtinst
