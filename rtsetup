@@ -33,7 +33,7 @@ if [ -z $branch ] || [ $(git ls-remote --heads https://github.com/arakasi72/rtin
 fi
 
 cd
-rm -r /etc/rtinst
+rm -fr /etc/rtinst
 git clone https://github.com/arakasi72/rtinst.git /etc/rtinst
 cd /etc/rtinst
 git checkout $branch
