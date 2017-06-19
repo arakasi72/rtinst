@@ -28,3 +28,9 @@ fi
 rm -r /etc/rtinst
 git clone -b $branch --single-branch https://github.com/arakasi72/rtinst.git /etc/rtinst
 ln -sf /etc/rtinst/scripts/* /usr/local/bin
+ln -sf /etc/rtinst/rtsetup /usr/local/bin
+
+rundir=$(dirname $(readlink -f $0))
+if [ "$rundir" != "/etc/rtinst" ]; then
+    rm -f $rundir/rtgetscripts
+fi
