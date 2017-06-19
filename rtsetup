@@ -23,7 +23,7 @@ echo "Installing git"
 apt-get -yqq install git 2>&1 >> /dev/null
 fi
 
-if [ -z $branch ] && [ -d /etc/rtinst ]; then
+if [ -d /etc/rtinst ] && [ -z $branch ] ||  [ $(git ls-remote --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
   cd /etc/rtinst
   branch=$(git symbolic-ref --short HEAD 2>/dev/null)
 fi
