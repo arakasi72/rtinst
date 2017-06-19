@@ -1,5 +1,8 @@
 ## rtinst
 
+###NOTE: Please note there are some minor changes to how the script is installed and run.
+If you are familiar with rtinst please check the guide to avoid any confusion
+
 #### 30 Second Guide
 
 Ubuntu and Debian Seedbox Installation
