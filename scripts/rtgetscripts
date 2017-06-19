@@ -10,20 +10,6 @@
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
-blob=master
-RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$blob
-
-if [ "$blob" = "master" ]; then
-  script_dir=https://github.com/arakasi72/rtinst/trunk/scripts
-else
-  script_dir=https://github.com/arakasi72/rtinst/branches/$blob/scripts
-fi
-
-check_url() {
-  if [[ `wget -S --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then echo "true"; fi
-}
-
-
 if [ "$(id -u)" != "0" ]; then
   echo "Must be run as root, directly or with sudo"
   exit 1
@@ -31,6 +17,9 @@ fi
 
 cd /etc/rtinst
 branch=$(git symbolic-ref --short HEAD)
+
 git fetch --all
 git reset --hard origin/$branch
 git pull origin $branch
+
+ln -sf /etc/rtinst/scripts/* /usr/local/bin
