@@ -34,7 +34,6 @@ fi
 
 cd
 rm -r /etc/rtinst
-echo $branch
 git clone -b $branch --single-branch https://github.com/arakasi72/rtinst.git /etc/rtinst
 ln -sf /etc/rtinst/scripts/* /usr/local/bin
 ln -sf /etc/rtinst/rtsetup /usr/local/bin
