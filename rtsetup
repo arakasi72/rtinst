@@ -39,6 +39,6 @@ git clone -b $branch --single-branch https://github.com/arakasi72/rtinst.git /et
 ln -sf /etc/rtinst/scripts/* /usr/local/bin
 ln -sf /etc/rtinst/rtsetup /usr/local/bin
 
-if [ "$rundir" != "/etc/rtinst" ]; then
-    rm -f $rundir/rtsetup
-fi
+#if [ "$rundir" != "/etc/rtinst" ]; then
+#    rm -f $rundir/rtsetup
+#fi
