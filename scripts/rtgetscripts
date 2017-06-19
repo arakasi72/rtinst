@@ -29,3 +29,8 @@ if [ "$(id -u)" != "0" ]; then
   exit 1
 fi
 
+cd /etc/rtinst
+branch=$(git symbolic-ref --short HEAD)
+git fetch --all
+git reset --hard origin/$branch
+git pull origin $branch
