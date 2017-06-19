@@ -69,8 +69,6 @@ echo "Installing $libvers/$rtvers"
 
 cd $HOME
 
-rtgetscripts
-
 if [ -d source ]; then
   cd source
 else
