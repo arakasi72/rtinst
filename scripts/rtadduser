@@ -248,7 +248,7 @@ fi
 
 if [ "$user" = "$SUDO_USER" ]; then
   echo "Will reset $user config, autodl filters and torrents will not be deleted"
-  rtgetscripts /var/www/rutorrent/conf/config.php ru.config 
+  cp -f /etc/rtinst/conf/ru.config /var/www/rutorrent/conf/config.php 
 fi
 
 ###############################
@@ -293,7 +293,7 @@ fi
 
 htpasswd -b $passfile $user $webpass
 
-rtgetscripts $home/.rtorrent.rc
+cp -f /etc/rtinst/conf/.rtorrent.rc $home/.rtorrent.rc
 
 sed -i "s|<user home>|${home}|g" $home/.rtorrent.rc
 sed -i "s/<user name>/$user/g" $home/.rtorrent.rc
