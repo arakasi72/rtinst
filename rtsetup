@@ -37,6 +37,7 @@ rm -r /etc/rtinst
 git clone https://github.com/arakasi72/rtinst.git /etc/rtinst
 cd /etc/rtinst
 git checkout $branch
+cd
 ln -sf /etc/rtinst/scripts/* /usr/local/bin
 ln -sf /etc/rtinst/rtsetup /usr/local/bin
 
