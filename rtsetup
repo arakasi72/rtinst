@@ -26,15 +26,14 @@ fi
 if [ -z $branch ] && [ -d /etc/rtinst ]; then
   cd /etc/rtinst
   branch=$(git symbolic-ref --short HEAD 2>/dev/null)
-  echo $branch
 fi
 
 if [ -z $branch ]; then
   branch=master
-  echo $branch
 fi
 
 rm -r /etc/rtinst
+echo $branch
 git clone -b $branch --single-branch https://github.com/arakasi72/rtinst.git /etc/rtinst
 ln -sf /etc/rtinst/scripts/* /usr/local/bin
 ln -sf /etc/rtinst/rtsetup /usr/local/bin
