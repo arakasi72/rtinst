@@ -4,8 +4,8 @@
 # This configuration will work with most systems, but optimal settings are dependant on specific server setup
 
 ### Set Directories
-method.insert = cfg.basedir,    private|const|string, (cat,"<user home>/rtorrent/")
-method.insert = cfg.watch,      private|const|string, (cat,(cfg.basedir),"watch/")
+method.insert = cfg.basedir,     private|const|string, (cat,"<user home>/rtorrent/")
+method.insert = cfg.watch,       private|const|string, (cat,(cfg.basedir),"watch/")
 
 #method.insert = cfg.logs,       private|const|string, (cat,(cfg.basedir),"log/")
 #method.insert = cfg.logfile,    private|const|string, (cat,(c   fg.logs),"rtorrent-",(system.time),".log")

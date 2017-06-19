@@ -12,7 +12,12 @@ PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 blob=master
 RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$blob
-script_dir=https://github.com/arakasi72/rtinst/trunk/scripts
+
+if [ "$blob" = "master" ]; then
+  script_dir=https://github.com/arakasi72/rtinst/trunk/scripts
+else
+  script_dir=https://github.com/arakasi72/rtinst/branches/$blob/scripts
+fi
 
 check_url() {
   if [[ `wget -S --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then echo "true"; fi
