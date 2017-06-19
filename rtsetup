@@ -9,6 +9,8 @@
 ######################################################################
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+
+rundir=$(dirname $(readlink -f $0))
 branch=$1
 
 if [ "$(id -u)" != "0" ]; then
@@ -37,7 +39,6 @@ git clone -b $branch --single-branch https://github.com/arakasi72/rtinst.git /et
 ln -sf /etc/rtinst/scripts/* /usr/local/bin
 ln -sf /etc/rtinst/rtsetup /usr/local/bin
 
-rundir=$(dirname $(readlink -f $0))
 if [ "$rundir" != "/etc/rtinst" ]; then
     rm -f $rundir/rtsetup
 fi
