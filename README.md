@@ -7,7 +7,7 @@ If you are familiar with rtinst please check the guide to avoid any confusion
 
 Ubuntu and Debian Seedbox Installation
 
-Download and run setup
+Download and run setup (if logged in as root, do not need to use sudo)
 
 	wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtsetup
 	sudo bash rtsetup
