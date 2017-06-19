@@ -9,7 +9,11 @@
 ######################################################################
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
-branch=develop
+branch=$1
+
+if [ -z $branch ]; then
+  branch=master
+fi
 
 if [ "$(id -u)" != "0" ]; then
   echo "Must be run as root, directly or with sudo"
