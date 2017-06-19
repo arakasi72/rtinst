@@ -32,5 +32,5 @@ ln -sf /etc/rtinst/rtsetup /usr/local/bin
 
 rundir=$(dirname $(readlink -f $0))
 if [ "$rundir" != "/etc/rtinst" ]; then
-    rm -f $rundir/rtgetscripts
+    rm -f $rundir/rtsetup
 fi
