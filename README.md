@@ -21,13 +21,13 @@ It takes about 10 minutes to run, depending on your server setup. After you have
 
 It has been tested with clean installs of: 
 
-	Ubuntu 12
+	Ubuntu 12 (unsupported)
 	Ubuntu 13
 	Ubuntu 14
 	Ubuntu 15
 	Ubuntu 16
 	Ubuntu 17
-	Debian 7 "Wheezy"
+	Debian 7 "Wheezy" (unsupported)
 	Debian 8 "Jessie"
 	Debian 9 "Stretch"
 
