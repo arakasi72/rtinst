@@ -13,7 +13,7 @@ PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 blob=master
 RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$blob
 
-if [ $blob = "master" ]; then
+if [ "$blob" = "master" ]; then
   script_dir=https://github.com/arakasi72/rtinst/trunk/scripts
 else
   script_dir=https://github.com/arakasi72/rtinst/branches/$blob/scripts
