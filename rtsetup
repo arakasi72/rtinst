@@ -34,7 +34,7 @@ fi
 
 cd
 rm -fr /etc/rtinst
-git clone https://github.com/arakasi72/rtinst.git /etc/rtinst
+git clone -q https://github.com/arakasi72/rtinst.git /etc/rtinst
 cd /etc/rtinst
 git checkout $branch
 cd
