@@ -28,7 +28,7 @@ if [ -z $branch ] && [ -d /etc/rtinst ]; then
   branch=$(git symbolic-ref --short HEAD 2>/dev/null)
 fi
 
-if [ -z $branch ]; then
+if [ -z $branch ] || [ $(git ls-remote --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
   branch=master
 fi
 
