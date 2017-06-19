@@ -413,11 +413,7 @@ else
   adduser $user sudo
 fi
 
-# download rt scripts and config files
-echo "Fetching rtinst scripts" | tee -a $logfile
 cd $home
-
-ln -sf /etc/rtinst/scripts/* /usr/local/bin 
 
 #raise file limits
 sed -i '/hard nofile/ d' /etc/security/limits.conf
