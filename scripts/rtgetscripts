@@ -10,89 +10,25 @@
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
-blob=master
-RTDIR=https://raw.githubusercontent.com/arakasi72/rtinst/$blob
-
-if [ "$blob" = "master" ]; then
-  script_dir=https://github.com/arakasi72/rtinst/trunk/scripts
-else
-  script_dir=https://github.com/arakasi72/rtinst/branches/$blob/scripts
-fi
-
-check_url() {
-  if [[ `wget -S --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then echo "true"; fi
-}
-
-get_scripts() {
-local script_dest=$1
-local script_name=$2
-local attempts=0
-local script_size=0
-local bindest="/usr/local/bin"
-
-if [ -z $script_name ]; then
-  script_name="${script_dest##*/}"
-fi
-
-while [ $script_size = 0 ]
-  do
-    rm -f $script_dest
-    attempts=$(( $attempts + 1 ))
-    if [ $attempts = 20 ]; then
-      echo "There is a problem downloading from github. Please check your network or there may be an issue with the github website"
-      echo "If the Github website is down, you can try again later"
-      exit
-    fi
-    wget -q --no-check-certificate --output-document=$script_dest $RTDIR/$script_name
-    script_size=$(du -b $script_dest | cut -f1)
-  done
-
-if case $script_dest in *"${bindest}"*) true;; *) false;; esac; then
-  chmod 755 $script_dest
-fi
-}
-
 if [ "$(id -u)" != "0" ]; then
   echo "Must be run as root, directly or with sudo"
   exit 1
 fi
 
-if [ $# = 0 ]; then
-  echo -n "Updating"
-  RTDIR=$RTDIR/scripts
-  if [ "$(check_url https://github.com/arakasi72/rtinst)" = "true" ]; then
-    script_list=$(svn ls $script_dir | sed 's/script_list//g')
-  else
-    echo "Could not access github repository"
-    exit
-  fi
+if [ ! -d /etc/rtinst ]; then
+  git clone https://github.com/arakasi72/rtinst.git /etc/rtinst
+fi
 
-  for script in $script_list
-  do
-      echo -n "."
-      get_scripts /usr/local/bin/$script $script
-  done
-  echo
-  echo "Completed scripts download"
-
-  RUNDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-  if [ "$RUNDIR" != "/usr/local/bin" ]; then
-    rm -f $RUNDIR/rtgetscripts
-  fi
-
+cd /etc/rtinst
+branch=$(git symbolic-ref --short HEAD)
+if [ $(git ls-remote --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
+  echo "$branch no longer appears to exist"
+  echo "run rtsetup to reset branch"
 else
-  RTDIR=$RTDIR/conf
-  if [ -z $2 ]; then
-    scriptnme="${1##*/}"
-  else
-    scriptnme=$2
-  fi
+  git fetch --all
+  git reset --hard origin/$branch
+  git pull origin $branch
 
-  if [ "$(check_url $RTDIR/$scriptnme)" = "true" ]; then
-    get_scripts $1 $2
-  else
-    echo "could not access $scriptnme on github, check github website"
-  fi
-
+  ln -sf /etc/rtinst/scripts/* /usr/local/bin
+  ln -sf /etc/rtinst/rtsetup /usr/local/bin
 fi

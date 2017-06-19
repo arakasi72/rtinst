@@ -20,9 +20,6 @@ rtorrentloc='http://rtorrent.net/downloads/rtorrent-'$rtorrentrel'.tar.gz'
 libtorrentloc='http://rtorrent.net/downloads/libtorrent-'$libtorrentrel'.tar.gz'
 xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
 
-blob=master
-rtdir=https://raw.githubusercontent.com/arakasi72/rtinst/$blob/scripts
-
 if [ $(dpkg-query -W -f='${Status}' lsb-release 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
 echo "Installing lsb-release"
 apt-get -yqq install lsb-release 2>&1 >> /dev/null
@@ -420,9 +417,7 @@ fi
 echo "Fetching rtinst scripts" | tee -a $logfile
 cd $home
 
-rm -f rtgetscripts
-wget -q --no-check-certificate $rtdir/rtgetscripts
-bash rtgetscripts
+ln -sf /etc/rtinst/scripts/* /usr/local/bin 
 
 #raise file limits
 sed -i '/hard nofile/ d' /etc/security/limits.conf
@@ -621,8 +616,7 @@ mkdir -p rtorrent/.session
 mkdir -p rtorrent/download
 mkdir -p rtorrent/watch
 
-
-rtgetscripts $home/.rtorrent.rc
+cp -f /etc/rtinst/conf/.rtorrent.rc $home/.rtorrent.rc
 sed -i "s|<user home>|${home}|g" $home/.rtorrent.rc
 sed -i "s/<user name>/$user/g" $home/.rtorrent.rc
 
@@ -654,7 +648,7 @@ fi
 
 echo "Configuring Rutorrent" | tee -a $logfile
 rm rutorrent/conf/config.php
-rtgetscripts /var/www/rutorrent/conf/config.php ru.config
+cp -f /etc/rtinst/conf/ru.config /var/www/rutorrent/conf/config.php
 mkdir -p /var/www/rutorrent/conf/users/$user/plugins
 
 echo "<?php" > /var/www/rutorrent/conf/users/$user/config.php
@@ -666,7 +660,7 @@ echo "\$XMLRPCMountPoint = \"/RPC2\";" >> /var/www/rutorrent/conf/users/$user/co
 echo >> /var/www/rutorrent/conf/users/$user/config.php
 echo "?>" >> /var/www/rutorrent/conf/users/$user/config.php
 
-rtgetscripts /var/www/rutorrent/conf/plugins.ini ru.ini
+cp -f /etc/rtinst/conf/ru.ini /var/www/rutorrent/conf/plugins.ini
 if [ $osname = "Raspbian" ]; then
   sed -i '/\[screenshots\]/,+1d' /var/www/rutorrent/conf/plugins.ini
   sed -i '/\[unpack\]/,+1d' /var/www/rutorrent/conf/plugins.ini
@@ -714,8 +708,8 @@ fi
 
 mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
 
-rtgetscripts /etc/nginx/sites-available/default nginxsite
-rtgetscripts /etc/nginx/sites-available/dload-loc nginxsitedl
+cp -f /etc/rtinst/conf/nginxsite /etc/nginx/sites-available/default
+cp -f /etc/rtinst/conf/nginxsitedl /etc/nginx/sites-available/dload-loc
 
 echo "location ~ \.php$ {" > /etc/nginx/conf.d/php
 echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/php

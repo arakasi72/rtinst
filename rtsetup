@@ -1,0 +1,46 @@
+#!/bin/bash
+
+######################################################################
+#
+#  Copyright (c) 2015 arakasi72 (https://github.com/arakasi72)
+#
+#  --> Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+#
+######################################################################
+
+PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+
+rundir=$(dirname $(readlink -f $0))
+branch=$1
+
+if [ "$(id -u)" != "0" ]; then
+  echo "Must be run as root, directly or with sudo"
+  exit 1
+fi
+
+if [ $(dpkg-query -W -f='${Status}' git 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+echo "Installing git"
+apt-get -yqq install git 2>&1 >> /dev/null
+fi
+
+if [ -d /etc/rtinst ] && [ -z $branch ] ||  [ $(git ls-remote --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
+  cd /etc/rtinst
+  branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+fi
+
+if [ -z $branch ] || [ $(git ls-remote --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
+  branch=master
+fi
+
+cd
+rm -r /etc/rtinst
+git clone https://github.com/arakasi72/rtinst.git /etc/rtinst
+cd /etc/rtinst
+git checkout $branch
+cd
+ln -sf /etc/rtinst/scripts/* /usr/local/bin
+ln -sf /etc/rtinst/rtsetup /usr/local/bin
+
+if [ "$rundir" != "/etc/rtinst" ]; then
+    rm -f $rundir/rtsetup
+fi
