@@ -23,6 +23,11 @@ echo "Installing git"
 apt-get -yqq install git 2>&1 >> /dev/null
 fi
 
+if [ $(dpkg-query -W -f='${Status}' ca-certificates 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+echo "Installing ca-certificates"
+apt-get -yqq install ca-certificates 2>&1 >> /dev/null
+fi
+
 if [ -d /etc/rtinst ] && [ -z $branch ] ||  [ $(git ls-remote --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
   cd /etc/rtinst
   branch=$(git symbolic-ref --short HEAD 2>/dev/null)
