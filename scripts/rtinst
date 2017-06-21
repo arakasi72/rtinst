@@ -200,7 +200,7 @@ else
  echo $fullrel
  echo "Only Ubuntu release 14 and later, and Debian and Raspbian release 8 and later, are supported"
  echo "Your system does not appear to be supported"
- echo "Check https://github.com/arakasi72/rtinst/wiki/Installing-on-Older-OS to see if it is supported by an earlier release"
+ echo "Check https://github.com/arakasi72/rtinst/wiki/Installing-on-Older-OS to see if it is supported by an rtinst earlier release"
  exit
 fi
 
