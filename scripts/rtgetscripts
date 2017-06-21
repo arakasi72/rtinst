@@ -21,7 +21,13 @@ fi
 
 cd /etc/rtinst
 
-branch=$(git symbolic-ref --short HEAD)
+branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+
+if [ -z $branch ]; then
+  echo "Not in a branch, this is a fixed release"
+  echo "Run rtsetup to switch to master release"
+  exit
+fi
 
 if [ $(git ls-remote --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
   echo "$branch no longer appears to exist"
