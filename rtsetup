@@ -30,7 +30,7 @@ fi
 
 if [ -d /etc/rtinst ] && [ -z $branch ] ||  [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
   cd /etc/rtinst
-  branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+  branch=$(basename "$(git symbolic-ref HEAD 2>/dev/null)")
 fi
 
 if [ -z $branch ] || [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
