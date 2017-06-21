@@ -194,12 +194,13 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # determine system
-if ([ "$osname" = "Ubuntu" ] && [ $relno -ge 12 ]) || ([ "$osname" = "Debian" ] && [ $relno -ge 7 ])  || ([ "$osname" = "Raspbian" ] && [ $relno -ge 7 ]); then
+if ([ "$osname" = "Ubuntu" ] && [ $relno -ge 14 ]) || ([ "$osname" = "Debian" ] && [ $relno -ge 8 ])  || ([ "$osname" = "Raspbian" ] && [ $relno -ge 8 ]); then
   echo $fullrel
 else
  echo $fullrel
- echo "Only Ubuntu release 12 and later, and Debian and Raspbian release 7 and later, are supported"
+ echo "Only Ubuntu release 14 and later, and Debian and Raspbian release 8 and later, are supported"
  echo "Your system does not appear to be supported"
+ echo "Check https://github.com/arakasi72/rtinst/wiki/Installing-on-Older-OS to see if it is supported by an earlier release"
  exit
 fi
 
