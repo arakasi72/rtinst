@@ -20,11 +20,6 @@ if [ ! -d /etc/rtinst ]; then
 fi
 
 cd /etc/rtinst
-#if [ $(git name-rev --name-only --tags HEAD) != undefined ]; then
-#  echo "This is a tagged release and can't be updated"
-#  echo "Run rtsetup if you wish to switch to the master build"
-#  exit
-#fi
 
 branch=$(git symbolic-ref --short HEAD)
 
@@ -33,7 +28,7 @@ if [ $(git ls-remote --heads https://github.com/arakasi72/rtinst.git $branch | w
   echo "run rtsetup to reset branch"
 else
   git fetch --all
-  git reset --hard origin/$branch
+  git reset --hard origin/$branch 2>&1 >> /dev/null
   git pull origin $branch
 
   ln -sf /etc/rtinst/scripts/* /usr/local/bin
