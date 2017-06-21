@@ -20,11 +20,11 @@ if [ ! -d /etc/rtinst ]; then
 fi
 
 cd /etc/rtinst
-if [ $(git name-rev --name-only --tags HEAD) != undefined ]; then
-  echo "This is a tagged release and can't be updated"
-  echo "Run rtsetup if you wish to switch to the master build"
-  exit
-fi
+#if [ $(git name-rev --name-only --tags HEAD) != undefined ]; then
+#  echo "This is a tagged release and can't be updated"
+#  echo "Run rtsetup if you wish to switch to the master build"
+#  exit
+#fi
 
 branch=$(git symbolic-ref --short HEAD)
 
