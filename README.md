@@ -26,7 +26,7 @@ It takes about 10 minutes to run, depending on your server setup. After you have
 It has been tested with clean installs of: 
 
 	Ubuntu 12 (unsupported)
-	Ubuntu 13
+	Ubuntu 13 (unsupported)
 	Ubuntu 14
 	Ubuntu 15
 	Ubuntu 16
