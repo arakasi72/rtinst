@@ -47,6 +47,8 @@ Services that will be installed and configured are
 
 [A detailed installation guide, and additional information on all the features](https://github.com/arakasi72/rtinst/wiki/Guide)
 
+For older unssuported OS listed above see the [Older OS Installation Guide](https://github.com/arakasi72/rtinst/wiki/Installing-on-Older-OS)
+
 To see latest updates to the script go to [Change Log](https://github.com/arakasi72/rtinst/wiki/Change-Log)
 
 -------------------------------------------------------------------------
