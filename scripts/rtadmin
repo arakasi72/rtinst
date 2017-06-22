@@ -23,8 +23,9 @@ while true
                     [5] ) rtupdate && return 0 ;;
                     [6] ) rutupgrade && return 0 ;;
                     [7] ) rtwebmin && return 0 ;;
+                    [8] ) rtsslcert && return 0 ;;
                    [Qq] ) exit ;;
-                      * ) echo "Enter 1-7 (q to quit)";;
+                      * ) echo "Enter 1-8 (q to quit)";;
     esac
   done
 }
@@ -52,6 +53,7 @@ echo "4.) rtdload $rtdaction - $rtdaction http downloads"
 echo "5.) rtupdate - up/down-grade rtorent/libtorrent"
 echo "6.) rutupgrade - upgrade to latest version of RuTorrent"
 echo "7.) rtwebmin - install webmin"
+echo "8.) rtsslcert - generate new self signed ssl certificate
 echo "Enter option or q to quit"
 
 select_task
