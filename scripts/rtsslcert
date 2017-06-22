@@ -9,8 +9,6 @@
 #########################################################################################
 
 
-
-serverip=$1
 forceyes=1
 headless=1
 
@@ -88,6 +86,8 @@ if [ $# -gt 1 ]; then
   echo "Only one argument allowed"
   exit
 fi
+
+serverip=$1
 
 if [ -z $serverip ]; then
   serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
