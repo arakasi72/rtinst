@@ -51,11 +51,13 @@ fi
 while getopts ":yd" optname
   do
     case $optname in
-      "y" ) forceyes=0; shift ;;
-      "d" ) headless=0; shift ;;
+      "y" ) forceyes=0 ;;
+      "d" ) headless=0 ;;
         * ) echo "-y or -d only options allowed" && exit ;;
     esac
   done
+
+shift $(( $OPTIND - 1 ))
 
 echo $forceyes
 echo $headless
