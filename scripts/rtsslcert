@@ -53,9 +53,12 @@ while getopts ":yd" optname
     case $optname in
       "y" ) forceyes=0; shift ;;
       "d" ) headless=0; shift ;;
-        * ) echo "-y only option allowed" && exit ;;
+        * ) echo "-y or -d only options allowed" && exit ;;
     esac
   done
+
+echo $forceyes
+echo $headless
 
 if [ $forceyes = 0 ] && [ $headless = 0 ]; then
   echo "Cannot run with both options -y and -d"
