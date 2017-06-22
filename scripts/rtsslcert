@@ -44,7 +44,7 @@ while true
 
 # function to generate the ssl certificates
 generate_certificate() {
-echo "Generateing https/ssl certificates"
+echo -n "Generateing https/ssl certificates"
 openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt > /dev/null 2>&1
 
 sed -i '/^\(\s\|#\)*rsa_private_key_file/ c\rsa_private_key_file=\/etc\/ssl\/private\/ruweb\.key' /etc/vsftpd.conf
@@ -55,7 +55,7 @@ sed -i '/ssl_certificate / c\        ssl_certificate \/etc\/ssl\/ruweb\.crt;' /e
 sed -i '/ssl_certificate_key/ c\        ssl_certificate_key \/etc\/ssl\/private\/ruweb\.key;' /etc/nginx/sites-available/default
 service nginx restart
 
-echo "Done"
+echo ": done"
 }
 
 #check it is being run as root
