@@ -105,6 +105,7 @@ elif ! openssl x509 -checkend 31536000 -noout -in /etc/ssl/ruweb.crt; then
 
 elif [ $forceyes = 0 ]; then
   generate_certificate
+
 else
   echo -n "Certificates look ok, sure you want to generate new ones y/n? "
   if ask_user ; then
