@@ -100,7 +100,7 @@ elif [ ! -z "$serverdn" ] && [ -z "$(grep -s $serverdn /etc/ssl/ruweb.cnf)" ]; t
   fi
   generate_certificate
 
-elif ! openssl x509 -checkend 31536000 -noout -in /etc/ssl/ruweb.crt; then
+elif ! openssl x509 -checkend 15768000 -noout -in /etc/ssl/ruweb.crt; then
   generate_certificate
 
 elif [ $forceyes = 0 ]; then
