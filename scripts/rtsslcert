@@ -12,6 +12,7 @@
 serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
 serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
 forceyes=1
+headless=1
 
 # function to ask user for y/n response
 ask_user(){
@@ -47,13 +48,19 @@ if [ "$(id -u)" != "0" ]; then
   echo "Must be run from root or using sudo" && exit 1
 fi
 
-while getopts ":y" optname
+while getopts ":yd" optname
   do
     case $optname in
       "y" ) forceyes=0; shift ;;
+      "d" ) headless=0; shift ;;
         * ) echo "-y only option allowed" && exit ;;
     esac
   done
+
+if [ $forceyes = 0 ] && [ $headless = 0 ]; then
+  echo "Cannot run with both options -y and -d"
+  exit
+fi
 
 if [ $# -gt 0 ]; then
   echo "No arguments allowed"
@@ -63,7 +70,7 @@ fi
 echo "IP: $serverip"
 echo "DN: $serverdn"
 
-if [ $forceyes = 1 ]; then
+if [ $forceyes = 1 ] && [ $headless = 1 ]; then
   echo -n "Continue y/n? "
   if ! ask_user; then
     exit
@@ -106,7 +113,7 @@ elif ! openssl x509 -checkend 15768000 -noout -in /etc/ssl/ruweb.crt; then
 elif [ $forceyes = 0 ]; then
   generate_certificate
 
-else
+elif [ $headless = 1 ]; then
   echo -n "Certificates look ok, sure you want to generate new ones y/n? "
   if ask_user ; then
     generate_certificate
