@@ -46,6 +46,14 @@ if [ "$(id -u)" != "0" ]; then
   echo "Must be run from root or using sudo" && exit 1
 fi
 
+echo "IP: $serverip"
+echo "DN: $serverdn"
+echo "Continue y/n? "
+
+if ! ask_user; then
+  exit
+fi
+
 if [ -z "$(grep -s $serverip$ /etc/ssl/ruweb.cnf)" ]; then
   cp /etc/ssl/openssl.cnf /etc/ssl/ruweb.cnf
   echo >> /etc/ssl/ruweb.cnf
