@@ -357,7 +357,7 @@ for package_name in $package_list
 test -z "$install_list" || apt-get -y install $install_list  2>&1 >>$logfile | tee -a $logfile
 
 #install unrar package
-if [ $osname = "Debian" ]; then
+if [ $osname = "Debian" ] && ! hash unrar >> /dev/null 2>&1; then
   cd $home
   attempts=0
   until [ -d rar ] || [ $attempts -gt 5 ]
