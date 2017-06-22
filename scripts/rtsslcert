@@ -12,6 +12,19 @@
 serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
 serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
 
+generate_certificate() {
+echo "Generateing https/ssl certificates - $serverip - $serverdn"
+openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
+
+sed -i '/^\(\s\|#\)*rsa_private_key_file/ c\rsa_private_key_file=\/etc\/ssl\/private\/ruweb\.key' /etc/vsftpd.conf
+sed -i '/^\(\s\|#\)*rsa_cert_file/ c\rsa_cert_file=\/etc\/ssl\/ruweb\.crt' /etc/vsftpd.conf
+service vsftpd restart
+
+sed -i '/ssl_certificate / c\        ssl_certificate \/etc\/ssl\/ruweb\.crt;' /etc/nginx/sites-available/default
+sed -i '/ssl_certificate_key/ c\       ssl_certificate_key \/etc\/ssl\/private\/ruweb\.key;' /etc/nginx/sites-available/default
+service nginx restart
+}
+
 #check it is being run as root
 if [ "$(id -u)" != "0" ]; then
   echo "Must be run from root or using sudo" && exit 1
@@ -29,12 +42,10 @@ if [ -z "$(grep -s $serverip$ /etc/ssl/ruweb.cnf)" ]; then
     echo "DNS.1 = $serverdn" >> /etc/ssl/ruweb.cnf
   fi
   echo >> /etc/ssl/ruweb.cnf
-  echo "Generateing https/ssl certificates - $serverip - $serverdn"
-  openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
+  generate_certificate
 
 elif [ ! -f /etc/ssl/ruweb.crt ] || [ ! -f /etc/ssl/private/ruweb.key ]; then
-  echo "Generateing https/ssl certificates - $serverip - $serverdn"
-  openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
+ generate_certificate
 
 elif [ ! -z "$serverdn" ] && [ -z "$(grep -s $serverdn /etc/ssl/ruweb.cnf)" ]; then
   dnno=1
@@ -47,16 +58,13 @@ elif [ ! -z "$serverdn" ] && [ -z "$(grep -s $serverdn /etc/ssl/ruweb.cnf)" ]; t
   else
      sed  -i "/DNS.$(( $dnno - 1 ))/ aDNS.$dnno = $serverdn" /etc/ssl/ruweb.cnf
   fi
-  echo "Generateing https/ssl certificates - $serverip - $serverdn"
-  openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
+  generate_certificate
 
 elif ! openssl x509 -checkend 31536000 -noout -in /etc/ssl/ruweb.crt; then
-  echo "Generateing https/ssl certificates - $serverip - $serverdn"
-  openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
+  generate_certificate
 fi
 
 
-sed -i '/^\(\s\|#\)*rsa_private_key_file/ c\rsa_private_key_file=\/etc\/ssl\/private\/ruweb\.key' /etc/vsftpd.conf
-sed -i '/^\(\s\|#\)*rsa_cert_file/ c\rsa_cert_file=\/etc\/ssl\/ruweb\.crt' /etc/vsftpd.conf
-service vsftpd restart
+
+
 
