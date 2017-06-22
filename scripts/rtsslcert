@@ -80,6 +80,6 @@ elif ! openssl x509 -checkend 31536000 -noout -in /etc/ssl/ruweb.crt; then
 else
   echo "Certificates look ok, sure you want to generate new ones y/n? "
   if ask_user ; then
-    generat_certificate
+    generate_certificate
   fi
 fi
