@@ -21,7 +21,7 @@ sed -i '/^\(\s\|#\)*rsa_cert_file/ c\rsa_cert_file=\/etc\/ssl\/ruweb\.crt' /etc/
 service vsftpd restart
 
 sed -i '/ssl_certificate / c\        ssl_certificate \/etc\/ssl\/ruweb\.crt;' /etc/nginx/sites-available/default
-sed -i '/ssl_certificate_key/ c\       ssl_certificate_key \/etc\/ssl\/private\/ruweb\.key;' /etc/nginx/sites-available/default
+sed -i '/ssl_certificate_key/ c\        ssl_certificate_key \/etc\/ssl\/private\/ruweb\.key;' /etc/nginx/sites-available/default
 service nginx restart
 }
 
