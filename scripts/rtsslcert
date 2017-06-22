@@ -12,6 +12,20 @@
 serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
 serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
 
+# function to ask user for y/n response
+ask_user(){
+local answer
+while true
+  do
+    read answer
+    case $answer in [Yy]* ) return 0 ;;
+                    [Nn]* ) return 1 ;;
+                        * ) echo "Enter y or n";;
+    esac
+  done
+}
+
+# function to generate the ssl certificates
 generate_certificate() {
 echo "Generateing https/ssl certificates - $serverip - $serverdn"
 openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt > /dev/null 2>&1
@@ -62,9 +76,10 @@ elif [ ! -z "$serverdn" ] && [ -z "$(grep -s $serverdn /etc/ssl/ruweb.cnf)" ]; t
 
 elif ! openssl x509 -checkend 31536000 -noout -in /etc/ssl/ruweb.crt; then
   generate_certificate
+
+else
+  echo "Certificates look ok, sure you want to generate new ones y/n? "
+  if ask_user ; then
+    generat_certificate
+  fi
 fi
-
-
-
-
-
