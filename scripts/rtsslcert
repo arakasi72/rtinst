@@ -9,10 +9,27 @@
 #########################################################################################
 
 
-serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
-serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
+
+serverip=$1
 forceyes=1
 headless=1
+
+#function to check if string is valid format for an ip address
+valid_ip()
+{
+local ip=${1:-1.2.3.4}
+local i
+if expr "$ip" : '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$' >/dev/null; then
+  for i in 1 2 3 4; do
+    if [ $(echo "$ip" | cut -d. -f$i) -gt 255 ]; then
+      return 1
+    fi
+  done
+  return 0
+else
+  return 1
+fi
+}
 
 # function to ask user for y/n response
 ask_user(){
@@ -67,10 +84,20 @@ if [ $forceyes = 0 ] && [ $headless = 0 ]; then
   exit
 fi
 
-if [ $# -gt 0 ]; then
-  echo "No arguments allowed"
+if [ $# -gt 1 ]; then
+  echo "Only one argument allowed"
   exit
 fi
+
+if [ -z $serverip ]; then
+  serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
+elif ! valid_ip $serverip; then
+  echo "$serverip is not a valid IP address"
+  serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
+  echo "will use $serverip instead"
+fi
+
+serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
 
 echo "IP: $serverip"
 echo "DN: $serverdn"
