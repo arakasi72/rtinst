@@ -44,7 +44,7 @@ while true
 
 # function to generate the ssl certificates
 generate_certificate() {
-echo -n "Generateing https/ssl certificates"
+echo -n "Generating https/ssl certificates"
 openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt > /dev/null 2>&1
 
 sed -i '/^\(\s\|#\)*rsa_private_key_file/ c\rsa_private_key_file=\/etc\/ssl\/private\/ruweb\.key' /etc/vsftpd.conf
