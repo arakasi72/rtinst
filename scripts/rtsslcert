@@ -14,7 +14,7 @@ serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_IN
 
 generate_certificate() {
 echo "Generateing https/ssl certificates - $serverip - $serverdn"
-openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt >> $logfile 2>&1
+openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt > /dev/null 2>&1
 
 sed -i '/^\(\s\|#\)*rsa_private_key_file/ c\rsa_private_key_file=\/etc\/ssl\/private\/ruweb\.key' /etc/vsftpd.conf
 sed -i '/^\(\s\|#\)*rsa_cert_file/ c\rsa_cert_file=\/etc\/ssl\/ruweb\.crt' /etc/vsftpd.conf
