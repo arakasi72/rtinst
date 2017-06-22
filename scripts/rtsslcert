@@ -55,6 +55,11 @@ while getopts ":y" optname
     esac
   done
 
+if [ $# -gt 0 ]; then
+  echo "No arguments allowed"
+  exit
+fi
+
 echo "IP: $serverip"
 echo "DN: $serverdn"
 
