@@ -11,6 +11,7 @@
 
 serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
 serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
+forceyes=1
 
 # function to ask user for y/n response
 ask_user(){
@@ -46,12 +47,22 @@ if [ "$(id -u)" != "0" ]; then
   echo "Must be run from root or using sudo" && exit 1
 fi
 
+while getopts ":y" optname
+  do
+    case $optname in
+      "y" ) forceyes=0 ;;
+        * ) echo "-y only option allowed" && exit ;;
+    esac
+  done
+
 echo "IP: $serverip"
 echo "DN: $serverdn"
-echo -n "Continue y/n? "
 
-if ! ask_user; then
-  exit
+if [ $forceyes = 1 ]; then
+  echo -n "Continue y/n? "
+  if ! ask_user; then
+    exit
+  fi
 fi
 
 if [ -z "$(grep -s $serverip$ /etc/ssl/ruweb.cnf)" ]; then
