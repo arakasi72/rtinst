@@ -9,9 +9,25 @@
 #########################################################################################
 
 
-serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
-serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
 forceyes=1
+headless=1
+
+#function to check if string is valid format for an ip address
+valid_ip()
+{
+local ip=${1:-1.2.3.4}
+local i
+if expr "$ip" : '[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*$' >/dev/null; then
+  for i in 1 2 3 4; do
+    if [ $(echo "$ip" | cut -d. -f$i) -gt 255 ]; then
+      return 1
+    fi
+  done
+  return 0
+else
+  return 1
+fi
+}
 
 # function to ask user for y/n response
 ask_user(){
@@ -28,18 +44,23 @@ while true
 
 # function to generate the ssl certificates
 generate_certificate() {
-echo "Generateing https/ssl certificates - $serverip - $serverdn"
+echo -n "Generating https/ssl certificates"
+
 openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt > /dev/null 2>&1
 
-sed -i '/^\(\s\|#\)*rsa_private_key_file/ c\rsa_private_key_file=\/etc\/ssl\/private\/ruweb\.key' /etc/vsftpd.conf
-sed -i '/^\(\s\|#\)*rsa_cert_file/ c\rsa_cert_file=\/etc\/ssl\/ruweb\.crt' /etc/vsftpd.conf
-service vsftpd restart
+if [ -f /etc/vsftpd.conf ]; then
+  sed -i '/^\(\s\|#\)*rsa_private_key_file/ c\rsa_private_key_file=\/etc\/ssl\/private\/ruweb\.key' /etc/vsftpd.conf
+  sed -i '/^\(\s\|#\)*rsa_cert_file/ c\rsa_cert_file=\/etc\/ssl\/ruweb\.crt' /etc/vsftpd.conf
+  service vsftpd restart
+fi
 
-sed -i '/ssl_certificate / c\        ssl_certificate \/etc\/ssl\/ruweb\.crt;' /etc/nginx/sites-available/default
-sed -i '/ssl_certificate_key/ c\        ssl_certificate_key \/etc\/ssl\/private\/ruweb\.key;' /etc/nginx/sites-available/default
-service nginx restart
+if [ -f /etc/nginx/sites-available/default ]; then
+  sed -i '/ssl_certificate / c\        ssl_certificate \/etc\/ssl\/ruweb\.crt;' /etc/nginx/sites-available/default
+  sed -i '/ssl_certificate_key/ c\        ssl_certificate_key \/etc\/ssl\/private\/ruweb\.key;' /etc/nginx/sites-available/default
+  service nginx restart
+fi
 
-echo "Done"
+echo ": done"
 }
 
 #check it is being run as root
@@ -47,23 +68,46 @@ if [ "$(id -u)" != "0" ]; then
   echo "Must be run from root or using sudo" && exit 1
 fi
 
-while getopts ":y" optname
+# options -y and -d take away the user interaction so can be called from another script
+# option -y will force the creation of new certificates
+# option -d will not unless it determines they are needed
+while getopts ":yd" optname
   do
     case $optname in
-      "y" ) forceyes=0; shift ;;
-        * ) echo "-y only option allowed" && exit ;;
+      "y" ) forceyes=0 ;;
+      "d" ) headless=0 ;;
+        * ) echo "-y or -d only options allowed" && exit ;;
     esac
   done
 
-if [ $# -gt 0 ]; then
-  echo "No arguments allowed"
+shift $(( $OPTIND - 1 ))
+
+if [ $forceyes = 0 ] && [ $headless = 0 ]; then
+  echo "Cannot run with both options -y and -d"
   exit
 fi
+
+if [ $# -gt 1 ]; then
+  echo "Only one argument allowed"
+  exit
+fi
+
+serverip=$1
+
+if [ -z $serverip ]; then
+  serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
+elif ! valid_ip $serverip; then
+  echo "$serverip is not a valid IP address"
+  serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
+  echo "will use $serverip instead"
+fi
+
+serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
 
 echo "IP: $serverip"
 echo "DN: $serverdn"
 
-if [ $forceyes = 1 ]; then
+if [ $forceyes = 1 ] && [ $headless = 1 ]; then
   echo -n "Continue y/n? "
   if ! ask_user; then
     exit
@@ -106,9 +150,12 @@ elif ! openssl x509 -checkend 15768000 -noout -in /etc/ssl/ruweb.crt; then
 elif [ $forceyes = 0 ]; then
   generate_certificate
 
-else
+elif [ $headless = 1 ]; then
   echo -n "Certificates look ok, sure you want to generate new ones y/n? "
   if ask_user ; then
     generate_certificate
   fi
+
+else
+echo "Use existing certificates"
 fi
