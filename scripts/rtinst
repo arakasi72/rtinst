@@ -358,6 +358,7 @@ test -z "$install_list" || apt-get -y install $install_list  2>&1 >>$logfile | t
 
 #install unrar package
 if [ $osname = "Debian" ] && ! hash unrar >> /dev/null 2>&1; then
+  echo "Installing rar/unrar"
   cd $home
   attempts=0
   until [ -d rar ] || [ $attempts -gt 5 ]
