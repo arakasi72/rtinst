@@ -29,7 +29,7 @@ while true
 
 # function to generate the ssl certificates
 generate_certificate() {
-echo "Generateing https/ssl certificates - $serverip - $serverdn"
+echo "Generateing https/ssl certificates"
 openssl req -x509 -nodes -days 3650 -subj /CN=$serverip -config /etc/ssl/ruweb.cnf -newkey rsa:2048 -keyout /etc/ssl/private/ruweb.key -out /etc/ssl/ruweb.crt > /dev/null 2>&1
 
 sed -i '/^\(\s\|#\)*rsa_private_key_file/ c\rsa_private_key_file=\/etc\/ssl\/private\/ruweb\.key' /etc/vsftpd.conf
@@ -48,6 +48,9 @@ if [ "$(id -u)" != "0" ]; then
   echo "Must be run from root or using sudo" && exit 1
 fi
 
+# options -y and -d take away the user interaction so can be called from another script
+# option -y will force the creation of new certificates
+# option -d will not unless it determines they are needed
 while getopts ":yd" optname
   do
     case $optname in
@@ -58,9 +61,6 @@ while getopts ":yd" optname
   done
 
 shift $(( $OPTIND - 1 ))
-
-echo $forceyes
-echo $headless
 
 if [ $forceyes = 0 ] && [ $headless = 0 ]; then
   echo "Cannot run with both options -y and -d"
