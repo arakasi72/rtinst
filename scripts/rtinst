@@ -357,21 +357,24 @@ for package_name in $package_list
 test -z "$install_list" || apt-get -y install $install_list  2>&1 >>$logfile | tee -a $logfile
 
 #install unrar package
-if [ $osname = "Debian" ]; then
+if [ $osname = "Debian" ] && ! hash unrar >> /dev/null 2>&1; then
+  echo "Installing rar/unrar"
   cd $home
   attempts=0
-  until [ -d rar ] || [ $attempts -gt 20 ]
+  until [ -d rar ] || [ $attempts -gt 5 ]
   do
     attempts=$(( $attempts + 1 ))    
     if [ "$(uname -m)" = "x86_64" ]; then
-      curl -s http://www.rarlab.com/rar/rarlinux-x64-5.4.0.tar.gz | tar xz 2>/dev/null
+      curl -s --connect-timeout 10 http://www.rarlab.com/rar/rarlinux-x64-5.4.0.tar.gz | tar xz 2>/dev/null
     elif [ "$(uname -m)" = "x86_32" ]; then
-      curl -s http://www.rarlab.com/rar/rarlinux-5.4.0.tar.gz | tar xz 2>/dev/null
+      curl -s --connect-timeout 10 http://www.rarlab.com/rar/rarlinux-5.4.0.tar.gz | tar xz 2>/dev/null
     fi
   done
-  cp $home/rar/rar /bin/rar
-  cp $home/rar/unrar /bin/unrar
-  rm -r $home/rar
+  if [ -d rar ]; then
+    cp $home/rar/rar /bin/rar
+    cp $home/rar/unrar /bin/unrar
+    rm -r $home/rar
+  fi
 elif [ $osname = "Ubuntu" ]; then
   apt-get -y install unrar  >> $logfile 2>&1
 fi

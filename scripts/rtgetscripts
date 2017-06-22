@@ -21,11 +21,11 @@ fi
 
 cd /etc/rtinst
 
-branch=$(basename "$(git symbolic-ref HEAD 2>/dev/null)")
+branch=$(git symbolic-ref -q --short HEAD)
 
 if [ -z $branch ]; then
-  echo "Not in a branch, this is a fixed release"
-  echo "Run rtsetup to switch to master release"
+  echo "Not in a branch, this is a tagged release"
+  echo "Run rtsetup to switch to master build"
   exit
 fi
 
