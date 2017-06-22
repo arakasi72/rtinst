@@ -37,6 +37,8 @@ service vsftpd restart
 sed -i '/ssl_certificate / c\        ssl_certificate \/etc\/ssl\/ruweb\.crt;' /etc/nginx/sites-available/default
 sed -i '/ssl_certificate_key/ c\        ssl_certificate_key \/etc\/ssl\/private\/ruweb\.key;' /etc/nginx/sites-available/default
 service nginx restart
+
+echo "Done"
 }
 
 #check it is being run as root
