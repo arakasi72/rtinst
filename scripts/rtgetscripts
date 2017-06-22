@@ -21,7 +21,7 @@ fi
 
 cd /etc/rtinst
 
-branch=$(basename "$(git symbolic-ref HEAD 2>/dev/null)")
+branch=$(git symbolic-ref -q --short HEAD)
 
 if [ -z $branch ]; then
   echo "Not in a branch, this is a fixed release"
