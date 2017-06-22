@@ -53,7 +53,7 @@ echo "4.) rtdload $rtdaction - $rtdaction http downloads"
 echo "5.) rtupdate - up/down-grade rtorent/libtorrent"
 echo "6.) rutupgrade - upgrade to latest version of RuTorrent"
 echo "7.) rtwebmin - install webmin"
-echo "8.) rtsslcert - generate new self signed ssl certificate
+echo "8.) rtsslcert - generate new self signed ssl certificate"
 echo "Enter option or q to quit"
 
 select_task
