@@ -50,7 +50,7 @@ fi
 while getopts ":y" optname
   do
     case $optname in
-      "y" ) forceyes=0 ;;
+      "y" ) forceyes=0; shift ;;
         * ) echo "-y only option allowed" && exit ;;
     esac
   done
