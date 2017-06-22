@@ -150,4 +150,7 @@ elif [ $headless = 1 ]; then
   if ask_user ; then
     generate_certificate
   fi
+
+else
+echo "Use existing certificates"
 fi
