@@ -194,13 +194,12 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # determine system
-if ([ "$osname" = "Ubuntu" ] && [ $relno -ge 14 ]) || ([ "$osname" = "Debian" ] && [ $relno -ge 8 ])  || ([ "$osname" = "Raspbian" ] && [ $relno -ge 8 ]); then
+if ([ "$osname" = "Ubuntu" ] && [ $relno -ge 12 ] && [ $relno -le 17 ]) || ([ "$osname" = "Debian" ] && [ $relno -ge 7 ] && [ $relno -le 9 ])  || ([ "$osname" = "Raspbian" ] && [ $relno -ge 7 ] && [ $relno -le 8 ]); then
   echo $fullrel
 else
  echo $fullrel
- echo "Only Ubuntu release 14 and later, and Debian and Raspbian release 8 and later, are supported"
+ echo "Only Ubuntu releases 12 to 17, and Debian and Raspbian releases 7 to 9, are supported"
  echo "Your system does not appear to be supported"
- echo "Check https://github.com/arakasi72/rtinst/wiki/Installing-on-Older-OS to see if it is supported by an earlier rtinst release"
  exit
 fi
 
@@ -326,6 +325,11 @@ echo "It will take approx 10 minutes for the script to complete"
 echo
 
 #update amd upgrade system
+if [ "$fullrel" = "Ubuntu 12.04.5 LTS" ]; then
+  cp /etc/apt/sources.list /etc/apt/sources.list.bak
+  cp -f /etc/rtinst/conf/sources1204 /etc/apt/sources.list
+fi
+
 echo "Updating package lists" | tee $logfile
 apt-get update 2>&1 >>$logfile | tee -a $logfile
 if ! [ $? = 0 ]; then
@@ -477,7 +481,19 @@ ftpport=$(random 41005 48995)
 
 if [ $(dpkg-query -W -f='${Status}' "vsftpd" 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
   echo "Installing vsftpd" | tee -a $logfile
-  apt-get -y install vsftpd >> $logfile 2>&1
+
+  if [ $relno = 12 ]; then
+    add-apt-repository -y ppa:thefrontiergroup/vsftpd >> $logfile 2>&1
+    apt-get update >> $logfile 2>&1
+    apt-get -y install vsftpd >> $logfile 2>&1
+  elif [ $relno = 7 ]; then
+    echo "deb http://ftp.cyconet.org/debian wheezy-updates main non-free contrib" >> /etc/apt/sources.list.d/wheezy-updates.cyconet2.list
+    aptitude update  >> $logfile 2>&1 || error_exit "problem updating package lists"
+    aptitude -o Aptitude::Cmdline::ignore-trust-violations=true -y install -t wheezy-updates debian-cyconet-archive-keyring vsftpd  >> $logfile 2>&1 || error_exit "Unable to download vsftpd"
+  else
+    apt-get -y install vsftpd >> $logfile 2>&1
+  fi
+
 fi
 
 sed -i '/^\(\s\|#\)*anonymous_enable/ c\anonymous_enable=NO' /etc/vsftpd.conf
@@ -663,7 +679,9 @@ cp -f /etc/rtinst/conf/nginxsitedl /etc/nginx/sites-available/dload-loc
 echo "location ~ \.php$ {" > /etc/nginx/conf.d/php
 echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/php
 
-if [ "$phpver" = "php7.0" ]; then
+if [ $relno = 12 ]; then
+  echo "          fastcgi_pass 127.0.0.1:9000;" >> /etc/nginx/conf.d/php
+elif [ "$phpver" = "php7.0" ]; then
   echo "          fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;" >> /etc/nginx/conf.d/php
 else
   echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
