@@ -36,10 +36,10 @@ if [ -z $branch ]; then
     fi
     # update to latest release
     echo "rtinst updating from $branch to $latest"
-    cd
-    rm -fr /etc/rtinst
-    git clone -q https://github.com/arakasi72/rtinst.git /etc/rtinst
-    cd /etc/rtinst
+#    cd
+#    rm -fr /etc/rtinst
+#    git clone -q https://github.com/arakasi72/rtinst.git /etc/rtinst
+#    cd /etc/rtinst
     git checkout $latest
     cd
     ln -sf /etc/rtinst/scripts/* /usr/local/bin
