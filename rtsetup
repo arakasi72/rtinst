@@ -35,6 +35,7 @@ if [ -d /etc/rtinst ] && [ -z $branch ] ||  [ $(git ls-remote --tags --heads htt
     branch=$(git describe --tags --exact-match)
   fi
 fi
+# remote list latest version
 
 if [ -z $branch ] || [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
   branch=master
