@@ -8,6 +8,7 @@
 #
 ######################################################################
 
+###test###
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 if [ "$(id -u)" != "0" ]; then
