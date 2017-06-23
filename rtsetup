@@ -31,6 +31,9 @@ fi
 if [ -d /etc/rtinst ] && [ -z $branch ] ||  [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
   cd /etc/rtinst
   branch=$(basename "$(git symbolic-ref -q HEAD)")
+  if [ -z $branch ]; then
+    branch=$(git describe --tags --exact-match)
+  fi
 fi
 
 if [ -z $branch ] || [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
