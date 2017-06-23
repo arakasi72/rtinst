@@ -36,7 +36,7 @@ if [ -d /etc/rtinst ] && [ -z $branch ]; then
     branch=$(git describe --tags --exact-match)
   fi
   if [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
-    echo "Could not find $branch it has been deleted using latest release instead"
+    echo "$branch has been deleted, using latest numbered release instead"
     branch=release
   fi
 fi
@@ -44,7 +44,7 @@ fi
 if [ -z $branch ] || [ $branch = release ]; then
   branch=$(basename "$(git ls-remote --tags https://github.com/arakasi72/rtinst.git | grep -o 'refs/tags/v.*' | sort -V | tail -1)")
   if [ -z $branch ]; then
-    echo "Could not find a numbered release using master instead"
+    echo "Could not find a numbered release, using master instead"
     branch=master
   fi
 fi
