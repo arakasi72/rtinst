@@ -26,6 +26,7 @@ branch=$(basename "$(git symbolic-ref -q HEAD)")
 if [ -z $branch ]; then
   branch=$(git describe --tags --exact-match)
   if [ ${branch:0:1} = v ]; then
+    git fetch origin
     latest=$(git tag | sort -V | grep ^v | tail -1)
     if [ $branch = $latest ]; then
       echo "Already using the latest release"
