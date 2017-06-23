@@ -1,7 +1,6 @@
 ## rtinst
 
-### NOTE: Please note there are some minor changes to how the script is installed and run.
-If you are familiar with rtinst please check the guide to avoid any confusion
+### NOTE: THIS IS RELEASE DEB7UBU12 - Installs rtinst on OS's Ubu12, Ubu13, and Deb7 which are no longer supported in the main rtinst releases
 
 #### 30 Second Guide
 
@@ -14,7 +13,7 @@ Download and run setup (if logged in as root, do not need to use sudo)
 
 and then to run the main script, ([check the options you can use](https://github.com/arakasi72/rtinst/wiki/Guide#21-main-script-options)):
 
-	sudo rtinst
+	sudo rtinst deb7ubu12
 
 It takes about 10 minutes to run, depending on your server setup. After you have run the script and everything is working, I suggest a reboot, the script does not automate this reboot, you need to do it manually using the reboot command.
 
