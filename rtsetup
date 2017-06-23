@@ -42,6 +42,7 @@ if [ -d /etc/rtinst ] && [ -z $branch ]; then
 fi
 
 if [ -z $branch ] || [ $branch = release ]; then
+  echo "CHECKPOINT"
   branch=$(basename "$(git ls-remote --tags https://github.com/arakasi72/rtinst.git | grep -o 'refs/tags/v.*' | sort -V | tail -1)")
   if [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
     echo "Could not find a numbered release using master instead"
