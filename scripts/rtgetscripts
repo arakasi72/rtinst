@@ -29,10 +29,10 @@ if [ -z $branch ]; then
     git fetch origin
     latest=$(git tag | sort -V | grep ^v | tail -1)
     if [ $branch = $latest ]; then
-      echo "Already using the latest release"
+      echo "Already using the latest release: $branch"
       exit
     fi
-
+    echo "rtinst updating from $branch to $latest"
     cd
     rm -fr /etc/rtinst
     git clone -q https://github.com/arakasi72/rtinst.git /etc/rtinst
