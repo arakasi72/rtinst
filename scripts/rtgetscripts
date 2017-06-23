@@ -21,12 +21,36 @@ fi
 
 cd /etc/rtinst
 
-branch=$(git symbolic-ref -q --short HEAD)
+branch=$(basename "$(git symbolic-ref -q HEAD)")
 
+# if branch is empty then it is a tag
 if [ -z $branch ]; then
-  echo "Not in a branch, this is a tagged release"
-  echo "Run rtsetup to switch to master build"
-  exit
+  branch=$(git describe --tags --exact-match)
+  if [ ${branch:0:1} = v ]; then
+    git fetch origin
+    latest=$(git tag | sort -V | grep ^v | tail -1)
+    if [ $branch = $latest ]; then
+      echo "Already using the latest release: $branch"
+      exit
+    fi
+    # update to latest release
+    echo "rtinst updating from $branch to $latest"
+    cd
+    rm -fr /etc/rtinst
+    git clone -q https://github.com/arakasi72/rtinst.git /etc/rtinst
+    cd /etc/rtinst
+    git checkout -q $latest
+    branch=$(git describe --tags --exact-match)
+    echo "rtinst $branch installed"
+    cd
+    ln -sf /etc/rtinst/scripts/* /usr/local/bin
+    ln -sf /etc/rtinst/rtsetup /usr/local/bin
+    exit
+  else
+    echo "$branch is not a branch, or a numbered release"
+    echo "Run rtsetup if you want to switch to another build"
+    exit
+  fi
 fi
 
 if [ $(git ls-remote --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then

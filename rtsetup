@@ -28,16 +28,30 @@ echo "Installing ca-certificates"
 apt-get -yqq install ca-certificates 2>&1 >> /dev/null
 fi
 
-if [ -d /etc/rtinst ] && [ -z $branch ] ||  [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
+
+if [ -d /etc/rtinst ] && [ -z $branch ]; then
   cd /etc/rtinst
   branch=$(basename "$(git symbolic-ref -q HEAD)")
   if [ -z $branch ]; then
     branch=$(git describe --tags --exact-match)
   fi
+  if [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
+    echo "$branch has been deleted, using latest numbered release instead"
+    branch=release
+  fi
 fi
 
-if [ -z $branch ] || [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
-  branch=master
+if [ -z $branch ] || [ $branch = release ]; then
+  branch=$(basename "$(git ls-remote --tags https://github.com/arakasi72/rtinst.git | grep -o 'refs/tags/v.*' | sort -V | tail -1)")
+  if [ -z $branch ]; then
+    echo "Could not find a numbered release, using master instead"
+    branch=master
+  fi
+fi
+
+if [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
+  echo "Could not find $branch, please try again"
+  exit
 fi
 
 cd

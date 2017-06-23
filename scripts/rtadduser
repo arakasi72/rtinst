@@ -293,7 +293,7 @@ fi
 
 htpasswd -b $passfile $user $webpass
 
-cp -f /etc/rtinst/conf/.rtorrent.rc $home/.rtorrent.rc
+cp -f /etc/rtinst/conf/rtorrent.rc $home/.rtorrent.rc
 
 sed -i "s|<user home>|${home}|g" $home/.rtorrent.rc
 sed -i "s/<user name>/$user/g" $home/.rtorrent.rc
