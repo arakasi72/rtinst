@@ -23,6 +23,7 @@ cd /etc/rtinst
 
 branch=$(basename "$(git symbolic-ref -q HEAD)")
 
+# if branch is empty then it is a tag
 if [ -z $branch ]; then
   branch=$(git describe --tags --exact-match)
   if [ ${branch:0:1} = v ]; then
