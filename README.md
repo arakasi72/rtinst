@@ -9,11 +9,11 @@ Ubuntu and Debian Seedbox Installation
 Download and run setup (if logged in as root, do not need to use sudo)
 
 	wget --no-check-certificate https://raw.githubusercontent.com/arakasi72/rtinst/master/rtsetup
-	sudo bash rtsetup
+	sudo bash rtsetup deb7ubu12
 
 and then to run the main script, ([check the options you can use](https://github.com/arakasi72/rtinst/wiki/Guide#21-main-script-options)):
 
-	sudo rtinst deb7ubu12
+	sudo rtinst
 
 It takes about 10 minutes to run, depending on your server setup. After you have run the script and everything is working, I suggest a reboot, the script does not automate this reboot, you need to do it manually using the reboot command.
 
