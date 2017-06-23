@@ -32,6 +32,7 @@ if [ -z $branch ]; then
       echo "Already using the latest release: $branch"
       exit
     fi
+    # update to latest release
     echo "rtinst updating from $branch to $latest"
     cd
     rm -fr /etc/rtinst
