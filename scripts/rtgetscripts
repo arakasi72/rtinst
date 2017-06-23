@@ -40,12 +40,14 @@ if [ -z $branch ]; then
     git clone -q https://github.com/arakasi72/rtinst.git /etc/rtinst
     cd /etc/rtinst
     git checkout -q $latest
+    branch=$(git describe --tags --exact-match)
+    echo "rtinst $branch installed"
     cd
     ln -sf /etc/rtinst/scripts/* /usr/local/bin
     ln -sf /etc/rtinst/rtsetup /usr/local/bin
     exit
   else
-    echo "Not a branch, or a numbered release"
+    echo "$branch Not a branch, or a numbered release"
     echo "Run rtsetup to switch to another build"
     exit
   fi
