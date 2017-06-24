@@ -1,7 +1,7 @@
 ## rtinst
 
 ### NOTE: Please note there are some minor changes to how the script is installed and run.
-Check the wiki for further info.
+[Check the wiki for further info](https://github.com/arakasi72/rtinst/wiki/Installing-rtinst)
 
 #### 30 Second Guide
 
