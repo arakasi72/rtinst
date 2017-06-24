@@ -24,4 +24,5 @@ if [ -z $branch ]; then
   fi
 else
   echo "Current Branch: $branch"
+  echo "Use rtgetscripts to update branch"
 fi
