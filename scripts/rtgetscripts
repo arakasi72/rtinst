@@ -57,7 +57,7 @@ if [ $(git ls-remote --heads https://github.com/arakasi72/rtinst.git $branch | w
   echo "run rtsetup to reset branch"
 else
   git fetch --all
-  git reset --hard origin/$branch 2>&1 >> /dev/null
+  git reset --hard origin/$branch > /dev/null 2>&1
   git pull origin $branch
 
   ln -sf /etc/rtinst/scripts/* /usr/local/bin
