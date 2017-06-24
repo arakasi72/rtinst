@@ -20,7 +20,7 @@ rt_releases=$(wget -q -O - $sourcedir | grep -o "rtorrent-[0-9]\{1,2\}\.[0-9]\{1
 for rtversion in $rt_releases
   do
     libversion=$(echo $rtversion | awk -F. -v OFS=. '{$2='$(( $(echo $rtversion | cut -d. -f2) + 4 ))'; print }')
-    duoversion="$duoversion $rtversion/$libversion"
+    duoversion="$duoversion $libversion/$rtversion"
   done
 
 installed() {
