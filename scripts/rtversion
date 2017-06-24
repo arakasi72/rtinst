@@ -1,0 +1,27 @@
+#!/bin/bash
+
+######################################################################
+#
+#  Copyright (c) 2015 arakasi72 (https://github.com/arakasi72)
+#
+#  --> Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+#
+######################################################################
+
+
+cd /etc/rtinst
+branch=$(basename "$(git symbolic-ref -q HEAD)")
+if [ -z $branch ]; then
+  branch=$(git describe --tags --exact-match)
+  echo "Current Release: rtinst $branch"
+  if [ ${branch:0:1} = v ]; then
+    latest=$(basename "$(git ls-remote --tags https://github.com/arakasi72/rtinst.git | grep -o 'refs/tags/v.*' | sort -V | tail -1)")
+    if [ $branch = $latest ]; then
+      echo "This is the latest release"
+    else
+      echo "Use rtgetscripts to update to rtinst $latest"
+    fi   
+  fi
+else
+  echo "Current Branch: $branch"
+fi
