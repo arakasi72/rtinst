@@ -63,8 +63,9 @@ git checkout $branch > /dev/null 2>&1
 cd
 ln -sf /etc/rtinst/scripts/* /usr/local/bin
 ln -sf /etc/rtinst/rtsetup /usr/local/bin
+
+echo "Installation complete"
 echo
-echo "rtinst $branch installed"
 echo "You can now run rtinst and the additional supporting scripts"
 
 if [ "$rundir" != "/etc/rtinst" ]; then
