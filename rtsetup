@@ -54,6 +54,7 @@ if [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $bra
   exit
 fi
 
+echo "Installing rtinst $branch"
 cd
 rm -fr /etc/rtinst
 git clone -q https://github.com/arakasi72/rtinst.git /etc/rtinst
