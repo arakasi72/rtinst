@@ -77,8 +77,14 @@ if [ -z $passed_rtvers ]; then
     echo "This script is for upgrading/downgrading only, not for initial install"
     exit 1
   fi
+  if [ $relno -eq 9 ]; then
+    libsvers='0.13.6'
+    rtvers='0.9.6'
+    echo "Currently Debian 9 Stretch, is only supported by libtorrent-0.13.6/rtorrent-0.9.6"
+  else
+    list_version
+  fi
   
-  list_version
   echo "Install libtorrent-$libvers and rtorrent-$rtvers"
   echo "Your rtorrent config, torrents, and data will not be lost or changed"
   echo -n "Continue? "
@@ -110,8 +116,14 @@ rm -rf xmlrpc libtorrent* rtorrent*
 
 echo "Fetching source files"
 svn co $xmlrpcloc xmlrpc  >> $logfile 2>&1
-curl -# http://rtorrent.net/downloads/libtorrent-$libvers.tar.gz | tar xz
-curl -# http://rtorrent.net/downloads/rtorrent-$rtvers.tar.gz | tar xz
+
+if [ $relno -eq 9 ]; then
+  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/libtorrent.git libtorrent-$libvers
+  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/rtorrent.git rtorrent-$rtvers
+else
+  curl -# http://rtorrent.net/downloads/libtorrent-$libvers.tar.gz | tar xz
+  curl -# http://rtorrent.net/downloads/rtorrent-$rtvers.tar.gz | tar xz
+fi
 
 cd xmlrpc
 echo "Installing xmlrpc" | tee -a $logfile
