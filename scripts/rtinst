@@ -14,10 +14,8 @@
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
-rtorrentrel='0.9.6'
-libtorrentrel='0.13.6'
-rtorrentloc='http://rtorrent.net/downloads/rtorrent-'$rtorrentrel'.tar.gz'
-libtorrentloc='http://rtorrent.net/downloads/libtorrent-'$libtorrentrel'.tar.gz'
+rtorrentrel=''
+sourcedir='http://rtorrent.net/downloads/'
 xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
 
 if [ $(dpkg-query -W -f='${Status}' lsb-release 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
@@ -514,10 +512,18 @@ echo "FTP port set to $ftpport"
 ###############################
 
 if [ $install_rt = 0 ]; then
+  if [ -z $rtorrentrel ]; then
+    rtorrentrel=$(wget -q -O - $sourcedir | grep -o "rtorrent-[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}\.tar.gz" | sort -uV | tail -1 | grep -o "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
+  fi
+  libtorrentrel=$(echo $rtorrentrel | awk -F. -v OFS=. '{$2='$(( $(echo $rtorrentrel | cut -d. -f2) + 4 ))'; print }')
+  rtorrentloc=$sourcedir'rtorrent-'$rtorrentrel'.tar.gz'
+  libtorrentloc=$sourcedir'libtorrent-'$libtorrentrel'.tar.gz'
+  
   cd $home
   mkdir -p source
   cd source
-  echo "Downloading rtorrent source files" | tee -a $logfile
+  echo
+  echo "Installing libtorrent-$libtorrentrel and rtorrent-$rtorrentrel" | tee -a $logfile
   rm -rf xmlrpc libtorrent-$libtorrentrel rtorrent-$rtorrentrel
 
   svn co $xmlrpcloc xmlrpc  >> $logfile 2>&1 || error_exit "Unable to download xmlrpc source files from https://svn.code.sf.net/p/xmlrpc-c/code/stable"

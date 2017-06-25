@@ -10,17 +10,24 @@
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
-RTFILE=/usr/local/bin/rt
+sourcedir='http://rtorrent.net/downloads/'
+osname=$(lsb_release -si)
+listsize=6
+duoversion=''
 
-duoversion="0.13.2/0.9.2 0.13.3/0.9.3 0.13.4/0.9.4 0.13.5/0.9.5 0.13.6/0.9.6"
-OSNAME=$(cat /etc/issue.net | cut -d' ' -f1)
+rt_releases=$(wget -q -O - $sourcedir | grep -o "rtorrent-[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}\.tar.gz" | sort -uV | tail -$listsize | grep -o "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
 
+for rtversion in $rt_releases
+  do
+    libversion=$(echo $rtversion | awk -F. -v OFS=. '{$2='$(( $(echo $rtversion | cut -d. -f2) + 4 ))'; print }')
+    duoversion="$duoversion $libversion/$rtversion"
+  done
 
 installed() {
 hash $1 2>/dev/null
 }
 
-ask_version() {
+list_version() {
 while [ -z "$verschoice" ]
 do
   echo "Please select libtorrent/rtorrent version."
@@ -33,16 +40,16 @@ do
 done
 }
 
-confirm_answer() {
+ask_user(){
+local answer
 while true
-      do
-      read -p "Sure you wish to install libtorrent-"$libvers" and rtorrent-"$rtvers"?" answer
-      case $answer in [Yy]* ) return 0 ;;
-                      [Nn]* ) exit ;;
-                          * ) echo "Enter y or n";;
-      esac
-    done
-
+  do
+    read answer
+    case $answer in [Yy]* ) return 0 ;;
+                    [Nn]* ) return 1 ;;
+                        * ) echo "Enter y or n";;
+    esac
+  done
 }
 
 if [ "$(id -u)" != "0" ]; then
@@ -61,8 +68,11 @@ else
   exit 1
 fi
 
-ask_version
-confirm_answer
+list_version
+echo -n "Install libtorrent-"$libvers" and rtorrent-"$rtvers", continue? "
+if ! ask_user; then
+  exit
+fi
 
 echo
 echo "Installing $libvers/$rtvers"
@@ -83,7 +93,7 @@ curl -# http://rtorrent.net/downloads/rtorrent-$rtvers.tar.gz | tar xz
 echo "Compiling libtorrent"
 cd $HOME/source/libtorrent-$libvers
 ./autogen.sh >> /dev/null 2>&1
-if [ "$OSNAME" = "Raspbian" ]; then
+if [ "$osname" = "Raspbian" ]; then
     ./configure --prefix=/usr --disable-instrumentation >> /dev/null 2>&1
   else
     ./configure --prefix=/usr >> /dev/null 2>&1

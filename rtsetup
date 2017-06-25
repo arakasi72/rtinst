@@ -54,16 +54,19 @@ if [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $bra
   exit
 fi
 
+echo "Installing rtinst $branch"
 cd
 rm -fr /etc/rtinst
 git clone -q https://github.com/arakasi72/rtinst.git /etc/rtinst
 cd /etc/rtinst
-git checkout $branch
+git checkout $branch > /dev/null 2>&1
 cd
 ln -sf /etc/rtinst/scripts/* /usr/local/bin
 ln -sf /etc/rtinst/rtsetup /usr/local/bin
+
+echo "Installation complete"
 echo
-echo "rtinst $branch installed"
+echo "You can now run rtinst and the additional supporting scripts"
 
 if [ "$rundir" != "/etc/rtinst" ]; then
     rm -f $rundir/rtsetup
