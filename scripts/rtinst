@@ -464,6 +464,7 @@ echo "SSH port set to $sshport"
 ### SSL CERTIFICATES ###
 ###############################
 
+# calls the script rtsslcert to generate the ssl certificated for vsftpd and nginx
 rtsslcert -d $serverip
 
 ###############################
@@ -515,6 +516,7 @@ if [ $install_rt = 0 ]; then
     rtorrentrel='latest'
   fi
   cd $home
+  # call the script rtupdate to install lib/rtorrent
   rtupdate $rtorrentrel
 else
  echo "skiping rtorrent installation" | tee -a $logfile
