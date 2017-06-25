@@ -73,8 +73,8 @@ if [ -z $1 ]; then
   fi
   
   list_version
-  echo "Install libtorrent-"$libvers" and rtorrent-"$rtvers", continue? "
-  echo "Your .rtorrent.rc file, and download, watch, and .session directories will not be altered in any way"
+  echo "Install libtorrent-$libvers and rtorrent-$rtvers"
+  echo "Your rtorrent config, torrents, and data will not be lost or changed"
   echo -n "Continue? "
   if ! ask_user; then
     exit
