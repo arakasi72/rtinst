@@ -11,9 +11,13 @@
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 sourcedir='http://rtorrent.net/downloads/'
+xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
 osname=$(lsb_release -si)
+relno=$(lsb_release -sr | cut -d. -f1)
 listsize=6
 duoversion=''
+logfile="/dev/null"
+passed_rtvers=$1
 
 rt_releases=$(wget -q -O - $sourcedir | grep -o "rtorrent-[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}\.tar.gz" | sort -uV | tail -$listsize | grep -o "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
 
@@ -23,11 +27,16 @@ for rtversion in $rt_releases
     duoversion="$duoversion $libversion/$rtversion"
   done
 
+latest_duo=$(echo $duoversion | rev | cut -d' ' -f1 | rev)
+latest_libvers=$(echo $latest_duo | cut -d/ -f1)
+latest_rtvers=$(echo $latest_duo | cut -d/ -f2)
+
 installed() {
 hash $1 2>/dev/null
 }
 
 list_version() {
+local verschoice
 while [ -z "$verschoice" ]
 do
   echo "Please select libtorrent/rtorrent version."
@@ -57,72 +66,108 @@ if [ "$(id -u)" != "0" ]; then
   exit 1
 fi
 
-if ( installed rtorrent ); then
-  rtorrent_current=$(rtorrent -h | grep -m 1 'version')
-  rtorrent_current=${rtorrent_current#*version }
-  echo "rtorrent $rtorrent_current detected"
-  echo
+if [ -z $passed_rtvers ]; then
+  if ( installed rtorrent ); then
+    rtorrent_current=$(rtorrent -h | grep -m 1 'version')
+    rtorrent_current=${rtorrent_current#*version }
+    echo "rtorrent $rtorrent_current detected"
+    cd $HOME
+  else
+    echo "rtorrent NOT installed"
+    echo "This script is for upgrading/downgrading only, not for initial install"
+    exit 1
+  fi
+  if [ $relno -eq 9 ]; then
+    libvers='0.13.6'
+    rtvers='0.9.6'
+    echo "Debian 9 is only supported by libtorrent-0.13.6/rtorrent-0.9.6"
+  else
+    list_version
+  fi
+  
+  echo "Install libtorrent-$libvers and rtorrent-$rtvers"
+  echo "Your rtorrent config, torrents, and data will not be lost or changed"
+  echo -n "Continue? "
+  if ! ask_user; then
+    exit
+  fi
 else
-  echo "rtorrent NOT installed"
-  echo "This script is for upgrading/downgrading only, not for initial install"
-  exit 1
-fi
+  if [ "$passed_rtvers" = "latest" ] || [ $(wget -q -O - $sourcedir | grep -o "rtorrent-$passed_rtvers.tar.gz" | wc -l) -eq 0 ]; then
+    if [ "$passed_rtvers" != "latest" ]; then
+      echo " Could not find $passed_rtvers so using latest version instead"
+    fi
+    libvers=$latest_libvers
+    rtvers=$latest_rtvers
+  else
+    libvers=$(echo $passed_rtvers | awk -F. -v OFS=. '{$2='$(( $(echo $rtversion | cut -d. -f2) + 4 ))'; print }')
+    rtvers=$passed_rtvers
+  fi
+  
+  if [ $relno -eq 9 ]; then
+    libvers='0.13.6'
+    rtvers='0.9.6'
+    echo "Debian 9 is only supported by libtorrent-0.13.6/rtorrent-0.9.6"
+  fi
 
-list_version
-echo -n "Install libtorrent-"$libvers" and rtorrent-"$rtvers", continue? "
-if ! ask_user; then
-  exit
 fi
 
 echo
-echo "Installing $libvers/$rtvers"
-
-cd $HOME
+echo "Installing libtorrent-$libvers/rtorrent-$rtvers"
 
 if [ -d source ]; then
   cd source
 else
   mkdir source && cd source
 fi
-rm -r -f libtorrent* rtorrent*
+rm -rf xmlrpc libtorrent* rtorrent*
 
 echo "Fetching source files"
-curl -# http://rtorrent.net/downloads/libtorrent-$libvers.tar.gz | tar xz
-curl -# http://rtorrent.net/downloads/rtorrent-$rtvers.tar.gz | tar xz
+svn co $xmlrpcloc xmlrpc  >> $logfile 2>&1
 
-echo "Compiling libtorrent"
-cd $HOME/source/libtorrent-$libvers
-./autogen.sh >> /dev/null 2>&1
-if [ "$osname" = "Raspbian" ]; then
-    ./configure --prefix=/usr --disable-instrumentation >> /dev/null 2>&1
-  else
-    ./configure --prefix=/usr >> /dev/null 2>&1
+if [ $relno -eq 9 ]; then
+  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/libtorrent.git libtorrent-$libvers
+  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/rtorrent.git rtorrent-$rtvers
+else
+  curl -# http://rtorrent.net/downloads/libtorrent-$libvers.tar.gz | tar xz
+  curl -# http://rtorrent.net/downloads/rtorrent-$rtvers.tar.gz | tar xz
 fi
-make -j2 >> /dev/null 2>&1
-make install >> /dev/null 2>&1
 
-echo "Compiling rtorrent"
-cd $HOME/source/rtorrent-$rtvers
-./autogen.sh >> /dev/null 2>&1
-./configure --prefix=/usr --with-xmlrpc-c >> /dev/null 2>&1
-make -j2 >> /dev/null 2>&1
-make install >> /dev/null 2>&1
-ldconfig
+cd xmlrpc
+echo "Installing xmlrpc" | tee -a $logfile
+./configure --prefix=/usr --disable-cplusplus >> $logfile 2>&1
+make >> $logfile 2>&1
+make install >> $logfile 2>&1
 
-cd /var/www/rutorrent/conf/users
-user_list=*
+cd ../libtorrent-$libvers
+echo "Installing libtorrent" | tee -a $logfile
+./autogen.sh >> $logfile 2>&1
+if [ $osname = "Raspbian" ]; then
+  ./configure --prefix=/usr --disable-instrumentation >> $logfile 2>&1
+else
+  ./configure --prefix=/usr >> $logfile 2>&1
+fi
+make -j2 >> $logfile 2>&1
+make install >> $logfile 2>&1
 
-for user in $user_list
-  do
+cd ../rtorrent-$rtvers
+echo "Installing rtorrent" | tee -a $logfile
+./autogen.sh >> $logfile 2>&1
+./configure --prefix=/usr --with-xmlrpc-c >> $logfile 2>&1
+make -j2 >> $logfile 2>&1
+make install >> $logfile 2>&1
+ldconfig >> $logfile 2>&1
+
+ echo "$libvers/$rtvers installed"
+ echo
+
+if [ -d /var/www/rutorrent/conf/users ]; then
+  cd /var/www/rutorrent/conf/users
+  user_list=*
+  for user in $user_list; do
     if [ ! "$user" = '*' ]; then
       echo "Restarting rtorrent for $user"
       su $user -c 'rt restart >> /dev/null 2>&1'
     fi
   done
-
-cd $HOME
-
-echo
-echo "$libvers/$rtvers installed"
-echo
-echo "Your .rtorrent.rc file, and download, watch, and .session directories have not been altered in any way"
+  echo
+fi
