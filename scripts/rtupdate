@@ -28,8 +28,8 @@ for rtversion in $rt_releases
   done
 
 latest_duo=$(echo $duoversion | rev | cut -d' ' -f1 | rev)
-latest_libvers=$(echo $verschoice | cut -d/ -f1)
-latest_rtvers=$(echo $verschoice | cut -d/ -f2)
+latest_libvers=$(echo $latest_duo | cut -d/ -f1)
+latest_rtvers=$(echo $latest_duo | cut -d/ -f2)
 
 installed() {
 hash $1 2>/dev/null
