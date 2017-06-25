@@ -73,7 +73,9 @@ if [ -z $1 ]; then
   fi
   
   list_version
-  echo -n "Install libtorrent-"$libvers" and rtorrent-"$rtvers", continue? "
+  echo "Install libtorrent-"$libvers" and rtorrent-"$rtvers", continue? "
+  echo "Your .rtorrent.rc file, and download, watch, and .session directories will not be altered in any way"
+  echo -n "Continue? "
   if ! ask_user; then
     exit
   fi
@@ -131,13 +133,11 @@ ldconfig >> $logfile 2>&1
 if [ -d /var/www/rutorrent/conf/users ]; then
   cd /var/www/rutorrent/conf/users
   user_list=*
-
   for user in $user_list; do
     if [ ! "$user" = '*' ]; then
       echo "Restarting rtorrent for $user"
       su $user -c 'rt restart >> /dev/null 2>&1'
     fi
   done
-
-  echo "Your .rtorrent.rc file, and download, watch, and .session directories have not been altered in any way"
+  echo
 fi
