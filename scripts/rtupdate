@@ -85,7 +85,7 @@ if [ -z $passed_rtvers ]; then
   if [ $relno -eq 9 ]; then
     libvers='0.13.6'
     rtvers='0.9.6'
-    echo "Currently Debian 9 Stretch, is only supported by libtorrent-0.13.6/rtorrent-0.9.6"
+    echo "Debian 9 is only supported by libtorrent-0.13.6/rtorrent-0.9.6"
   else
     list_version
   fi
@@ -111,7 +111,7 @@ else
   if [ $relno -eq 9 ]; then
     libvers='0.13.6'
     rtvers='0.9.6'
-    echo "Currently Debian 9 Stretch, is only supported by libtorrent-0.13.6/rtorrent-0.9.6"
+    echo "Debian 9 is only supported by libtorrent-0.13.6/rtorrent-0.9.6"
   fi
 
 fi
