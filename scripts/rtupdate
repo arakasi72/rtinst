@@ -17,6 +17,7 @@ relno=$(lsb_release -sr | cut -d. -f1)
 listsize=6
 duoversion=''
 logfile="/dev/null"
+passed_rtvers=$1
 
 rt_releases=$(wget -q -O - $sourcedir | grep -o "rtorrent-[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}\.tar.gz" | sort -uV | tail -$listsize | grep -o "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
 
@@ -26,11 +27,16 @@ for rtversion in $rt_releases
     duoversion="$duoversion $libversion/$rtversion"
   done
 
+latest_duo=$(echo $duoversion | rev | cut -d' ' -f1 | rev)
+latest_libvers=$(echo $verschoice | cut -d/ -f1)
+latest_rtvers=$(echo $verschoice | cut -d/ -f2)
+
 installed() {
 hash $1 2>/dev/null
 }
 
 list_version() {
+local verschoice
 while [ -z "$verschoice" ]
 do
   echo "Please select libtorrent/rtorrent version."
@@ -60,7 +66,7 @@ if [ "$(id -u)" != "0" ]; then
   exit 1
 fi
 
-if [ -z $1 ]; then
+if [ -z $passed_rtvers ]; then
   if ( installed rtorrent ); then
     rtorrent_current=$(rtorrent -h | grep -m 1 'version')
     rtorrent_current=${rtorrent_current#*version }
@@ -80,10 +86,15 @@ if [ -z $1 ]; then
     exit
   fi
 else
-  if [ "$1" = "latest" ]; then
-    verschoice=$(echo $duoversion | rev | cut -d' ' -f1 | rev)
-    libvers=$(echo $verschoice | cut -d/ -f1)
-    rtvers=$(echo $verschoice | cut -d/ -f2)
+  if [ "$passed_rtvers" = "latest" ] || [ $(wget -q -O - $sourcedir | grep -o "rtorrent-$passed_rtvers.tar.gz" | wc -l) -eq 0 ]; then
+    if [ "$passed_rtvers" != "latest" ]; then
+      echo " Could not find $passed_rtvers so using latest version instead"
+    fi
+    libvers=$latest_libvers
+    rtvers=$latest_rtvers
+  else
+    libvers=$(echo $passed_rtvers | awk -F. -v OFS=. '{$2='$(( $(echo $rtversion | cut -d. -f2) + 4 ))'; print }')
+    rtvers=$passed_rtvers
   fi
 fi
 
