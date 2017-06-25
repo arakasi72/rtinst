@@ -83,7 +83,7 @@ else
     libvers=$(echo $verschoice | cut -d/ -f1)
     rtvers=$(echo $verschoice | cut -d/ -f2)
   fi
-
+fi
 echo
 echo "Installing $libvers/$rtvers"
 
