@@ -65,7 +65,7 @@ if [ -z $1 ]; then
     rtorrent_current=$(rtorrent -h | grep -m 1 'version')
     rtorrent_current=${rtorrent_current#*version }
     echo "rtorrent $rtorrent_current detected"
-    echo
+    cd $HOME
   else
     echo "rtorrent NOT installed"
     echo "This script is for upgrading/downgrading only, not for initial install"
@@ -84,12 +84,9 @@ else
     rtvers=$(echo $verschoice | cut -d/ -f2)
   fi
 fi
+
 echo
 echo "Installing $libvers/$rtvers"
-
-exit
-
-cd $HOME
 
 if [ -d source ]; then
   cd source
@@ -99,6 +96,7 @@ fi
 rm -rf xmlrpc libtorrent* rtorrent*
 
 echo "Fetching source files"
+svn co $xmlrpcloc xmlrpc  >> $logfile 2>&1
 curl -# http://rtorrent.net/downloads/libtorrent-$libvers.tar.gz | tar xz
 curl -# http://rtorrent.net/downloads/rtorrent-$rtvers.tar.gz | tar xz
 
@@ -127,23 +125,19 @@ make -j2 >> $logfile 2>&1
 make install >> $logfile 2>&1
 ldconfig >> $logfile 2>&1
 
+ echo "$libvers/$rtvers installed"
+ echo
 
+if [ -d /var/www/rutorrent/conf/users ]; then
+  cd /var/www/rutorrent/conf/users
+  user_list=*
 
-
-cd /var/www/rutorrent/conf/users
-user_list=*
-
-for user in $user_list
-  do
+  for user in $user_list; do
     if [ ! "$user" = '*' ]; then
       echo "Restarting rtorrent for $user"
       su $user -c 'rt restart >> /dev/null 2>&1'
     fi
   done
 
-cd $HOME
-
-echo
-echo "$libvers/$rtvers installed"
-echo
-echo "Your .rtorrent.rc file, and download, watch, and .session directories have not been altered in any way"
+  echo "Your .rtorrent.rc file, and download, watch, and .session directories have not been altered in any way"
+fi
