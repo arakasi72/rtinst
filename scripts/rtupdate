@@ -102,10 +102,17 @@ else
     libvers=$(echo $passed_rtvers | awk -F. -v OFS=. '{$2='$(( $(echo $rtversion | cut -d. -f2) + 4 ))'; print }')
     rtvers=$passed_rtvers
   fi
+  
+  if [ $relno -eq 9 ]; then
+    libsvers='0.13.6'
+    rtvers='0.9.6'
+    echo "Currently Debian 9 Stretch, is only supported by libtorrent-0.13.6/rtorrent-0.9.6"
+  fi
+
 fi
 
 echo
-echo "Installing $libvers/$rtvers"
+echo "Installing libtorrent-$libvers/rtorrent-$rtvers"
 
 if [ -d source ]; then
   cd source
