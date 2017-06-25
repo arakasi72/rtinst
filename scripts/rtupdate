@@ -11,9 +11,12 @@
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 sourcedir='http://rtorrent.net/downloads/'
+xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
 osname=$(lsb_release -si)
+relno=$(lsb_release -sr | cut -d. -f1)
 listsize=6
 duoversion=''
+logfile="/dev/null"
 
 rt_releases=$(wget -q -O - $sourcedir | grep -o "rtorrent-[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}\.tar.gz" | sort -uV | tail -$listsize | grep -o "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
 
@@ -57,25 +60,34 @@ if [ "$(id -u)" != "0" ]; then
   exit 1
 fi
 
-if ( installed rtorrent ); then
-  rtorrent_current=$(rtorrent -h | grep -m 1 'version')
-  rtorrent_current=${rtorrent_current#*version }
-  echo "rtorrent $rtorrent_current detected"
-  echo
+if [ -z $1 ]; then
+  if ( installed rtorrent ); then
+    rtorrent_current=$(rtorrent -h | grep -m 1 'version')
+    rtorrent_current=${rtorrent_current#*version }
+    echo "rtorrent $rtorrent_current detected"
+    echo
+  else
+    echo "rtorrent NOT installed"
+    echo "This script is for upgrading/downgrading only, not for initial install"
+    exit 1
+  fi
+  
+  list_version
+  echo -n "Install libtorrent-"$libvers" and rtorrent-"$rtvers", continue? "
+  if ! ask_user; then
+    exit
+  fi
 else
-  echo "rtorrent NOT installed"
-  echo "This script is for upgrading/downgrading only, not for initial install"
-  exit 1
-fi
-
-list_version
-echo -n "Install libtorrent-"$libvers" and rtorrent-"$rtvers", continue? "
-if ! ask_user; then
-  exit
-fi
+  if [ "$1" = "latest" ]; then
+    verschoice=$(echo $duoversion | rev | cut -d' ' -f1 | rev)
+    libvers=$(echo $verschoice | cut -d/ -f1)
+    rtvers=$(echo $verschoice | cut -d/ -f2)
+  fi
 
 echo
 echo "Installing $libvers/$rtvers"
+
+exit
 
 cd $HOME
 
@@ -84,30 +96,39 @@ if [ -d source ]; then
 else
   mkdir source && cd source
 fi
-rm -r -f libtorrent* rtorrent*
+rm -rf xmlrpc libtorrent* rtorrent*
 
 echo "Fetching source files"
 curl -# http://rtorrent.net/downloads/libtorrent-$libvers.tar.gz | tar xz
 curl -# http://rtorrent.net/downloads/rtorrent-$rtvers.tar.gz | tar xz
 
-echo "Compiling libtorrent"
-cd $HOME/source/libtorrent-$libvers
-./autogen.sh >> /dev/null 2>&1
-if [ "$osname" = "Raspbian" ]; then
-    ./configure --prefix=/usr --disable-instrumentation >> /dev/null 2>&1
-  else
-    ./configure --prefix=/usr >> /dev/null 2>&1
-fi
-make -j2 >> /dev/null 2>&1
-make install >> /dev/null 2>&1
+cd xmlrpc
+echo "Installing xmlrpc" | tee -a $logfile
+./configure --prefix=/usr --disable-cplusplus >> $logfile 2>&1
+make >> $logfile 2>&1
+make install >> $logfile 2>&1
 
-echo "Compiling rtorrent"
-cd $HOME/source/rtorrent-$rtvers
-./autogen.sh >> /dev/null 2>&1
-./configure --prefix=/usr --with-xmlrpc-c >> /dev/null 2>&1
-make -j2 >> /dev/null 2>&1
-make install >> /dev/null 2>&1
-ldconfig
+cd ../libtorrent-$libvers
+echo "Installing libtorrent" | tee -a $logfile
+./autogen.sh >> $logfile 2>&1
+if [ $osname = "Raspbian" ]; then
+  ./configure --prefix=/usr --disable-instrumentation >> $logfile 2>&1
+else
+  ./configure --prefix=/usr >> $logfile 2>&1
+fi
+make -j2 >> $logfile 2>&1
+make install >> $logfile 2>&1
+
+cd ../rtorrent-$rtvers
+echo "Installing rtorrent" | tee -a $logfile
+./autogen.sh >> $logfile 2>&1
+./configure --prefix=/usr --with-xmlrpc-c >> $logfile 2>&1
+make -j2 >> $logfile 2>&1
+make install >> $logfile 2>&1
+ldconfig >> $logfile 2>&1
+
+
+
 
 cd /var/www/rutorrent/conf/users
 user_list=*
