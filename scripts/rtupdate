@@ -27,7 +27,7 @@ installed() {
 hash $1 2>/dev/null
 }
 
-ask_version() {
+list_version() {
 while [ -z "$verschoice" ]
 do
   echo "Please select libtorrent/rtorrent version."
@@ -40,16 +40,16 @@ do
 done
 }
 
-confirm_answer() {
+ask_user(){
+local answer
 while true
-      do
-      read -p "Sure you wish to install libtorrent-"$libvers" and rtorrent-"$rtvers"?" answer
-      case $answer in [Yy]* ) return 0 ;;
-                      [Nn]* ) exit ;;
-                          * ) echo "Enter y or n";;
-      esac
-    done
-
+  do
+    read answer
+    case $answer in [Yy]* ) return 0 ;;
+                    [Nn]* ) return 1 ;;
+                        * ) echo "Enter y or n";;
+    esac
+  done
 }
 
 if [ "$(id -u)" != "0" ]; then
@@ -68,8 +68,11 @@ else
   exit 1
 fi
 
-ask_version
-confirm_answer
+list_version
+echo -n "Install libtorrent-"$libvers" and rtorrent-"$rtvers", continue? "
+if ! ask_user; then
+  exit
+fi
 
 echo
 echo "Installing $libvers/$rtvers"
