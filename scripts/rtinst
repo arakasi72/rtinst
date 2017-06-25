@@ -515,7 +515,7 @@ if [ $install_rt = 0 ]; then
     rtorrentrel='latest'
   fi
   cd $home
-  rtupdate $rtorrentrel $logfile
+  rtupdate $rtorrentrel
 else
  echo "skiping rtorrent installation" | tee -a $logfile
 fi
