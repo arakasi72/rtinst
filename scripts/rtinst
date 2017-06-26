@@ -665,7 +665,7 @@ mkdir -p $home/.autodl
 touch $home/.autodl/autodl.cfg && touch $home/.autodl/autodl2.cfg
 
 cd /var/www/rutorrent/plugins
-git clone https://github.com/autodl-community/autodl-rutorrent.git autodl-irssi >> $logfile 2>&1 || error_exit "Unable to download autodl plugin files from https://github.com/autodl-community/autodl-irssi"
+git clone -q https://github.com/autodl-community/autodl-rutorrent.git autodl-irssi | tee -a $home/rtinst.info
 
 mkdir /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi
 
@@ -690,7 +690,6 @@ echo "gui-server-password = $adlpass" >> autodl2.cfg
 # set permissions
 echo "Setting permissions, Starting services" | tee -a $logfile
 chown -R www-data:www-data /var/www
-#chmod -R 755 /var/www/rutorrent
 chown -R $user:$user $home
 
 cd $home
