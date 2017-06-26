@@ -57,19 +57,6 @@ forceyes=1
 ### FUNCTIONS ###
 ###############################
 
-#exit on error function
-error_exit() {
-echo "Error: $1"
-echo "This is most likely a network error, if your network is working, then it is likely a temporary issue with the relevant file server"
-echo "Run 'bash rtinst.sh -l' for detailed output to rtinst.log"
-echo "Once issue is resolved the script can be run again to complete installation"
-if ! [ -z "$sshport" ]; then
-  echo "SSH Port was set before script was stopped to $sshport"
-  echo "make sure you can login before closing this session"
-fi
-exit 1
-}
-
 #function to check if string is valid format for an ip address
 valid_ip()
 {
@@ -324,16 +311,13 @@ echo
 
 #update amd upgrade system
 echo "Updating package lists" | tee $logfile
-apt-get update 2>&1 >>$logfile | tee -a $logfile
-if ! [ $? = 0 ]; then
-  error_exit "Problem updating packages."
-fi
+apt-get -qq update | tee -a $logfile
 
 echo "Upgrading packages" | tee -a $logfile
 export DEBIAN_FRONTEND=noninteractive
-apt-get -y upgrade  2>&1 >>$logfile | tee -a $logfile
+apt-get -qq upgrade >> $logfile 2>&1
 if ! [ $? = 0 ]; then
-  error_exit "Problem upgrading packages."
+  echo "Problem upgrading packages. Run 'apt-get -qq upgrade' successfully and rerun the script" && exit
 fi
 
 apt-get clean && apt-get autoclean >> $logfile 2>&1
@@ -351,7 +335,10 @@ for package_name in $package_list
     fi
   done
 
-test -z "$install_list" || apt-get -y install $install_list  2>&1 >>$logfile | tee -a $logfile
+test -z "$install_list" || apt-get -qq install $install_list >> $logfile 2>&1
+if ! [ $? = 0 ]; then
+  echo "Problem installing packages. Check log and rerun once it is resolved" && exit
+fi
 
 #install unrar package
 if [ $osname = "Debian" ] && ! hash unrar >> /dev/null 2>&1; then
@@ -373,7 +360,7 @@ if [ $osname = "Debian" ] && ! hash unrar >> /dev/null 2>&1; then
     rm -r $home/rar
   fi
 elif [ $osname = "Ubuntu" ]; then
-  apt-get -y install unrar  >> $logfile 2>&1
+  apt-get -qq install unrar >> $logfile 2>&1
 fi
 
 if hash unrar >> /dev/null 2>&1; then
@@ -387,15 +374,15 @@ if ! [ $osname = "Raspbian" ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/de
   echo "Installing ffmpeg"
   if [ $relno = 14 ]; then
     apt-add-repository -y ppa:mc3man/trusty-media >> $logfile 2>&1
-    apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
-    apt-get -y install ffmpeg >> $logfile 2>&1
+    apt-get -qq update | tee -a $logfile
+    apt-get -qq install ffmpeg >> $logfile 2>&1
   elif [ $relno = 8 ]; then
     grep "deb http://www.deb-multimedia.org jessie main" /etc/apt/sources.list >> /dev/null || echo "deb http://www.deb-multimedia.org jessie main" >> /etc/apt/sources.list
-    apt-get update >> $logfile 2>&1 || error_exit "problem updating package lists"
-    apt-get -y --force-yes install deb-multimedia-keyring >> $logfile 2>&1
-    apt-get -y --force-yes install ffmpeg >> $logfile 2>&1
+    apt-get -qq update | tee -a $logfile
+    apt-get -qq --force-yes install deb-multimedia-keyring >> $logfile 2>&1
+    apt-get -qq --force-yes install ffmpeg >> $logfile 2>&1
   else
-    apt-get -y install ffmpeg >> $logfile 2>&1
+    apt-get -qq install ffmpeg >> $logfile 2>&1
   fi
 fi
 
@@ -546,13 +533,16 @@ fi
 
  if [ $rudevflag = 1 ]; then
    echo "Installing Rutorrent (stable)" | tee -a $logfile
-   wget --no-check-certificate https://github.com/Novik/ruTorrent/archive/v3.8.tar.gz >> $logfile 2>&1
+   wget -q https://github.com/Novik/ruTorrent/archive/v3.8.tar.gz | tee -a $logfile
    tar -xzf v3.8.tar.gz
    mv -f ruTorrent-3.8 rutorrent
    rm v3.8.tar.gz
  else
    echo "Installing Rutorrent (latest build)" | tee -a $logfile
-   git clone https://github.com/Novik/ruTorrent.git rutorrent >> $logfile 2>&1
+   wget -q https://github.com/Novik/ruTorrent/archive/master.tar.gz | tee -a $logfile
+   tar -xzf master.tar.gz
+   mv -f ruTorrent-master rutorrent
+   rm master.tar.gz
  fi
 
 echo "Configuring Rutorrent" | tee -a $logfile
@@ -655,14 +645,14 @@ adlpass=$(genpasswd $(random 12 16))
 mkdir -p $home/.irssi/scripts/autorun
 cd $home/.irssi/scripts
 curl -sL http://git.io/vlcND | grep -Po '(?<="browser_download_url": ")(.*-v[\d.]+.zip)' | xargs wget --quiet -O autodl-irssi.zip
-unzip -o autodl-irssi.zip >> $logfile 2>&1
+unzip -qq -o autodl-irssi.zip | tee -a $logfile
 rm autodl-irssi.zip
 cp autodl-irssi.pl autorun/
 mkdir -p $home/.autodl
 touch $home/.autodl/autodl.cfg && touch $home/.autodl/autodl2.cfg
 
 cd /var/www/rutorrent/plugins
-git clone https://github.com/autodl-community/autodl-rutorrent.git autodl-irssi >> $logfile 2>&1 || error_exit "Unable to download autodl plugin files from https://github.com/autodl-community/autodl-irssi"
+git clone -q https://github.com/autodl-community/autodl-rutorrent.git autodl-irssi | tee -a $home/rtinst.info
 
 mkdir /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi
 
@@ -687,7 +677,6 @@ echo "gui-server-password = $adlpass" >> autodl2.cfg
 # set permissions
 echo "Setting permissions, Starting services" | tee -a $logfile
 chown -R www-data:www-data /var/www
-chmod -R 755 /var/www/rutorrent
 chown -R $user:$user $home
 
 cd $home
