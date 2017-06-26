@@ -546,13 +546,16 @@ fi
 
  if [ $rudevflag = 1 ]; then
    echo "Installing Rutorrent (stable)" | tee -a $logfile
-   wget --no-check-certificate https://github.com/Novik/ruTorrent/archive/v3.8.tar.gz >> $logfile 2>&1
+   wget -q https://github.com/Novik/ruTorrent/archive/v3.8.tar.gz | tee -a $logfile
    tar -xzf v3.8.tar.gz
    mv -f ruTorrent-3.8 rutorrent
    rm v3.8.tar.gz
  else
    echo "Installing Rutorrent (latest build)" | tee -a $logfile
-   git clone https://github.com/Novik/ruTorrent.git rutorrent >> $logfile 2>&1
+   wget -q https://github.com/Novik/ruTorrent/archive/master.tar.gz | tee -a $logfile
+   tar -xzf master.tar.gz
+   mv -f ruTorrent-master rutorrent
+   rm master.zip
  fi
 
 echo "Configuring Rutorrent" | tee -a $logfile
