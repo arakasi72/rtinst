@@ -328,7 +328,10 @@ apt-get -qq update | tee -a $logfile
 
 echo "Upgrading packages" | tee -a $logfile
 export DEBIAN_FRONTEND=noninteractive
-apt-get -qq upgrade | tee -a $logfile
+apt-get -qq upgrade >> $logfile 2>&1
+if ! [ $? = 0 ]; then
+  echo "Problem upgrading packages. Run 'apt-get -qq upgrade' successfully and rerun the script" && exit
+fi
 
 apt-get clean && apt-get autoclean >> $logfile 2>&1
 
@@ -345,7 +348,10 @@ for package_name in $package_list
     fi
   done
 
-test -z "$install_list" || apt-get -qq install $install_list >> $logfile 2>&1
+test -z "$install_list" || apt-get -qq install $install_list >> >> $logfile 2>&1
+if ! [ $? = 0 ]; then
+  echo "Problem installing packages. Check log and rerun once it is resolved" && exit
+fi
 
 #install unrar package
 if [ $osname = "Debian" ] && ! hash unrar >> /dev/null 2>&1; then
