@@ -53,13 +53,13 @@ echo ": done"
 if [ -f /etc/vsftpd.conf ]; then
   sed -i '/^\(\s\|#\)*rsa_private_key_file/ c\rsa_private_key_file=\/etc\/ssl\/private\/ruweb\.key' /etc/vsftpd.conf
   sed -i '/^\(\s\|#\)*rsa_cert_file/ c\rsa_cert_file=\/etc\/ssl\/ruweb\.crt' /etc/vsftpd.conf
-  service vsftpd restart
+  service vsftpd restart >/dev/null 2>&1
 fi
 
 if [ -f /etc/nginx/sites-available/default ]; then
   sed -i '/ssl_certificate / c\        ssl_certificate \/etc\/ssl\/ruweb\.crt;' /etc/nginx/sites-available/default
   sed -i '/ssl_certificate_key/ c\        ssl_certificate_key \/etc\/ssl\/private\/ruweb\.key;' /etc/nginx/sites-available/default
-  service nginx restart
+  service nginx restart >/dev/null 2>&1
 fi
 }
 
