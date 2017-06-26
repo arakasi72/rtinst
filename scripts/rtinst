@@ -57,19 +57,6 @@ forceyes=1
 ### FUNCTIONS ###
 ###############################
 
-#exit on error function
-error_exit() {
-echo "Error: $1"
-echo "This is most likely a network error, if your network is working, then it is likely a temporary issue with the relevant file server"
-echo "Run 'bash rtinst.sh -l' for detailed output to rtinst.log"
-echo "Once issue is resolved the script can be run again to complete installation"
-if ! [ -z "$sshport" ]; then
-  echo "SSH Port was set before script was stopped to $sshport"
-  echo "make sure you can login before closing this session"
-fi
-exit 1
-}
-
 #function to check if string is valid format for an ip address
 valid_ip()
 {
