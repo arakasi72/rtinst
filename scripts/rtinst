@@ -555,7 +555,7 @@ fi
    wget -q https://github.com/Novik/ruTorrent/archive/master.tar.gz | tee -a $logfile
    tar -xzf master.tar.gz
    mv -f ruTorrent-master rutorrent
-   rm master.zip
+   rm master.tar.gz
  fi
 
 echo "Configuring Rutorrent" | tee -a $logfile
