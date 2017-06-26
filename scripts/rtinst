@@ -690,7 +690,7 @@ echo "gui-server-password = $adlpass" >> autodl2.cfg
 # set permissions
 echo "Setting permissions, Starting services" | tee -a $logfile
 chown -R www-data:www-data /var/www
-chmod -R 755 /var/www/rutorrent
+#chmod -R 755 /var/www/rutorrent
 chown -R $user:$user $home
 
 cd $home
