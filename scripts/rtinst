@@ -658,7 +658,7 @@ adlpass=$(genpasswd $(random 12 16))
 mkdir -p $home/.irssi/scripts/autorun
 cd $home/.irssi/scripts
 curl -sL http://git.io/vlcND | grep -Po '(?<="browser_download_url": ")(.*-v[\d.]+.zip)' | xargs wget --quiet -O autodl-irssi.zip
-unzip -o autodl-irssi.zip >> $logfile 2>&1
+unzip -qq -o autodl-irssi.zip | tee -a $logfile
 rm autodl-irssi.zip
 cp autodl-irssi.pl autorun/
 mkdir -p $home/.autodl
