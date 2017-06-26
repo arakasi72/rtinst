@@ -19,22 +19,27 @@ duoversion=''
 logfile="/dev/null"
 passed_rtvers=$1
 
+# get a list of the most recent releases
 rt_releases=$(wget -q -O - $sourcedir | grep -o "rtorrent-[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}\.tar.gz" | sort -uV | tail -$listsize | grep -o "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
 
+# extract the release numbers from the list of most recent releases
 for rtversion in $rt_releases
   do
     libversion=$(echo $rtversion | awk -F. -v OFS=. '{$2='$(( $(echo $rtversion | cut -d. -f2) + 4 ))'; print }')
     duoversion="$duoversion $libversion/$rtversion"
   done
 
+# get the most recent release version number
 latest_duo=$(echo $duoversion | rev | cut -d' ' -f1 | rev)
 latest_libvers=$(echo $latest_duo | cut -d/ -f1)
 latest_rtvers=$(echo $latest_duo | cut -d/ -f2)
 
+# checks if an application is installed
 installed() {
 hash $1 2>/dev/null
 }
 
+# function to create a list of versions to install
 list_version() {
 local verschoice
 while [ -z "$verschoice" ]
@@ -77,6 +82,8 @@ if [ -z $passed_rtvers ]; then
     echo "This script is for upgrading/downgrading only, not for initial install"
     exit 1
   fi
+  
+  # checks if the OS is debian 9, and forces the version to 0.9.6 of it is
   if [ $relno -eq 9 ]; then
     libvers='0.13.6'
     rtvers='0.9.6'
@@ -103,6 +110,7 @@ else
     rtvers=$passed_rtvers
   fi
   
+  # checks if the OS is debian 9, and forces the version to 0.9.6 of it is
   if [ $relno -eq 9 ]; then
     libvers='0.13.6'
     rtvers='0.9.6'
