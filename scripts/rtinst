@@ -328,7 +328,7 @@ apt-get -qq update | tee -a $logfile
 
 echo "Upgrading packages" | tee -a $logfile
 export DEBIAN_FRONTEND=noninteractive
-apt-get -yqq upgrade | tee -a $logfile
+apt-get -qq upgrade | tee -a $logfile
 
 apt-get clean && apt-get autoclean >> $logfile 2>&1
 
@@ -345,7 +345,7 @@ for package_name in $package_list
     fi
   done
 
-test -z "$install_list" || apt-get -yqq install $install_list | tee -a $logfile
+test -z "$install_list" || apt-get -qq -o=Dpkg::Use-Pty=0 install $install_list | tee -a $logfile
 
 #install unrar package
 if [ $osname = "Debian" ] && ! hash unrar >> /dev/null 2>&1; then
@@ -367,7 +367,7 @@ if [ $osname = "Debian" ] && ! hash unrar >> /dev/null 2>&1; then
     rm -r $home/rar
   fi
 elif [ $osname = "Ubuntu" ]; then
-  apt-get -y install unrar  >> $logfile 2>&1
+  apt-get -qq install unrar | tee -a $logfile
 fi
 
 if hash unrar >> /dev/null 2>&1; then
@@ -382,14 +382,14 @@ if ! [ $osname = "Raspbian" ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/de
   if [ $relno = 14 ]; then
     apt-add-repository -y ppa:mc3man/trusty-media >> $logfile 2>&1
     apt-get -qq update | tee -a $logfile
-    apt-get -yqq install ffmpeg | tee -a $logfile
+    apt-get -qq install ffmpeg | tee -a $logfile
   elif [ $relno = 8 ]; then
     grep "deb http://www.deb-multimedia.org jessie main" /etc/apt/sources.list >> /dev/null || echo "deb http://www.deb-multimedia.org jessie main" >> /etc/apt/sources.list
     apt-get -qq update | tee -a $logfile
     apt-get -y --force-yes install deb-multimedia-keyring >> $logfile 2>&1
     apt-get -y --force-yes install ffmpeg >> $logfile 2>&1
   else
-    apt-get -yqq install ffmpeg | tee -a $logfile
+    apt-get -qq install ffmpeg | tee -a $logfile
   fi
 fi
 
