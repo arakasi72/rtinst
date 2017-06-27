@@ -29,7 +29,7 @@ fi
 echo
 
 if [ -d /var/www/rutorrent ]; then
-  ru_current=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f$
+  ru_current=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
   echo "RuTorrent installed: $ru_current"
   echo "RuTorrent available: $ru_latest"
 else
