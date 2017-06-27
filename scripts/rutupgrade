@@ -105,11 +105,10 @@ if [ $ruflag = 0 ]; then
   echo
 
   mv -f /var/www/rutorrent $HOME/rutorrent_old
-
   echo "Installing Rutorrent "$newvers
   wget -q https://github.com/Novik/ruTorrent/archive/master.tar.gz
   tar -xzf master.tar.gz
-  mv -f ruTorrent-master rutorrent
+  mv -f ruTorrent-master /var/www/rutorrent
   rm master.tar.gz
   
   git clone -q https://github.com/autodl-community/autodl-rutorrent.git /var/www/rutorrent/plugins/autodl-irssi
