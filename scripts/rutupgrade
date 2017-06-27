@@ -74,7 +74,6 @@ echo 'Detected '$HOME'/rutorrent_old'
       mv -f $HOME/rutorrent_old /var/www/rutorrent
       echo "Setting permissions, Starting services"
       chown -R www-data:www-data /var/www
-      chmod -R 755 /var/www/rutorrent
       echo "Done"
     else
       exit
@@ -108,14 +107,17 @@ if [ $ruflag = 0 ]; then
   mv -f /var/www/rutorrent $HOME/rutorrent_old
 
   echo "Installing Rutorrent "$newvers
-  git clone https://github.com/Novik/ruTorrent.git /var/www/rutorrent  >> /dev/null 2>&1
-  git clone https://github.com/autodl-community/autodl-rutorrent.git /var/www/rutorrent/plugins/autodl-irssi  >> /dev/null 2>&1
-
+  wget -q https://github.com/Novik/ruTorrent/archive/master.tar.gz
+  tar -xzf master.tar.gz
+  mv -f ruTorrent-master rutorrent
+  rm master.tar.gz
+  
+  git clone -q https://github.com/autodl-community/autodl-rutorrent.git /var/www/rutorrent/plugins/autodl-irssi
+  
   rm -r /var/www/rutorrent/conf  >> /dev/null 2>&1
   cp -r $HOME/rutorrent_old/conf /var/www/rutorrent/conf  >> /dev/null 2>&1
   rm -r /var/www/rutorrent/share >> /dev/null 2>&1
   cp -r $HOME/rutorrent_old/share /var/www/rutorrent/share >> /dev/null 2>&1
   echo "Setting permissions, Starting services"
   chown -R www-data:www-data /var/www
-  chmod -R 755 /var/www/rutorrent
 fi
