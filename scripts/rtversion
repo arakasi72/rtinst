@@ -38,7 +38,7 @@ fi
 
 echo
 
-
+echo "rtinst"
 cd /etc/rtinst
 branch=$(basename "$(git symbolic-ref -q HEAD)")
 if [ -z $branch ]; then
