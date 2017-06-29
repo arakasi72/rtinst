@@ -229,6 +229,7 @@ fi
 os_repo=0
 major_repo=0
 
+echo
 echo "Checking the web sites we will need are accessible"
 echo  "Checking $osname mirrors"
 for i in $(cat /etc/apt/sources.list | grep "^deb http" | cut -d' ' -f2 | uniq ); do
@@ -253,6 +254,7 @@ if [ $major_repo = 1 ]; then
   echo "We will continue for now, but may not be able to finish"
   echo "You can rerun rtinst later to complete the installation"
 fi
+echo
 
 # check IP Address
 [ $forceyes = 1 ] && enter_ip
