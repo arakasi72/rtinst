@@ -252,7 +252,7 @@ fi
 if [ $major_repo = 1 ]; then
   echo "Some of the repositories we need are not currently available."
   echo "We will continue for now, but may not be able to finish"
-  echo "You can rerun rtinst later to complete the installation"
+  echo "You can rerun rtinst later to complete the installation if needed"
 fi
 echo
 
