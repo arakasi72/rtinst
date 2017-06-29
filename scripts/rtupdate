@@ -10,10 +10,15 @@
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
-sourcedir='http://rtorrent.net/downloads/'
-xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
 osname=$(lsb_release -si)
 relno=$(lsb_release -sr | cut -d. -f1)
+sourcedir='http://rtorrent.net/downloads/'
+xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
+
+if [ $relno = 9 ]; then
+  sourcedir='https://github.com/rakshasa/'
+fi
+
 listsize=6
 duoversion=''
 logfile="/dev/null"
@@ -88,11 +93,37 @@ if [ -z $passed_rtvers ]; then
     exit 1
   fi
   
-  # checks if the OS is debian 9, and forces the version to 0.9.6 of it is
+xmlrpc_repo=0
+rt_repo=0
+
+echo
+echo "Checking File Repositories"
+echo -n "xmlrpc-c: "; check_url $xmlrpcloc && echo "OK" || { echo "FAIL"; xmlrpc_repo=1; }
+echo -n "rtorrent: "; check_url $sourcedir && echo "OK" || { echo "FAIL"; rt_repo=1; }
+
+if [ $rt_repo = 1 ]; then
+  echo "The libtorrent/rtorrent file repositoy is offline"
+  echo "Try again later, you can check if the following address is online in your browser:"
+  echo $sourcedir
+  exit 1
+fi
+
+if [ $xmlrpc_repo = 1 ]; then
+  if [ -d /usr/include/xmlrpc-c ]; then
+    echo "xmlrpc repository is off line, but looks like it has already beed installed."
+    echo "We will try and install rtorrent"
+  else
+    echo "The xmlrpc-c file repositoy is offline"
+    echo "Try again later, you can check if the following address is online in your browser:"
+    echo $xmlrpcloc
+    exit 1
+  fi
+fi  
+  
+# checks if the OS is debian 9, and forces the version to 0.9.6 of it is
   if [ $relno -eq 9 ]; then
     libvers='0.13.6'
     rtvers='0.9.6'
-    sourcedir='https://github.com/rakshasa/'
     echo "Debian 9 is only supported by libtorrent-0.13.6/rtorrent-0.9.6"
   else
     list_version
@@ -120,37 +151,9 @@ else
   if [ $relno -eq 9 ]; then
     libvers='0.13.6'
     rtvers='0.9.6'
-    sourcedir='https://github.com/rakshasa/'
     echo "Debian 9 is only supported by libtorrent-0.13.6/rtorrent-0.9.6"
   fi
 
-fi
-
-xmlrpc_repo=0
-rt_repo=0
-
-echo
-echo "Checking File Repositories"
-echo -n "xmlrpc-c: "; check_url $xmlrpcloc && echo "OK" || { echo "FAIL"; xmlrpc_repo=1; }
-echo -n "rtorrent: "; check_url $sourcedir && echo "OK" || { echo "FAIL"; rt_repo=1; }
-
-if [ $rt_repo = 1 ]; then
-  echo "The libtorrent/rtorrent file repositoy is offline"
-  echo "Try again later, you can check if the following address is online in your browser:"
-  echo $sourcedir
-  exit 1
-fi
-
-if [ $xmlrpc_repo = 1 ]; then
-  if [ -d /usr/include/xmlrpc-c ]; then
-    echo "xmlrpc repository is off line, but looks like it has already beed installed."
-    echo "We will try and install rtorrent"
-  else
-    echo "The xmlrpc-c file repositoy is offline"
-    echo "Try again later, you can check if the following address is online in your browser:"
-    echo $xmlrpcloc
-    exit 1
-  fi
 fi
 
 echo
