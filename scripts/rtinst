@@ -92,6 +92,16 @@ local genln=$1
 tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
 }
 
+#function executed if the script finishes early
+early_exit() {
+echo "Installation is incomplete. Run rtinst again to complete"
+echo
+echo "IMPORTANT - SSH Port has been set to: $sshport"
+echo "IMPORTANT - SSH Port has been set to: $sshport"
+echo "IMPORTANT - SSH Port has been set to: $sshport"
+exit 1
+}
+
 #function to set a user input password
 set_pass() {
 local localpass
@@ -611,7 +621,7 @@ if [ $install_rt = 0 ]; then
   fi
   cd $home
   # call the script rtupdate to install lib/rtorrent
-  rtupdate $rtorrentrel || exit 1
+  rtupdate $rtorrentrel || early_exit
 else
   echo "skiping rtorrent installation" | tee -a $logfile
 fi
