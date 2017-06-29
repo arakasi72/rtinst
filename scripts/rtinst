@@ -611,9 +611,9 @@ if [ $install_rt = 0 ]; then
   fi
   cd $home
   # call the script rtupdate to install lib/rtorrent
-  rtupdate $rtorrentrel
+  rtupdate $rtorrentrel || exit 1
 else
- echo "skiping rtorrent installation" | tee -a $logfile
+  echo "skiping rtorrent installation" | tee -a $logfile
 fi
 
 echo "Configuring rtorrent" | tee -a $logfile
