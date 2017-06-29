@@ -159,8 +159,6 @@ fi
 echo
 echo "Installing libtorrent-$libvers/rtorrent-$rtvers"
 
-exit
-
 if [ -d source ]; then
   cd source
 else
