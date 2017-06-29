@@ -535,6 +535,71 @@ ftpport=$(grep 'listen_port=' /etc/vsftpd.conf | sed 's/[^0-9]*//g')
 echo "FTP port set to $ftpport"
 
 ###############################
+### INSTALL NGINX ###
+###############################
+
+cd $home
+
+if [ -f "/etc/apache2/ports.conf" ]; then
+  echo "Detected apache2. Changing apache2 port to 81 in /etc/apache2/ports.conf" | tee -a $logfile
+  sed -i "s/Listen 80/Listen 81/g" /etc/apache2/ports.conf
+  service apache2 stop >> $logfile 2>&1
+fi
+
+echo "Installing nginx" | tee -a $logfile
+
+htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
+chown www-data:www-data $passfile
+chmod 640 $passfile
+
+sed -i "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
+sed -i "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
+sed -i "s/pid \/run\/nginx\.pid;/pid \/var\/run\/nginx\.pid;/g" /etc/nginx/nginx.conf
+sed -i "s/# server_tokens off;/server_tokens off;/g" /etc/nginx/nginx.conf
+sed -i "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/nginx/nginx.conf
+sed -i "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
+grep client_max_body_size /etc/nginx/nginx.conf > /dev/null 2>&1 || sed -i "/server_tokens off;/ a\        client_max_body_size 40m;\n" /etc/nginx/nginx.conf
+sed -i "/upload_max_filesize/ c\upload_max_filesize = 40M" $phploc/fpm/php.ini
+sed -i '/^;\?listen.owner/ c\listen.owner = www-data' $phploc/fpm/pool.d/www.conf
+sed -i '/^;\?listen.group/ c\listen.group = www-data' $phploc/fpm/pool.d/www.conf
+sed -i '/^;\?listen.mode/ c\listen.mode = 0660' $phploc/fpm/pool.d/www.conf
+
+if [ -d "/usr/share/nginx/www" ]; then
+  cp /usr/share/nginx/www/* /var/www
+elif [ -d "/usr/share/nginx/html" ]; then
+  cp /usr/share/nginx/html/* /var/www
+fi
+
+mv -n /etc/nginx/sites-available/default /etc/nginx/sites-available/default.original
+
+cp -f /etc/rtinst/conf/nginxsite /etc/nginx/sites-available/default
+cp -f /etc/rtinst/conf/nginxsitedl /etc/nginx/sites-available/dload-loc
+
+echo "location ~ \.php$ {" > /etc/nginx/conf.d/php
+echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/php
+
+if [ "$phpver" = "php7.0" ]; then
+  echo "          fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;" >> /etc/nginx/conf.d/php
+else
+  echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
+fi
+
+echo "          fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;" >> /etc/nginx/conf.d/php
+echo "          fastcgi_index index.php;" >> /etc/nginx/conf.d/php
+echo "          include fastcgi_params;" >> /etc/nginx/conf.d/php
+echo "}" >> /etc/nginx/conf.d/php
+
+echo "location ~* \.(jpg|jpeg|gif|css|png|js|woff|ttf|svg|eot)$ {" > /etc/nginx/conf.d/cache
+echo "        expires 30d;" >> /etc/nginx/conf.d/cache
+echo "}" >> /etc/nginx/conf.d/cache
+
+service nginx restart && service $phpver-fpm restart
+
+if [ $dlflag = 0 ]; then
+  rtdload enable
+fi
+
+###############################
 ### INSTALL RTORRENT ###
 ###############################
 
@@ -607,71 +672,6 @@ if [ $osname = "Raspbian" ]; then
   echo 'enabled = no' >> /var/www/rutorrent/conf/plugins.ini
   echo '[unpack]' >> /var/www/rutorrent/conf/plugins.ini
   echo 'enabled = no' >> /var/www/rutorrent/conf/plugins.ini
-fi
-
-###############################
-### INSTALL NGINX ###
-###############################
-
-cd $home
-
-if [ -f "/etc/apache2/ports.conf" ]; then
-  echo "Detected apache2. Changing apache2 port to 81 in /etc/apache2/ports.conf" | tee -a $logfile
-  sed -i "s/Listen 80/Listen 81/g" /etc/apache2/ports.conf
-  service apache2 stop >> $logfile 2>&1
-fi
-
-echo "Installing nginx" | tee -a $logfile
-
-htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
-chown www-data:www-data $passfile
-chmod 640 $passfile
-
-sed -i "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
-sed -i "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
-sed -i "s/pid \/run\/nginx\.pid;/pid \/var\/run\/nginx\.pid;/g" /etc/nginx/nginx.conf
-sed -i "s/# server_tokens off;/server_tokens off;/g" /etc/nginx/nginx.conf
-sed -i "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/nginx/nginx.conf
-sed -i "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
-grep client_max_body_size /etc/nginx/nginx.conf > /dev/null 2>&1 || sed -i "/server_tokens off;/ a\        client_max_body_size 40m;\n" /etc/nginx/nginx.conf
-sed -i "/upload_max_filesize/ c\upload_max_filesize = 40M" $phploc/fpm/php.ini
-sed -i '/^;\?listen.owner/ c\listen.owner = www-data' $phploc/fpm/pool.d/www.conf
-sed -i '/^;\?listen.group/ c\listen.group = www-data' $phploc/fpm/pool.d/www.conf
-sed -i '/^;\?listen.mode/ c\listen.mode = 0660' $phploc/fpm/pool.d/www.conf
-
-if [ -d "/usr/share/nginx/www" ]; then
-  cp /usr/share/nginx/www/* /var/www
-elif [ -d "/usr/share/nginx/html" ]; then
-  cp /usr/share/nginx/html/* /var/www
-fi
-
-mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
-
-cp -f /etc/rtinst/conf/nginxsite /etc/nginx/sites-available/default
-cp -f /etc/rtinst/conf/nginxsitedl /etc/nginx/sites-available/dload-loc
-
-echo "location ~ \.php$ {" > /etc/nginx/conf.d/php
-echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/php
-
-if [ "$phpver" = "php7.0" ]; then
-  echo "          fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;" >> /etc/nginx/conf.d/php
-else
-  echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
-fi
-
-echo "          fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;" >> /etc/nginx/conf.d/php
-echo "          fastcgi_index index.php;" >> /etc/nginx/conf.d/php
-echo "          include fastcgi_params;" >> /etc/nginx/conf.d/php
-echo "}" >> /etc/nginx/conf.d/php
-
-echo "location ~* \.(jpg|jpeg|gif|css|png|js|woff|ttf|svg|eot)$ {" > /etc/nginx/conf.d/cache
-echo "        expires 30d;" >> /etc/nginx/conf.d/cache
-echo "}" >> /etc/nginx/conf.d/cache
-
-service nginx restart && service $phpver-fpm restart
-
-if [ $dlflag = 0 ]; then
-  rtdload enable
 fi
 
 ###############################
