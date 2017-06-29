@@ -136,7 +136,7 @@ echo -n "rtorrent: "; check_url $sourcedir && echo "OK" || { echo "FAIL"; rt_rep
 
 if [ $rt_repo = 1 ]; then
   echo "The libtorrent/rtorrent file repositoy is offline"
-  echo "Try again later, you can check if the following address is online in your browser:
+  echo "Try again later, you can check if the following address is online in your browser:"
   echo $sourcedir
   exit 1
 fi
@@ -147,7 +147,7 @@ if [ $xmlrpc_repo = 1 ]; then
     echo "We will try and install rtorrent"
   else
     echo "The xmlrpc-c file repositoy is offline"
-    echo "Try again later, you can check if the following address is online in your browser:
+    echo "Try again later, you can check if the following address is online in your browser:"
     echo $xmlrpcloc
     exit 1
   fi
