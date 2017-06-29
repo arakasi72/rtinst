@@ -39,6 +39,11 @@ installed() {
 hash $1 2>/dev/null
 }
 
+#function to check if a web site is reachable
+check_url() {
+  if [[ `wget -S --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then return 0; else return 1; fi
+}
+
 # function to create a list of versions to install
 list_version() {
 local verschoice
@@ -87,6 +92,7 @@ if [ -z $passed_rtvers ]; then
   if [ $relno -eq 9 ]; then
     libvers='0.13.6'
     rtvers='0.9.6'
+    sourcedir='https://github.com/rakshasa/'
     echo "Debian 9 is only supported by libtorrent-0.13.6/rtorrent-0.9.6"
   else
     list_version
@@ -114,13 +120,43 @@ else
   if [ $relno -eq 9 ]; then
     libvers='0.13.6'
     rtvers='0.9.6'
+    sourcedir='https://github.com/rakshasa/'
     echo "Debian 9 is only supported by libtorrent-0.13.6/rtorrent-0.9.6"
   fi
 
 fi
 
+xmlrpc_repo=0
+rt_repo=0
+
+echo
+echo "Checking File Repositories"
+echo -n "xmlrpc-c: "; check_url $xmlrpcloc && echo "OK" || { echo "FAIL"; xmlrpc_repo=1; }
+echo -n "rtorrent: "; check_url $sourcedir && echo "OK" || { echo "FAIL"; rt_repo=1; }
+
+if [ $rt_repo = 1 ]; then
+  echo "The libtorrent/rtorrent file repositoy is offline"
+  echo "Try again later, you can check if the following address is online in your browser:
+  echo $sourcedir
+  exit 1
+fi
+
+if [ $xmlrpc_repo = 1 ]; then
+  if [ -d /usr/include/xmlrpc-c ]; then
+    echo "xmlrpc repository is off line, but looks like it has already beed installed."
+    echo "We will try and install rtorrent"
+  else
+    echo "The xmlrpc-c file repositoy is offline"
+    echo "Try again later, you can check if the following address is online in your browser:
+    echo $xmlrpcloc
+    exit 1
+  fi
+fi
+
 echo
 echo "Installing libtorrent-$libvers/rtorrent-$rtvers"
+
+exit
 
 if [ -d source ]; then
   cd source
@@ -130,7 +166,7 @@ fi
 rm -rf xmlrpc libtorrent* rtorrent*
 
 echo "Fetching source files"
-svn co $xmlrpcloc xmlrpc  >> $logfile 2>&1
+
 
 if [ $relno -eq 9 ]; then
   git clone -q -b feature-bind --single-branch https://github.com/rakshasa/libtorrent.git libtorrent-$libvers
@@ -140,13 +176,18 @@ else
   curl -# http://rtorrent.net/downloads/rtorrent-$rtvers.tar.gz | tar xz
 fi
 
-cd xmlrpc
-echo "Installing xmlrpc" | tee -a $logfile
-./configure --prefix=/usr --disable-cplusplus >> $logfile 2>&1
-make >> $logfile 2>&1
-make install >> $logfile 2>&1
+if [ $xmlrpc_repo = 0 ]; then
+  svn co $xmlrpcloc xmlrpc  >> $logfile 2>&1
 
-cd ../libtorrent-$libvers
+  cd xmlrpc
+  echo "Installing xmlrpc" | tee -a $logfile
+  ./configure --prefix=/usr --disable-cplusplus >> $logfile 2>&1
+  make >> $logfile 2>&1
+  make install >> $logfile 2>&1
+  cd ..
+fi
+
+cd libtorrent-$libvers
 echo "Installing libtorrent" | tee -a $logfile
 ./autogen.sh >> $logfile 2>&1
 if [ $osname = "Raspbian" ]; then
