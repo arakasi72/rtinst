@@ -17,6 +17,12 @@ PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 # if left blank will install latest version of rtorrent, or set to a specific release E.G. '0.9.6' to install that release 
 rtorrentrel=''
 
+#url's of the major components
+rt_url="http://rtorrent.net/downloads/"
+xmlrpc_url="https://svn.code.sf.net/p/xmlrpc-c/code/stable/"
+ru_url="https://github.com/Novik/ruTorrent/
+adl_url="https://github.com/autodl-community/"
+
 if [ $(dpkg-query -W -f='${Status}' lsb-release 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
 echo "Installing lsb-release"
 apt-get -yqq install lsb-release 2>&1 >> /dev/null
@@ -56,6 +62,11 @@ forceyes=1
 ###############################
 ### FUNCTIONS ###
 ###############################
+
+#function to check if a web site is reachable
+check_url() {
+  if [[ `wget -S --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then return 0; else return 1; fi
+}
 
 #function to check if string is valid format for an ip address
 valid_ip()
@@ -212,6 +223,35 @@ done
 if [ $# -gt 0 ]; then
   echo "No arguments allowed $1 is not a valid argument"
   exit 1
+fi
+
+# check required web repos are accessible
+os_repo=0
+major_repo=0
+
+echo "Checking the web sites we will need are accessible"
+echo  "Checking $osname mirrors"
+for i in $(cat /etc/apt/sources.list | grep "^deb http" | cut -d' ' -f2 | uniq ); do
+  echo -n $i": "
+  check_url $i && echo "OK" || { echo "FAIL"; os_repo=1; }
+done
+
+echo
+echo "Checking major 3rd party components"
+echo -n "Rtorrent: "; check_url $rt_url && echo "OK" || { echo "FAIL"; major_repo=1; }
+echo -n "xmlrpc-c: "; check_url $xmlrpc_url && echo "OK" || { echo "FAIL"; major_repo=1; }
+echo -n "RuTorrent: ";check_url $ru_url && echo "OK" || { echo "FAIL"; major_repo=1; }
+echo -n "Autodl-irssi: "; check_url $adl_url && echo "OK" || { echo "FAIL"; major_repo=1; }
+
+if [ $os_repo = 1 ]; then
+  echo "Some of your $osname mirrors are down, try again later"
+  exit 1
+fi
+
+if [ $major_repo = 1 ]; then
+  echo "Some of the repositories we need are not currently available."
+  echo "We will continue for now, but may not be able to finish"
+  echo "You can rerun rtinst later to complete the installation"
 fi
 
 # check IP Address
