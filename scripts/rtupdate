@@ -81,9 +81,9 @@ if [ "$(id -u)" != "0" ]; then
   exit 1
 fi
 
+# Check the libtorrent/rtorrent and xmlrpc sites are available
 xmlrpc_repo=0
 rt_repo=0
-
 echo
 echo "Checking File Repositories"
 echo -n "xmlrpc-c: "; check_url $xmlrpcloc && echo "OK" || { echo "FAIL"; xmlrpc_repo=1; }
