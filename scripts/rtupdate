@@ -81,18 +81,6 @@ if [ "$(id -u)" != "0" ]; then
   exit 1
 fi
 
-if [ -z $passed_rtvers ]; then
-  if ( installed rtorrent ); then
-    rtorrent_current=$(rtorrent -h | grep -m 1 'version')
-    rtorrent_current=${rtorrent_current#*version }
-    echo "rtorrent $rtorrent_current detected"
-    cd $HOME
-  else
-    echo "rtorrent NOT installed"
-    echo "This script is for upgrading/downgrading only, not for initial install"
-    exit 1
-  fi
-  
 xmlrpc_repo=0
 rt_repo=0
 
@@ -118,8 +106,20 @@ if [ $xmlrpc_repo = 1 ]; then
     echo $xmlrpcloc
     exit 1
   fi
-fi  
-  
+fi
+
+if [ -z $passed_rtvers ]; then
+  if ( installed rtorrent ); then
+    rtorrent_current=$(rtorrent -h | grep -m 1 'version')
+    rtorrent_current=${rtorrent_current#*version }
+    echo "rtorrent $rtorrent_current detected"
+    cd $HOME
+  else
+    echo "rtorrent NOT installed"
+    echo "This script is for upgrading/downgrading only, not for initial install"
+    exit 1
+  fi
+    
 # checks if the OS is debian 9, and forces the version to 0.9.6 of it is
   if [ $relno -eq 9 ]; then
     libvers='0.13.6'
