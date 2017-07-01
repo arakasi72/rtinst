@@ -110,9 +110,9 @@ if [ $ruflag = 0 ]; then
   tar -xzf master.tar.gz
   mv -f ruTorrent-master /var/www/rutorrent
   rm master.tar.gz
-  
+
   git clone -q https://github.com/autodl-community/autodl-rutorrent.git /var/www/rutorrent/plugins/autodl-irssi
-  
+
   rm -r /var/www/rutorrent/conf  >> /dev/null 2>&1
   cp -r $HOME/rutorrent_old/conf /var/www/rutorrent/conf  >> /dev/null 2>&1
   rm -r /var/www/rutorrent/share >> /dev/null 2>&1
