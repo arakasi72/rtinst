@@ -118,7 +118,7 @@ if [ -z $passed_rtvers ]; then
     echo "This script is for upgrading/downgrading only, not for initial install"
     exit 1
   fi
-    
+
 # checks if the OS is debian 9, and forces the version to 0.9.6 of it is
   if [ $relno -eq 9 ]; then
     libvers='0.13.6'
@@ -127,7 +127,7 @@ if [ -z $passed_rtvers ]; then
   else
     list_version
   fi
-  
+
   echo "Install libtorrent-$libvers and rtorrent-$rtvers"
   echo "Your rtorrent config, torrents, and data will not be lost or changed"
   echo -n "Continue? "
@@ -145,7 +145,7 @@ else
     libvers=$(echo $passed_rtvers | awk -F. -v OFS=. '{$2='$(( $(echo $rtversion | cut -d. -f2) + 4 ))'; print }')
     rtvers=$passed_rtvers
   fi
-  
+
   # checks if the OS is debian 9, and forces the version to 0.9.6 of it is
   if [ $relno -eq 9 ]; then
     libvers='0.13.6'
