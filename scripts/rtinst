@@ -42,7 +42,7 @@ else
   geoipver=php5-geoip
 fi
 
-serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
+export serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
 webpass=''
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
@@ -504,7 +504,7 @@ echo "SSH port set to $sshport"
 ###############################
 
 # calls the script rtsslcert to generate the ssl certificated for vsftpd and nginx
-rtsslcert -d $serverip
+rtsslcert -d
 
 ###############################
 ### INSTALL FTP ###
