@@ -96,6 +96,8 @@ tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
 early_exit() {
 echo "Installation is incomplete. Run rtinst again to complete"
 echo
+echo "FTP Port set to $ftpport"
+echo
 echo "IMPORTANT - SSH Port has been set to: $sshport"
 echo "IMPORTANT - SSH Port has been set to: $sshport"
 echo "IMPORTANT - SSH Port has been set to: $sshport"
