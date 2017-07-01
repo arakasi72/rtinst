@@ -619,9 +619,10 @@ if [ $install_rt = 0 ]; then
   if [ -z $rtorrentrel ]; then
     rtorrentrel='latest'
   fi
-  cd $home
+  export $home
   # call the script rtupdate to install lib/rtorrent
   rtupdate $rtorrentrel || early_exit
+  export -n $home
 else
   echo "skiping rtorrent installation" | tee -a $logfile
 fi
