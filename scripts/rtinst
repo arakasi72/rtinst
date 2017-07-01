@@ -287,14 +287,14 @@ if hash rtorrent >> /dev/null 2>&1; then
     echo "rtorrent $rtorrent_current has been detected."
     echo -n "Do you wish to skip rtorrent compilation? "
     if ask_user; then
-      install_rt=1
+      skip_rt=0
       echo "rtorrent installation will be skipped."
     else
-      install_rt=0
+      skip_rt=1
       echo "rtorrent will be re-installed"
     fi
   else
-    install_rt=1
+    skip_rt=1
     echo "rtorrent $rtorrent_current has been detected."
     echo "rtorrent installation will be skipped."
   fi
@@ -615,7 +615,7 @@ fi
 ### INSTALL RTORRENT ###
 ###############################
 
-if [ $install_rt = 0 ]; then
+if [ $skip_rt = 1 ]; then
   if [ -z $rtorrentrel ]; then
     rtorrentrel='latest'
   fi
