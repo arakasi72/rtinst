@@ -296,7 +296,7 @@ if hash rtorrent >> /dev/null 2>&1; then
       echo "rtorrent will be re-installed"
     fi
   else
-    skip_rt=1
+    skip_rt=0
     echo "rtorrent $rtorrent_current has been detected."
     echo "rtorrent installation will be skipped."
   fi
