@@ -14,7 +14,7 @@
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
-# if left blank will install latest version of rtorrent, or set to a specific release E.G. '0.9.6' to install that release 
+# if left blank will install latest version of rtorrent, or set to a specific release E.G. '0.9.6' to install that release
 rtorrentrel=''
 
 #url's of the major components
@@ -401,7 +401,7 @@ if [ $osname = "Debian" ] && ! hash unrar >> /dev/null 2>&1; then
   attempts=0
   until [ -d rar ] || [ $attempts -gt 5 ]
   do
-    attempts=$(( $attempts + 1 ))    
+    attempts=$(( $attempts + 1 ))
     if [ "$(uname -m)" = "x86_64" ]; then
       curl -s --connect-timeout 10 http://www.rarlab.com/rar/rarlinux-x64-5.4.0.tar.gz | tar xz 2>/dev/null
     elif [ "$(uname -m)" = "x86_32" ]; then
