@@ -87,12 +87,10 @@ if [ $forceyes = 0 ] && [ $headless = 0 ]; then
   exit
 fi
 
-if [ $# -gt 1 ]; then
-  echo "Only one argument allowed"
+if [ $# -gt 0 ]; then
+  echo "No arguments allowed"
   exit
 fi
-
-serverip=$1
 
 if [ -z $serverip ]; then
   serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
