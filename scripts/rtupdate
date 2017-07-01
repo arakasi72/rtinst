@@ -113,7 +113,6 @@ if [ -z $passed_rtvers ]; then
     rtorrent_current=$(rtorrent -h | grep -m 1 'version')
     rtorrent_current=${rtorrent_current#*version }
     echo "rtorrent $rtorrent_current detected"
-    cd $HOME
   else
     echo "rtorrent NOT installed"
     echo "This script is for upgrading/downgrading only, not for initial install"
@@ -156,8 +155,14 @@ else
 
 fi
 
+if [ -z "$home" ]; then
+  home=$HOME
+fi
+
 echo
 echo "Installing libtorrent-$libvers/rtorrent-$rtvers"
+
+cd $homw
 
 if [ -d source ]; then
   cd source
