@@ -8,7 +8,37 @@
 #
 ######################################################################
 
+sourcedir='http://rtorrent.net/downloads/'
+rt_latest=$(wget -q -O - $sourcedir | grep -o "rtorrent-[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}" | sort -uV | tail -1 | grep -o "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
+ru_latest=$(curl -s https://raw.githubusercontent.com/Novik/ruTorrent/master/js/webui.js | grep -m 1 version: | cut -d \" -f2)
 
+# checks if an application is installed
+installed() {
+hash $1 2>/dev/null
+}
+
+if ( installed rtorrent ); then
+  rt_current=$(rtorrent -h | grep -m 1 'version')
+  rt_current=${rt_current#*version }
+  echo "rtorrent installed: $rt_current"
+  echo "rtorrent available: $rt_latest"
+else
+  echo "rtorrent: not installed"
+fi
+
+echo
+
+if [ -d /var/www/rutorrent ]; then
+  ru_current=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
+  echo "RuTorrent installed: $ru_current"
+  echo "RuTorrent available: $ru_latest"
+else
+  echo "RuTorrent: not installed"
+fi
+
+echo
+
+echo "rtinst"
 cd /etc/rtinst
 branch=$(basename "$(git symbolic-ref -q HEAD)")
 if [ -z $branch ]; then

@@ -20,8 +20,8 @@ if [ $(dpkg-query -W -f='${Status}' webmin 2>/dev/null | grep -c "ok installed")
   echo "Installing Webmin"
   echo "deb http://download.webmin.com/download/repository sarge contrib" > /etc/apt/sources.list.d/webmin.list
   wget -qO - http://www.webmin.com/jcameron-key.asc | apt-key add -
-  apt-get update  >> /dev/null 2>&1
-  apt-get -y install webmin  >> /dev/null 2>&1
+  apt-get -qq update
+  apt-get -qq install webmin
 else
   echo 'Webmin is already installed'
 fi

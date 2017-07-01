@@ -14,8 +14,14 @@
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
-# if left blank will install latest version of rtorrent, or set to a specific release E.G. '0.9.6' to install that release 
+# if left blank will install latest version of rtorrent, or set to a specific release E.G. '0.9.6' to install that release
 rtorrentrel=''
+
+#url's of the major components
+rt_url="http://rtorrent.net/downloads/"
+xmlrpc_url="https://svn.code.sf.net/p/xmlrpc-c/code/stable/"
+ru_url="https://github.com/Novik/ruTorrent/"
+adl_url="https://github.com/autodl-community/"
 
 if [ $(dpkg-query -W -f='${Status}' lsb-release 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
 echo "Installing lsb-release"
@@ -36,14 +42,14 @@ else
   geoipver=php5-geoip
 fi
 
-serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
+export serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
 webpass=''
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 dlflag=1
 portdefault=1
 logfile="/dev/null"
-install_rt=0
+skip_rt=1
 sshport=''
 rudevflag=0
 passfile='/etc/nginx/.htpasswd'
@@ -56,6 +62,11 @@ forceyes=1
 ###############################
 ### FUNCTIONS ###
 ###############################
+
+#function to check if a web site is reachable
+check_url() {
+  if [[ `wget -S --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then return 0; else return 1; fi
+}
 
 #function to check if string is valid format for an ip address
 valid_ip()
@@ -79,6 +90,18 @@ genpasswd() {
 local genln=$1
 [ -z "$genln" ] && genln=8
 tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
+}
+
+#function executed if the script finishes early
+early_exit() {
+echo "Installation is incomplete. Run rtinst again to complete"
+echo
+echo "FTP Port set to $ftpport"
+echo
+echo "IMPORTANT - SSH Port has been set to: $sshport"
+echo "IMPORTANT - SSH Port has been set to: $sshport"
+echo "IMPORTANT - SSH Port has been set to: $sshport"
+exit 1
 }
 
 #function to set a user input password
@@ -214,6 +237,37 @@ if [ $# -gt 0 ]; then
   exit 1
 fi
 
+# check required web repos are accessible
+os_repo=0
+major_repo=0
+
+echo
+echo "Checking the web sites we will need are accessible"
+echo  "Checking $osname mirrors"
+for i in $(cat /etc/apt/sources.list | grep "^deb http" | cut -d' ' -f2 | uniq ); do
+  echo -n $i": "
+  check_url $i && echo "OK" || { echo "FAIL"; os_repo=1; }
+done
+
+echo
+echo "Checking major 3rd party components"
+echo -n "Rtorrent: "; check_url $rt_url && echo "OK" || { echo "FAIL"; major_repo=1; }
+echo -n "xmlrpc-c: "; check_url $xmlrpc_url && echo "OK" || { echo "FAIL"; major_repo=1; }
+echo -n "RuTorrent: ";check_url $ru_url && echo "OK" || { echo "FAIL"; major_repo=1; }
+echo -n "Autodl-irssi: "; check_url $adl_url && echo "OK" || { echo "FAIL"; major_repo=1; }
+
+if [ $os_repo = 1 ]; then
+  echo "Some of your $osname mirrors are down, try again later"
+  exit 1
+fi
+
+if [ $major_repo = 1 ]; then
+  echo "Some of the repositories we need are not currently available."
+  echo "We will continue for now, but may not be able to finish"
+  echo "You can rerun rtinst later to complete the installation if needed"
+fi
+echo
+
 # check IP Address
 [ $forceyes = 1 ] && enter_ip
 
@@ -235,14 +289,14 @@ if hash rtorrent >> /dev/null 2>&1; then
     echo "rtorrent $rtorrent_current has been detected."
     echo -n "Do you wish to skip rtorrent compilation? "
     if ask_user; then
-      install_rt=1
+      skip_rt=0
       echo "rtorrent installation will be skipped."
     else
-      install_rt=0
+      skip_rt=1
       echo "rtorrent will be re-installed"
     fi
   else
-    install_rt=1
+    skip_rt=0
     echo "rtorrent $rtorrent_current has been detected."
     echo "rtorrent installation will be skipped."
   fi
@@ -347,7 +401,7 @@ if [ $osname = "Debian" ] && ! hash unrar >> /dev/null 2>&1; then
   attempts=0
   until [ -d rar ] || [ $attempts -gt 5 ]
   do
-    attempts=$(( $attempts + 1 ))    
+    attempts=$(( $attempts + 1 ))
     if [ "$(uname -m)" = "x86_64" ]; then
       curl -s --connect-timeout 10 http://www.rarlab.com/rar/rarlinux-x64-5.4.0.tar.gz | tar xz 2>/dev/null
     elif [ "$(uname -m)" = "x86_32" ]; then
@@ -452,7 +506,7 @@ echo "SSH port set to $sshport"
 ###############################
 
 # calls the script rtsslcert to generate the ssl certificated for vsftpd and nginx
-rtsslcert -d $serverip
+rtsslcert -d
 
 ###############################
 ### INSTALL FTP ###
@@ -495,18 +549,84 @@ ftpport=$(grep 'listen_port=' /etc/vsftpd.conf | sed 's/[^0-9]*//g')
 echo "FTP port set to $ftpport"
 
 ###############################
+### INSTALL NGINX ###
+###############################
+
+cd $home
+
+if [ -f "/etc/apache2/ports.conf" ]; then
+  echo "Detected apache2. Changing apache2 port to 81 in /etc/apache2/ports.conf" | tee -a $logfile
+  sed -i "s/Listen 80/Listen 81/g" /etc/apache2/ports.conf
+  service apache2 stop >> $logfile 2>&1
+fi
+
+echo "Installing nginx" | tee -a $logfile
+
+htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
+chown www-data:www-data $passfile
+chmod 640 $passfile
+
+sed -i "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
+sed -i "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
+sed -i "s/pid \/run\/nginx\.pid;/pid \/var\/run\/nginx\.pid;/g" /etc/nginx/nginx.conf
+sed -i "s/# server_tokens off;/server_tokens off;/g" /etc/nginx/nginx.conf
+sed -i "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/nginx/nginx.conf
+sed -i "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
+grep client_max_body_size /etc/nginx/nginx.conf > /dev/null 2>&1 || sed -i "/server_tokens off;/ a\        client_max_body_size 40m;\n" /etc/nginx/nginx.conf
+sed -i "/upload_max_filesize/ c\upload_max_filesize = 40M" $phploc/fpm/php.ini
+sed -i '/^;\?listen.owner/ c\listen.owner = www-data' $phploc/fpm/pool.d/www.conf
+sed -i '/^;\?listen.group/ c\listen.group = www-data' $phploc/fpm/pool.d/www.conf
+sed -i '/^;\?listen.mode/ c\listen.mode = 0660' $phploc/fpm/pool.d/www.conf
+
+if [ -d "/usr/share/nginx/www" ]; then
+  cp /usr/share/nginx/www/* /var/www
+elif [ -d "/usr/share/nginx/html" ]; then
+  cp /usr/share/nginx/html/* /var/www
+fi
+
+mv -n /etc/nginx/sites-available/default /etc/nginx/sites-available/default.original
+
+cp -f /etc/rtinst/conf/nginxsite /etc/nginx/sites-available/default
+cp -f /etc/rtinst/conf/nginxsitedl /etc/nginx/sites-available/dload-loc
+
+echo "location ~ \.php$ {" > /etc/nginx/conf.d/php
+echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/php
+
+if [ "$phpver" = "php7.0" ]; then
+  echo "          fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;" >> /etc/nginx/conf.d/php
+else
+  echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
+fi
+
+echo "          fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;" >> /etc/nginx/conf.d/php
+echo "          fastcgi_index index.php;" >> /etc/nginx/conf.d/php
+echo "          include fastcgi_params;" >> /etc/nginx/conf.d/php
+echo "}" >> /etc/nginx/conf.d/php
+
+echo "location ~* \.(jpg|jpeg|gif|css|png|js|woff|ttf|svg|eot)$ {" > /etc/nginx/conf.d/cache
+echo "        expires 30d;" >> /etc/nginx/conf.d/cache
+echo "}" >> /etc/nginx/conf.d/cache
+
+service nginx restart && service $phpver-fpm restart
+
+if [ $dlflag = 0 ]; then
+  rtdload enable
+fi
+
+###############################
 ### INSTALL RTORRENT ###
 ###############################
 
-if [ $install_rt = 0 ]; then
+if [ $skip_rt = 1 ]; then
   if [ -z $rtorrentrel ]; then
     rtorrentrel='latest'
   fi
-  cd $home
+  export home
   # call the script rtupdate to install lib/rtorrent
-  rtupdate $rtorrentrel
+  rtupdate $rtorrentrel || early_exit
+  export -n home
 else
- echo "skiping rtorrent installation" | tee -a $logfile
+  echo "skiping rtorrent installation" | tee -a $logfile
 fi
 
 echo "Configuring rtorrent" | tee -a $logfile
@@ -567,71 +687,6 @@ if [ $osname = "Raspbian" ]; then
   echo 'enabled = no' >> /var/www/rutorrent/conf/plugins.ini
   echo '[unpack]' >> /var/www/rutorrent/conf/plugins.ini
   echo 'enabled = no' >> /var/www/rutorrent/conf/plugins.ini
-fi
-
-###############################
-### INSTALL NGINX ###
-###############################
-
-cd $home
-
-if [ -f "/etc/apache2/ports.conf" ]; then
-  echo "Detected apache2. Changing apache2 port to 81 in /etc/apache2/ports.conf" | tee -a $logfile
-  sed -i "s/Listen 80/Listen 81/g" /etc/apache2/ports.conf
-  service apache2 stop >> $logfile 2>&1
-fi
-
-echo "Installing nginx" | tee -a $logfile
-
-htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
-chown www-data:www-data $passfile
-chmod 640 $passfile
-
-sed -i "s/user www-data;/user www-data www-data;/g" /etc/nginx/nginx.conf
-sed -i "s/worker_processes 4;/worker_processes 1;/g" /etc/nginx/nginx.conf
-sed -i "s/pid \/run\/nginx\.pid;/pid \/var\/run\/nginx\.pid;/g" /etc/nginx/nginx.conf
-sed -i "s/# server_tokens off;/server_tokens off;/g" /etc/nginx/nginx.conf
-sed -i "s/access_log \/var\/log\/nginx\/access\.log;/access_log off;/g" /etc/nginx/nginx.conf
-sed -i "s/error\.log;/error\.log crit;/g" /etc/nginx/nginx.conf
-grep client_max_body_size /etc/nginx/nginx.conf > /dev/null 2>&1 || sed -i "/server_tokens off;/ a\        client_max_body_size 40m;\n" /etc/nginx/nginx.conf
-sed -i "/upload_max_filesize/ c\upload_max_filesize = 40M" $phploc/fpm/php.ini
-sed -i '/^;\?listen.owner/ c\listen.owner = www-data' $phploc/fpm/pool.d/www.conf
-sed -i '/^;\?listen.group/ c\listen.group = www-data' $phploc/fpm/pool.d/www.conf
-sed -i '/^;\?listen.mode/ c\listen.mode = 0660' $phploc/fpm/pool.d/www.conf
-
-if [ -d "/usr/share/nginx/www" ]; then
-  cp /usr/share/nginx/www/* /var/www
-elif [ -d "/usr/share/nginx/html" ]; then
-  cp /usr/share/nginx/html/* /var/www
-fi
-
-mv /etc/nginx/sites-available/default /etc/nginx/sites-available/default.old
-
-cp -f /etc/rtinst/conf/nginxsite /etc/nginx/sites-available/default
-cp -f /etc/rtinst/conf/nginxsitedl /etc/nginx/sites-available/dload-loc
-
-echo "location ~ \.php$ {" > /etc/nginx/conf.d/php
-echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/php
-
-if [ "$phpver" = "php7.0" ]; then
-  echo "          fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;" >> /etc/nginx/conf.d/php
-else
-  echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
-fi
-
-echo "          fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;" >> /etc/nginx/conf.d/php
-echo "          fastcgi_index index.php;" >> /etc/nginx/conf.d/php
-echo "          include fastcgi_params;" >> /etc/nginx/conf.d/php
-echo "}" >> /etc/nginx/conf.d/php
-
-echo "location ~* \.(jpg|jpeg|gif|css|png|js|woff|ttf|svg|eot)$ {" > /etc/nginx/conf.d/cache
-echo "        expires 30d;" >> /etc/nginx/conf.d/cache
-echo "}" >> /etc/nginx/conf.d/cache
-
-service nginx restart && service $phpver-fpm restart
-
-if [ $dlflag = 0 ]; then
-  rtdload enable
 fi
 
 ###############################
