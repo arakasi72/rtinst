@@ -842,6 +842,7 @@ echo "To see contents enter: cat $home/rtinst.info"
 echo
 echo "To install webmin enter: sudo rtwebmin"
 echo
+echo "SCROLL UP IF NEEDED TO READ ALL THE SUMMARY INFO"
 echo "PLEASE REBOOT YOUR SYSTEM ONCE YOU HAVE NOTED THE ABOVE INFORMATION"
 echo | tee -a $home/rtinst.info
 echo "Thank You for choosing rtinst" | tee -a $home/rtinst.info
