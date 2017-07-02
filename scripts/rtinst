@@ -443,9 +443,9 @@ if ! [ $osname = "Raspbian" ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/de
     apt-get -qq install ffmpeg >> $logfile 2>&1
   elif [ $relno = 8 ]; then
     grep "deb http://www.deb-multimedia.org jessie main" /etc/apt/sources.list >> /dev/null || echo "deb http://www.deb-multimedia.org jessie main" >> /etc/apt/sources.list
-    apt-get -qq install deb-multimedia-keyring
     apt-get -qq update >> $logfile 2>&1
     apt-get -qq --force-yes install deb-multimedia-keyring >> $logfile 2>&1
+    apt-get -qq update >> $logfile 2>&1
     apt-get -qq --force-yes install ffmpeg >> $logfile 2>&1
   else
     apt-get -qq install ffmpeg >> $logfile 2>&1
