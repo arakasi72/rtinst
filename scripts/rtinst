@@ -780,9 +780,13 @@ ru_version=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
 
 echo
 echo "Summary of Installation" | tee $home/rtinst.info
+
 echo | tee $home/rtinst.info
+
 echo "SSH Configured" | tee -a $home/rtinst.info
 echo "   SSH port set to $sshport" | tee -a $home/rtinst.info
+
+echo | tee $home/rtinst.info
 
 echo "FTP Server"  | tee -a $home/rtinst.info
 if installed vsftpd; then
@@ -794,6 +798,7 @@ else
 fi
 
 echo | tee -a $home/rtinst.info
+
 echo "rtorrent torrent client" | tee -a $home/rtinst.info
 if installed rtorrent; then
   echo "   rtorrent $rt_current installed" | tee -a $home/rtinst.info
@@ -808,16 +813,17 @@ echo "RuTorrent Web GUI" | tee -a $home/rtinst.info
 if [ -z $ru_current ]; then
   echo "   RuTorrent was not installed" | tee -a $home/rtinst.info
 else
-  echo "RuTorrent $ru_current installed" | tee -a $home/rtinst.info
+  echo "   RuTorrent $ru_current installed" | tee -a $home/rtinst.info
   echo "   rutorrent can be accessed at https://$serverip/rutorrent" | tee -a $home/rtinst.info
   if [ $passflag = 1 ]; then
     echo "   rutorrent password set to $webpass" | tee -a $home/rtinst.info
   else
     echo "   rutorrent password as set by user" | tee -a $home/rtinst.info
   fi
-echo "   to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
-echo | tee -a $home/rtinst.info
-echo "   If enabled, access https downloads at https://$serverip/download/$user" | tee -a $home/rtinst.info
+  echo "   to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
+  echo | tee -a $home/rtinst.info
+  echo "   If enabled, access https downloads at https://$serverip/download/$user" | tee -a $home/rtinst.info
+fi
 
 echo | tee -a $home/rtinst.info
 
