@@ -776,7 +776,7 @@ fi
 ### WRITE RTINST.INFO ###
 ###############################
 
-ftp_current=$(vsftpd -v)
+ftp_current=$(echo $(vsftpd -v))
 rt_current=$(rtorrent -h | grep -om 1 "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
 ru_current=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
 
