@@ -590,6 +590,7 @@ sed -i '/^;\?listen.owner/ c\listen.owner = www-data' $phploc/fpm/pool.d/www.con
 sed -i '/^;\?listen.group/ c\listen.group = www-data' $phploc/fpm/pool.d/www.conf
 sed -i '/^;\?listen.mode/ c\listen.mode = 0660' $phploc/fpm/pool.d/www.conf
 
+mkdir -p /var/www
 if [ -d "/usr/share/nginx/www" ]; then
   cp /usr/share/nginx/www/* /var/www
 elif [ -d "/usr/share/nginx/html" ]; then
