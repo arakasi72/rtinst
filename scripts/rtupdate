@@ -110,9 +110,8 @@ fi
 
 if [ -z $passed_rtvers ]; then
   if ( installed rtorrent ); then
-    rtorrent_current=$(rtorrent -h | grep -m 1 'version')
-    rtorrent_current=${rtorrent_current#*version }
-    echo "rtorrent $rtorrent_current detected"
+    rt_current=$(rtorrent -h | grep -om 1 "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
+    echo "rtorrent $rt_current detected"
   else
     echo "rtorrent NOT installed"
     echo "This script is for upgrading/downgrading only, not for initial install"
