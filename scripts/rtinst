@@ -68,6 +68,11 @@ check_url() {
   if [[ `wget -S --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then return 0; else return 1; fi
 }
 
+# checks if an application is installed
+installed() {
+hash $1 2>/dev/null
+}
+
 #function to check if string is valid format for an ip address
 valid_ip()
 {
@@ -95,6 +100,13 @@ tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
 #function executed if the script finishes early
 early_exit() {
 echo "Installation is incomplete. Run rtinst again to complete"
+echo
+if hash rtorrent >> /dev/null 2>&1; then
+  rt_current=$(rtorrent -h | grep -om 1 "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
+  echo "rtorrent $rt_current installed"
+else
+  echo "rtorrent was not installed"
+fi
 echo
 echo "FTP Port set to $ftpport"
 echo
@@ -282,11 +294,10 @@ else
 fi
 
 #check rtorrent installation
-if hash rtorrent >> /dev/null 2>&1; then
-  rtorrent_current=$(rtorrent -h | grep -m 1 'version')
-  rtorrent_current=${rtorrent_current#*version }
+if installed rtorrent; then
+  rt_current=$(rtorrent -h | grep -om 1 "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
   if [ $forceyes = 1 ]; then
-    echo "rtorrent $rtorrent_current has been detected."
+    echo "rtorrent $rt_current has been detected."
     echo -n "Do you wish to skip rtorrent compilation? "
     if ask_user; then
       skip_rt=0
@@ -297,7 +308,7 @@ if hash rtorrent >> /dev/null 2>&1; then
     fi
   else
     skip_rt=0
-    echo "rtorrent $rtorrent_current has been detected."
+    echo "rtorrent $rt_current has been detected."
     echo "rtorrent installation will be skipped."
   fi
 fi
@@ -395,7 +406,7 @@ if ! [ $? = 0 ]; then
 fi
 
 #install unrar package
-if [ $osname = "Debian" ] && ! hash unrar >> /dev/null 2>&1; then
+if [ $osname = "Debian" ] && ! installed unrar; then
   echo "Installing rar/unrar"
   cd $home
   attempts=0
@@ -417,7 +428,7 @@ elif [ $osname = "Ubuntu" ]; then
   apt-get -qq install unrar >> $logfile 2>&1
 fi
 
-if hash unrar >> /dev/null 2>&1; then
+if installed unrar; then
   echo "rar/unrar installed"
 else
   echo "rar/unrar install failed"
@@ -428,12 +439,13 @@ if ! [ $osname = "Raspbian" ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/de
   echo "Installing ffmpeg"
   if [ $relno = 14 ]; then
     apt-add-repository -y ppa:mc3man/trusty-media >> $logfile 2>&1
-    apt-get -qq update | tee -a $logfile
+    apt-get -qq update >> $logfile 2>&1
     apt-get -qq install ffmpeg >> $logfile 2>&1
   elif [ $relno = 8 ]; then
     grep "deb http://www.deb-multimedia.org jessie main" /etc/apt/sources.list >> /dev/null || echo "deb http://www.deb-multimedia.org jessie main" >> /etc/apt/sources.list
-    apt-get -qq update | tee -a $logfile
+    apt-get -qq update >> $logfile 2>&1
     apt-get -qq --force-yes install deb-multimedia-keyring >> $logfile 2>&1
+    apt-get -qq update >> $logfile 2>&1
     apt-get -qq --force-yes install ffmpeg >> $logfile 2>&1
   else
     apt-get -qq install ffmpeg >> $logfile 2>&1
@@ -647,6 +659,8 @@ sed -i "s/<user name>/$user/g" $home/.rtorrent.rc
 mkdir -p /var/www
 cd /var/www
 
+echo -n "RuTorrent: "; check_url $ru_url && echo "OK" || { echo "FAIL"; early_exit; }
+
 if [ -d "/var/www/rutorrent" ]; then
   rm -r /var/www/rutorrent
 fi
@@ -734,6 +748,10 @@ echo "Setting permissions, Starting services" | tee -a $logfile
 chown -R www-data:www-data /var/www
 chown -R $user:$user $home
 
+if [ $dlflag = 0 ]; then
+  find $home -type d -print0 | xargs -0 chmod 755
+fi
+
 cd $home
 
 #allows users to change their rutorrent passwords
@@ -758,33 +776,76 @@ fi
 ###############################
 ### WRITE RTINST.INFO ###
 ###############################
-echo
-echo "crontab entries made. rtorrent and irssi will start on boot for $user"
-echo
-echo "ftp client should be set to explicit ftp over tls using port $ftpport" | tee $home/rtinst.info
-echo
-if [ $dlflag = 0 ]; then
-  find $home -type d -print0 | xargs -0 chmod 755
-fi
-echo "If enabled, access https downloads at https://$serverip/download/$user" | tee -a $home/rtinst.info
-echo
-echo "rutorrent can be accessed at https://$serverip/rutorrent" | tee -a $home/rtinst.info
 
-if [ $passflag = 1 ]; then
-  echo "rutorrent password set to $webpass" | tee -a $home/rtinst.info
+ftp_current=$(apt-cache policy vsftpd | grep -o Installed.* | cut -d ' ' -f2)
+rt_current=$(rtorrent -h | grep -om 1 "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
+ru_current=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
+
+echo
+echo
+echo "Summary of Installation (Important Information, please read" | tee $home/rtinst.info
+
+echo | tee $home/rtinst.info
+
+echo "SSH Configured" | tee -a $home/rtinst.info
+echo "   SSH port set to $sshport" | tee -a $home/rtinst.info
+echo "   root login directly from SSH disabled"
+echo "   login with $user and switch to root using: sudo su"
+
+echo | tee -a $home/rtinst.info
+
+echo "FTP Server"  | tee -a $home/rtinst.info
+if installed vsftpd; then
+  echo "   vsftpd $ftp_current installed" | tee -a $home/rtinst.info
+  echo "   ftp port set to $ftpport" | tee -a $home/rtinst.info
+  echo "   ftp client should be set to explicit ftp over tls using port $ftpport" | tee -a $home/rtinst.info
 else
-  echo "rutorrent password as set by user" | tee -a $home/rtinst.info
+  echo "   vsftpd is not installed" | tee -a $home/rtinst.info
 fi
 
-echo "to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
-echo
-echo "IMPORTANT: SSH Port set to $sshport - Ensure you can login before closing this session"
-echo "ssh port changed to $sshport" | tee -a $home/rtinst.info > /dev/null
+echo | tee -a $home/rtinst.info
+
+echo "rtorrent torrent client" | tee -a $home/rtinst.info
+if installed rtorrent; then
+  echo "   rtorrent $rt_current installed" | tee -a $home/rtinst.info
+  echo "   crontab entries made. rtorrent and irssi will start on boot for $user" | tee -a $home/rtinst.info
+else
+  echo "   rtorrent was not installed" | tee -a $home/rtinst.info
+fi
+
+echo | tee -a $home/rtinst.info
+
+echo "RuTorrent Web GUI" | tee -a $home/rtinst.info
+if [ -z $ru_current ]; then
+  echo "   RuTorrent was not installed" | tee -a $home/rtinst.info
+else
+  echo "   RuTorrent $ru_current installed" | tee -a $home/rtinst.info
+  echo "   rutorrent can be accessed at https://$serverip/rutorrent" | tee -a $home/rtinst.info
+  if [ $passflag = 1 ]; then
+    echo "   rutorrent password set to $webpass" | tee -a $home/rtinst.info
+  else
+    echo "   rutorrent password as set by user" | tee -a $home/rtinst.info
+  fi
+  echo "   to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
+  echo | tee -a $home/rtinst.info
+  echo "   If enabled, access https downloads at https://$serverip/download/$user" | tee -a $home/rtinst.info
+fi
+
+echo | tee -a $home/rtinst.info
+
+echo "IMPORTANT: SSH Port set to $sshport" | tee -a $home/rtinst.info
+echo "IMPORTANT: SSH Port set to $sshport"
+echo "IMPORTANT: SSH Port set to $sshport"
+echo "Please ensure you can login BEFORE closing this session"
 echo
 echo "The above information is stored in rtinst.info in your home directory."
 echo "To see contents enter: cat $home/rtinst.info"
 echo
 echo "To install webmin enter: sudo rtwebmin"
 echo
+echo "SCROLL UP IF NEEDED TO READ ALL THE SUMMARY INFO"
 echo "PLEASE REBOOT YOUR SYSTEM ONCE YOU HAVE NOTED THE ABOVE INFORMATION"
+echo | tee -a $home/rtinst.info
+echo "Thank You for choosing rtinst" | tee -a $home/rtinst.info
+echo
 chown $user rtinst.info
