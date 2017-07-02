@@ -21,8 +21,8 @@ fi
 
 listsize=6
 duoversion=''
-logfile="/dev/null"
 passed_rtvers=$1
+[ -z $logfile ] && logfile="/dev/null"
 
 # get a list of the most recent releases
 rt_releases=$(wget -q -O - $sourcedir | grep -o "rtorrent-[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}\.tar.gz" | sort -uV | tail -$listsize | grep -o "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
