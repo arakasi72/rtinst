@@ -790,7 +790,8 @@ echo | tee $home/rtinst.info
 
 echo "FTP Server"  | tee -a $home/rtinst.info
 if installed vsftpd; then
-  echo "   "$(vsftpd -v) | tee -a $home/rtinst.info
+  echo -n "   " | tee -a $home/rtinst.info
+  vsftpd -v | tee -a $home/rtinst.info
   echo "   ftp port set to $ftpport" | tee -a $home/rtinst.info
   echo "   ftp client should be set to explicit ftp over tls using port $ftpport" | tee -a $home/rtinst.info
 else
