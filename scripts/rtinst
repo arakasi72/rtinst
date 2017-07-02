@@ -780,19 +780,21 @@ ru_current=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
 
 echo
 echo
-echo "Summary of Installation" | tee $home/rtinst.info
+echo "Summary of Installation (Important Information, please read" | tee $home/rtinst.info
 
 echo | tee $home/rtinst.info
 
 echo "SSH Configured" | tee -a $home/rtinst.info
 echo "   SSH port set to $sshport" | tee -a $home/rtinst.info
+echo "   root login directly from SSH disabled"
+echo "   login with $user and switch to root using: sudo su"
 
 echo | tee $home/rtinst.info
 
 echo "FTP Server"  | tee -a $home/rtinst.info
 if installed vsftpd; then
   echo -n "   " | tee -a $home/rtinst.info
-  vsftpd -v | tee -a $home/rtinst.info
+  echo $(vsftpd -v) | tee -a $home/rtinst.info
   echo "   ftp port set to $ftpport" | tee -a $home/rtinst.info
   echo "   ftp client should be set to explicit ftp over tls using port $ftpport" | tee -a $home/rtinst.info
 else
