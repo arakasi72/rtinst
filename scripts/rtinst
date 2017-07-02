@@ -43,12 +43,13 @@ else
 fi
 
 export serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
+export logfile="/dev/null"
 webpass=''
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 dlflag=1
 portdefault=1
-logfile="/dev/null"
+
 skip_rt=1
 sshport=''
 rudevflag=0
