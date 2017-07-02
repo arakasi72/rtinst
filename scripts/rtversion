@@ -18,8 +18,7 @@ hash $1 2>/dev/null
 }
 
 if ( installed rtorrent ); then
-  rt_current=$(rtorrent -h | grep -m 1 'version')
-  rt_current=${rt_current#*version }
+  rt_current=$(rtorrent -h | grep -om 1 "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
   echo "rtorrent installed: $rt_current"
   echo "rtorrent available: $rt_latest"
 else
