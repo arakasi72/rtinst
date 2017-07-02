@@ -779,6 +779,7 @@ rt_current=$(rtorrent -h | grep -om 1 "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}"
 ru_current=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
 
 echo
+echo
 echo "Summary of Installation" | tee $home/rtinst.info
 
 echo | tee $home/rtinst.info
@@ -839,6 +840,7 @@ echo
 echo "To install webmin enter: sudo rtwebmin"
 echo
 echo "PLEASE REBOOT YOUR SYSTEM ONCE YOU HAVE NOTED THE ABOVE INFORMATION"
+echo | tee -a $home/rtinst.info
+echo "Thank You for choosing rtinst" | tee -a $home/rtinst.info
 echo
-echo "Thank You for choosing rtinst"
 chown $user rtinst.info
