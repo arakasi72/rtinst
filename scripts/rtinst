@@ -97,18 +97,10 @@ early_exit() {
 echo "Installation is incomplete. Run rtinst again to complete"
 echo
 if hash rtorrent >> /dev/null 2>&1; then
-  rtorrent_current=$(rtorrent -h | grep -m 1 'version')
-  rtorrent_current=${rtorrent_current#*version }
-  echo "rtorrent $rtorrent_current installed"
+  rt_current=$(rtorrent -h | grep -om 1 "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
+  echo "rtorrent $rt_current installed"
 else
   echo "rtorrent was not installed"
-fi
-echo
-ru_installed=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
-if [ -z $ru_installed ]; then
-  echo "RuTorrent was not installed"
-else
-  echo "RuTorrent $ru_installed installed
 fi
 echo
 echo "FTP Port set to $ftpport"
@@ -298,10 +290,9 @@ fi
 
 #check rtorrent installation
 if hash rtorrent >> /dev/null 2>&1; then
-  rtorrent_current=$(rtorrent -h | grep -m 1 'version')
-  rtorrent_current=${rtorrent_current#*version }
+  rt_current=$(rtorrent -h | grep -om 1 "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
   if [ $forceyes = 1 ]; then
-    echo "rtorrent $rtorrent_current has been detected."
+    echo "rtorrent $rt_current has been detected."
     echo -n "Do you wish to skip rtorrent compilation? "
     if ask_user; then
       skip_rt=0
@@ -312,7 +303,7 @@ if hash rtorrent >> /dev/null 2>&1; then
     fi
   else
     skip_rt=0
-    echo "rtorrent $rtorrent_current has been detected."
+    echo "rtorrent $rt_current has been detected."
     echo "rtorrent installation will be skipped."
   fi
 fi
@@ -775,6 +766,9 @@ fi
 ###############################
 ### WRITE RTINST.INFO ###
 ###############################
+ru_version=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
+
+
 echo
 echo "crontab entries made. rtorrent and irssi will start on boot for $user"
 echo
