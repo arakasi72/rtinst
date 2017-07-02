@@ -775,6 +775,8 @@ fi
 ###############################
 ### WRITE RTINST.INFO ###
 ###############################
+
+ftp_current=$(vsftpd -v)
 rt_current=$(rtorrent -h | grep -om 1 "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
 ru_current=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
 
@@ -793,8 +795,7 @@ echo | tee $home/rtinst.info
 
 echo "FTP Server"  | tee -a $home/rtinst.info
 if installed vsftpd; then
-  echo -n "   " | tee -a $home/rtinst.info
-  echo $(vsftpd -v) | tee -a $home/rtinst.info
+  echo "   $ftp_current" | tee -a $home/rtinst.info
   echo "   ftp port set to $ftpport" | tee -a $home/rtinst.info
   echo "   ftp client should be set to explicit ftp over tls using port $ftpport" | tee -a $home/rtinst.info
 else
