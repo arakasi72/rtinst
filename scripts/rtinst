@@ -791,7 +791,7 @@ echo "   SSH port set to $sshport" | tee -a $home/rtinst.info
 echo "   root login directly from SSH disabled"
 echo "   login with $user and switch to root using: sudo su"
 
-echo | tee $home/rtinst.info
+echo | tee -a $home/rtinst.info
 
 echo "FTP Server"  | tee -a $home/rtinst.info
 if installed vsftpd; then
