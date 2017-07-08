@@ -368,13 +368,15 @@ if [ -z "$webpass" ] && [ $forceyes = 0 ]; then
 fi
 
 if [ -z "$webpass" ]  && [ $passflag != 2 ]; then
-  if [ -z $(grep -s $user $passfile) ]; then
+  if [ ! -z $(grep -s $user $passfile) ]; then
     echo "There is an existing RuTorrent password for $user"
     echo -n "Create a new password y/n ? "
     if ask_user; then
       echo "Set Password for RuTorrent web client"
       webpass=$(set_pass)
       passflag=$?
+    else
+      passflag=2
     fi
   else
     echo "Set Password for RuTorrent web client"
@@ -589,7 +591,10 @@ fi
 
 echo "Installing nginx" | tee -a $logfile
 
-htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
+if [ $passflag != 2 ]; then
+  htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
+fi
+
 chown www-data:www-data $passfile
 chmod 640 $passfile
 
