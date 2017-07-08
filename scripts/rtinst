@@ -829,7 +829,7 @@ else
   echo "   rutorrent can be accessed at https://$serverip/rutorrent" | tee -a $home/rtinst.info
   if [ $passflag = 1 ]; then
     echo "   rutorrent password set to $webpass" | tee -a $home/rtinst.info
-  elif [ $passflag = 2]; then
+  elif [ $passflag = 2 ]; then
     echo "   rutorrent password has not been changed" | tee -a $home/rtinst.info
   else
     echo "   rutorrent password as set by user" | tee -a $home/rtinst.info
