@@ -287,11 +287,13 @@ if ! [ -d "$home/rtorrent/watch" ]; then
 mkdir $home/rtorrent/watch
 fi
 
-if [ -z "$webpass" ]; then
+if [ -z "$webpass" ] && [ -z $(grep -s $user $passfile) ]; then
   webpass=$(genpasswd)
 fi
 
-htpasswd -b $passfile $user $webpass
+if [ ! -z "$webpass" ]; then
+  htpasswd -b $passfile $user $webpass
+fi
 
 cp -f /etc/rtinst/conf/rtorrent.rc $home/.rtorrent.rc
 
@@ -382,7 +384,11 @@ echo "https downloads can be accessed at https://$serverip/download/$user" | tee
 echo
 fi
 echo "rutorrent can be accessed at https://$serverip/rutorrent" | tee -a $home/rtinst.info
-echo "rutorrent password set to $webpass" | tee -a $home/rtinst.info
+if [ -z $webpass ]; then
+  echo "rutorrent password has not been changed" | tee -a $home/rtinst.info
+else
+  echo "rutorrent password set to $webpass" | tee -a $home/rtinst.info
+fi
 echo "to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
 echo
 echo "The above info is stored at $home/rtinst.info"

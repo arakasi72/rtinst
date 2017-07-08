@@ -43,12 +43,13 @@ else
 fi
 
 export serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
+export logfile="/dev/null"
 webpass=''
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
 dlflag=1
 portdefault=1
-logfile="/dev/null"
+
 skip_rt=1
 sshport=''
 rudevflag=0
@@ -358,14 +359,30 @@ home=$(eval echo "~$user")
 
 #set password for rutorrent
 if [ -z "$webpass" ] && [ $forceyes = 0 ]; then
-  webpass=$(genpasswd)
-  passflag=1
+  if [ -z $(grep -s $user $passfile) ]; then
+    webpass=$(genpasswd)
+    passflag=1
+  else
+    passflag=2
+  fi
 fi
 
-if [ -z "$webpass" ]; then
-  echo "Set Password for RuTorrent web client"
-  webpass=$(set_pass)
-  passflag=$?
+
+
+if [ -z "$webpass" ]  && [ $passflag != 2 ]; then
+  if [ ! -z $(grep -s $user $passfile) ]; then
+    echo "There is an existing RuTorrent password for $user"
+    echo -n "Use existing password y/n ? "
+    if ask_user; then
+      passflag=2
+    fi
+  fi
+  
+  if [ $passflag != 2 ]; then
+    echo "Set Password for RuTorrent web client"
+    webpass=$(set_pass)
+    passflag=$?
+  fi
 fi
 
 #Interaction ended message
@@ -574,7 +591,10 @@ fi
 
 echo "Installing nginx" | tee -a $logfile
 
-htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
+if [ $passflag != 2 ]; then
+  htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
+fi
+
 chown www-data:www-data $passfile
 chmod 640 $passfile
 
@@ -824,6 +844,8 @@ else
   echo "   rutorrent can be accessed at https://$serverip/rutorrent" | tee -a $home/rtinst.info
   if [ $passflag = 1 ]; then
     echo "   rutorrent password set to $webpass" | tee -a $home/rtinst.info
+  elif [ $passflag = 2 ]; then
+    echo "   rutorrent password has not been changed" | tee -a $home/rtinst.info
   else
     echo "   rutorrent password as set by user" | tee -a $home/rtinst.info
   fi
