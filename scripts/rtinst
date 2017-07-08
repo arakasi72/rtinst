@@ -376,6 +376,7 @@ if [ -z "$webpass" ]  && [ $passflag != 2 ]; then
     if ask_user; then
       passflag=2
     fi
+  fi
   
   if [ $passflag != 2 ]; then
     echo "Set Password for RuTorrent web client"
