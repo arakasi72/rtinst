@@ -367,18 +367,17 @@ if [ -z "$webpass" ] && [ $forceyes = 0 ]; then
   fi
 fi
 
+
+
 if [ -z "$webpass" ]  && [ $passflag != 2 ]; then
   if [ ! -z $(grep -s $user $passfile) ]; then
     echo "There is an existing RuTorrent password for $user"
-    echo -n "Create a new password y/n ? "
+    echo -n "Use existing password y/n ? "
     if ask_user; then
-      echo "Set Password for RuTorrent web client"
-      webpass=$(set_pass)
-      passflag=$?
-    else
       passflag=2
     fi
-  else
+  
+  if [ $passflag != 2 ]; then
     echo "Set Password for RuTorrent web client"
     webpass=$(set_pass)
     passflag=$?
