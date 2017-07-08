@@ -287,11 +287,13 @@ if ! [ -d "$home/rtorrent/watch" ]; then
 mkdir $home/rtorrent/watch
 fi
 
-if [ -z "$webpass" ]; then
+if [ -z "$webpass" ] && [ -z $(grep -s $user $passfile) ]; then
   webpass=$(genpasswd)
 fi
 
-htpasswd -b $passfile $user $webpass
+if [ ! -z "$webpass" ]; then
+  htpasswd -b $passfile $user $webpass
+fi
 
 cp -f /etc/rtinst/conf/rtorrent.rc $home/.rtorrent.rc
 
