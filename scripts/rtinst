@@ -385,6 +385,35 @@ if [ -z "$webpass" ]  && [ $passflag != 2 ]; then
   fi
 fi
 
+rut_user_list=$(ls /var/www/rutorrent/conf/users 2>/dev/null | sed "s/$user//g")
+
+if [ -z "$rut_user_list" ]; then
+  echo "No additional users to add"
+else
+  for rut_user in $rut_user_list; do
+    if ! id -u $rut_user >/dev/null 2>&1; then
+      rut_user_list=$(echo $rut_user_list | sed "s/$rut_user//g")
+    fi
+  done
+fi
+
+if [ -z "$rut_user_list" ]; then
+  rut_add_users=1
+elif [ $force_yes = 0 ]; then
+  rut_add_users=0
+else
+  echo "These users have been detected: $rut_user_list"
+  echo -n "Add them to rutorrent y/n ? "
+  if ask_user; then
+    rut_add_users=0
+  else
+    rut_add_users=1
+  fi
+fi
+
+echo $rut_add_users
+exit
+
 #Interaction ended message
 echo
 echo "No more user input required, you can complete unattended"
