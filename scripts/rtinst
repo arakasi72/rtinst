@@ -411,9 +411,6 @@ else
   fi
 fi
 
-echo $rut_add_users
-exit
-
 #Interaction ended message
 echo
 echo "No more user input required, you can complete unattended"
