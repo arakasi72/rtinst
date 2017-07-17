@@ -372,6 +372,7 @@ echo
 ### WRITE RTINST.INFO ###
 ###############################
 
+echo > $home/rtinst.info
 if groups $user | grep -q -E ' sshuser(\s|$)' || groups $user | grep -q -E ' sudo(\s|$)'; then
 echo "$user has SSH access on port $sshport" | tee -a $home/rtinst.info
 echo
