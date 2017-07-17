@@ -400,10 +400,16 @@ fi
 if [ -z "$rut_user_list" ]; then
   rut_add_users=1
 elif [ $forceyes = 0 ]; then
-  echo "These users will be added: $rut_user_list"
+  echo "These users will be added:"
+  for rut_user in $rut_user_list; do
+    echo $rut_user
+  done
   rut_add_users=0
 else
-  echo "These users have been detected: $rut_user_list"
+  echo "These users have been detected:"
+  for rut_user in $rut_user_list; do
+    echo $rut_user
+  done
   echo -n "Add them to rutorrent y/n ? "
   if ask_user; then
     rut_add_users=0
