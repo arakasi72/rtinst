@@ -339,7 +339,6 @@ echo "gui-server-password = $adlpass" >> autodl2.cfg
 
 chown -R $user:$user $home
 chown -R www-data:www-data /var/www/rutorrent
-chmod -R 755 /var/www/rutorrent
 
 if [ -z "$(crontab -u $user -l | grep "$cronline1")" ]; then
   (crontab -u $user -l; echo "$cronline1" ) | crontab -u $user -
