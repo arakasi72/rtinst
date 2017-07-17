@@ -403,7 +403,7 @@ else
   done
 
   if [ $forceyes = 0 ]; then
-    echo "Users will be added
+    echo "Users will be added"
     rut_add_users=0
   else
     echo -n "Add them to rutorrent y/n ? "
