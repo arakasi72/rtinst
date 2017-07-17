@@ -400,6 +400,7 @@ fi
 if [ -z "$rut_user_list" ]; then
   rut_add_users=1
 elif [ $forceyes = 0 ]; then
+  echo "These users will be added: $rut_user_list"
   rut_add_users=0
 else
   echo "These users have been detected: $rut_user_list"
