@@ -819,6 +819,13 @@ if [ -z  "$(crontab -u $user -l | grep "\*/10 \* \* \* \* /usr/local/bin/rtcheck
     (crontab -u $user -l; echo "$cronline2" ) | crontab -u $user - >> $logfile 2>&1
 fi
 
+# add aditional users if any
+if [ $rut_add_users = 0 ]; then
+  for rut_user in $rut_user_list; do
+    echo "Adding $rut_user"
+    rtadduser -n -u $rut_user >> $logfile 2>&1
+  done
+fi
 
 ###############################
 ### WRITE RTINST.INFO ###
