@@ -624,7 +624,11 @@ fi
 echo "Installing nginx" | tee -a $logfile
 
 if [ $passflag != 2 ]; then
-  htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
+  if [ -f $passfile ]; then
+    htpasswd -b $passfile $user $webpass >> $logfile 2>&1
+  else
+    htpasswd -c -b $passfile $user $webpass >> $logfile 2>&1
+  fi
 fi
 
 chown www-data:www-data $passfile
