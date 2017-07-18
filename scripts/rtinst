@@ -59,6 +59,7 @@ Install_list=""
 unixpass=""
 passflag=0
 forceyes=1
+rut_add_users=1
 
 ###############################
 ### FUNCTIONS ###
@@ -385,6 +386,33 @@ if [ -z "$webpass" ]  && [ $passflag != 2 ]; then
   fi
 fi
 
+rut_user_list=$(ls /var/www/rutorrent/conf/users 2>/dev/null | sed "s/$user//g")
+
+for rut_user in $rut_user_list; do
+  if ! id -u $rut_user >/dev/null 2>&1; then
+    rut_user_list=$(echo $rut_user_list | sed "s/$rut_user//g")
+  fi
+done
+
+if [ -z "$rut_user_list" ]; then
+  echo "No additional users to add"
+else
+  echo "These users have been detected:"
+  for rut_user in $rut_user_list; do
+    echo $rut_user
+  done
+
+  if [ $forceyes = 0 ]; then
+    echo "Users will be added"
+    rut_add_users=0
+  else
+    echo -n "Add them to rutorrent y/n ? "
+    if ask_user; then
+      rut_add_users=0
+    fi
+  fi
+fi
+
 #Interaction ended message
 echo
 echo "No more user input required, you can complete unattended"
@@ -420,6 +448,10 @@ for package_name in $package_list
 test -z "$install_list" || apt-get -qq install $install_list >> $logfile 2>&1
 if ! [ $? = 0 ]; then
   echo "Problem installing packages. Check log and rerun once it is resolved" && exit
+fi
+
+if [ "$phpver" = "php7.0" ]; then
+  apt-get -qq install php7.0-mbstring >> $logfile 2>&1
 fi
 
 #install unrar package
@@ -793,6 +825,13 @@ if [ -z  "$(crontab -u $user -l | grep "\*/10 \* \* \* \* /usr/local/bin/rtcheck
     (crontab -u $user -l; echo "$cronline2" ) | crontab -u $user - >> $logfile 2>&1
 fi
 
+# add aditional users if any
+if [ $rut_add_users = 0 ]; then
+  for rut_user in $rut_user_list; do
+    echo "Adding $rut_user"
+    rtadduser -n -u $rut_user >> $logfile 2>&1
+  done
+fi
 
 ###############################
 ### WRITE RTINST.INFO ###
