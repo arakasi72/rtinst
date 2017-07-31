@@ -722,6 +722,10 @@ if [ -d "/var/www/rutorrent" ]; then
   rm -r /var/www/rutorrent
 fi
 
+if [ "$relno" = "14" ]; then
+  rudevflag=1
+fi
+
  if [ $rudevflag = 1 ]; then
    echo "Installing Rutorrent (stable)" | tee -a $logfile
    wget -q https://github.com/Novik/ruTorrent/archive/v3.8.tar.gz | tee -a $logfile
