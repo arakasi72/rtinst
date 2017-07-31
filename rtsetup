@@ -34,6 +34,9 @@ if [ -d /etc/rtinst ] && [ -z $branch ]; then
   branch=$(basename "$(git symbolic-ref -q HEAD)")
   if [ -z $branch ]; then
     branch=$(git describe --tags --exact-match)
+    if [ ${branch:0:1} = v ]; then
+      branch=release
+    fi
   fi
   if [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
     echo "$branch has been deleted, using latest numbered release instead"
