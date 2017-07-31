@@ -35,7 +35,7 @@ if [ -d /etc/rtinst ] && [ -z $branch ]; then
   if [ -z $branch ]; then
     branch=$(git describe --tags --exact-match)
     if [ ${branch:0:1} = v ]; then
-      branch=release
+      branch=$(basename "$(git ls-remote --tags https://github.com/arakasi72/rtinst.git | grep -o 'refs/tags/v.*' | sort -V | tail -1)")
     fi
   fi
   if [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
