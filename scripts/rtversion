@@ -48,10 +48,10 @@ if [ -z $branch ]; then
     if [ $branch = $latest ]; then
       echo "This is the latest release"
     else
-      echo "Use rtgetscripts to update to rtinst $latest"
+      echo "Use rtsetup to update to rtinst $latest"
     fi   
   fi
 else
   echo "Current Branch: $branch"
-  echo "Use rtgetscripts to update branch"
+  echo "Use rtsetup to update branch"
 fi

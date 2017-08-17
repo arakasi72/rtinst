@@ -13,6 +13,19 @@ PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 rundir=$(dirname $(readlink -f $0))
 branch=$1
 
+# function to ask user for y/n response
+ask_user(){
+local answer
+while true
+  do
+    read answer
+    case $answer in [Yy]* ) return 0 ;;
+                    [Nn]* ) return 1 ;;
+                        * ) echo "Enter y or n";;
+    esac
+  done
+}
+
 if [ "$(id -u)" != "0" ]; then
   echo "Must be run as root, directly or with sudo"
   exit 1
@@ -34,6 +47,19 @@ if [ -d /etc/rtinst ] && [ -z $branch ]; then
   branch=$(basename "$(git symbolic-ref -q HEAD)")
   if [ -z $branch ]; then
     branch=$(git describe --tags --exact-match)
+    if [ ${branch:0:1} = v ]; then
+      latest=$(basename "$(git ls-remote --tags https://github.com/arakasi72/rtinst.git | grep -o 'refs/tags/v.*' | sort -V | tail -1)")
+      if [ $branch != $latest ]; then
+        echo "Updating from $branch to $latest"
+        branch=$latest
+      else
+        echo "Already using the latest version, rtinst $branch"
+        echo -n "Do you wish to reinstall rtinst y/n? "
+        if ! ask_user; then
+          exit
+        fi
+      fi
+    fi
   fi
   if [ $(git ls-remote --tags --heads https://github.com/arakasi72/rtinst.git $branch | wc -l) -eq 0 ]; then
     echo "$branch has been deleted, using latest numbered release instead"
