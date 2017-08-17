@@ -57,6 +57,7 @@ if [ -d /etc/rtinst ] && [ -z $branch ]; then
         echo -n "Do you wish to reinstall rtinst y/n? "
         if ! ask_user; then
           exit
+        fi
       fi
     fi
   fi
