@@ -70,7 +70,6 @@ git checkout $branch > /dev/null 2>&1
 cd
 ln -sf /etc/rtinst/scripts/* /usr/local/bin
 ln -sf /etc/rtinst/rtsetup /usr/local/bin
-ln -sf -T /etc/rtinst/rtsetup /usr/local/bin/rtgetscripts
 
 echo "Installation complete"
 echo
