@@ -200,14 +200,14 @@ if [ $osname = "Raspbian" ]; then
 else
   ./configure --prefix=/usr >> $logfile 2>&1
 fi
-make -s -j2 >> $logfile 2>&1
+make -s -j $(nproc) >> $logfile 2>&1
 make -s install >> $logfile 2>&1
 
 cd ../rtorrent-$rtvers
 echo "Installing rtorrent" | tee -a $logfile
 ./autogen.sh >> $logfile 2>&1
 ./configure --prefix=/usr --with-xmlrpc-c >> $logfile 2>&1
-make -s -j2 >> $logfile 2>&1
+make -s -j $(nproc) >> $logfile 2>&1
 make -s install >> $logfile 2>&1
 ldconfig >> $logfile 2>&1
 
