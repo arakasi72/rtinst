@@ -14,6 +14,7 @@ newvers=$(curl -s https://raw.githubusercontent.com/Novik/ruTorrent/master/js/we
 oldvers=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
 
 ruflag=0
+rurelease=master
 
 ask_option() {
  while true
@@ -105,11 +106,11 @@ if [ $ruflag = 0 ]; then
   echo
 
   mv -f /var/www/rutorrent $HOME/rutorrent_old
-  echo "Installing Rutorrent "$newvers
-  wget -q https://github.com/Novik/ruTorrent/archive/master.tar.gz
-  tar -xzf master.tar.gz
-  mv -f ruTorrent-master /var/www/rutorrent
-  rm master.tar.gz
+  echo "Installing Rutorrent ($rurelease)"
+  wget -q https://github.com/Novik/ruTorrent/archive/$rurelease.tar.gz
+  tar -xzf $rurelease.tar.gz
+  mv -f $(tar -tzf $rurelease.tar.gz | head -1) rutorrent
+  rm $rurelease.tar.gz
 
   git clone -q https://github.com/autodl-community/autodl-rutorrent.git /var/www/rutorrent/plugins/autodl-irssi
 
