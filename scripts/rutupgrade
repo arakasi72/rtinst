@@ -109,7 +109,7 @@ if [ $ruflag = 0 ]; then
   echo "Installing Rutorrent ($rurelease)"
   wget -q https://github.com/Novik/ruTorrent/archive/$rurelease.tar.gz
   tar -xzf $rurelease.tar.gz
-  mv -f $(tar -tzf $rurelease.tar.gz | head -1) rutorrent
+  mv -f $(tar -tzf $rurelease.tar.gz | head -1) /var/www/rutorrent
   rm $rurelease.tar.gz
 
   git clone -q https://github.com/autodl-community/autodl-rutorrent.git /var/www/rutorrent/plugins/autodl-irssi
