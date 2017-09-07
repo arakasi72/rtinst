@@ -28,6 +28,19 @@ ask_option() {
     done
 }
 
+ask_version() {
+  echo "Chose which build to install, (if you are not sure select 1)"
+  while true
+    do
+      echo "1. Use the latest stable release"
+      echo "2. Use the most recent master build"
+      read -p "Select 1 or 2: " answer
+      case $answer in [1]* ) return 0 ;;
+                      [2]* ) return 1 ;;
+      esac
+    done
+}
+
 check_user() {
 while true
   do
@@ -95,7 +108,11 @@ echo 'Detected '$HOME'/rutorrent_old'
 fi
 
 if [ $ruflag = 0 ]; then
-
+  
+  if ( ask_version ); then
+    rurelease=$(git ls-remote -t https://github.com/Novik/ruTorrent v\* | cut -d/ -f3 | sort -V | tail -1)
+  fi
+  
   if [ -d $HOME'/rutorrent_old' ]; then
     rm -r $HOME/rutorrent_old
 	echo "rutorrent_old has been deleted"
