@@ -31,7 +31,7 @@ ask_option() {
 check_user() {
 while true
   do
-    read -p "Do you wish to continue? " answer
+    read answer
     case $answer in [Yy]* ) return 0 ;;
                     [Nn]* ) return 1 ;;
                         * ) echo "Enter y or n";;
@@ -58,6 +58,7 @@ else
   echo "   Latest version: "$newvers
 fi
 
+echo -n "Do you wish to continue? "
 if ! ( check_user ); then
   exit
 fi
@@ -69,6 +70,7 @@ echo 'Detected '$HOME'/rutorrent_old'
     echo "Restoring Old version of rutorrent"
     echo "WARNING: The current rutorrent will be overwitten by older backup"
     ruflag=1
+    echo -n "Do you wish to continue? "
     if ( check_user ); then
       echo "Restoring"
       rm -r /var/www/rutorrent
@@ -82,7 +84,8 @@ echo 'Detected '$HOME'/rutorrent_old'
   else
     echo "Rutorrent will be upgraded"
     echo "WARNING: rutorrent_old will be deleted"
-	echo "If you wish to retain this older version you should exit this script, and rename or move it"
+    echo "If you wish to retain this older version you should exit this script, and rename or move it"
+    echo -n "Do you wish to continue? "
     if ( check_user ); then
       ruflag=0
     else
