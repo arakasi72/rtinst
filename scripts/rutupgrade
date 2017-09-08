@@ -39,7 +39,7 @@ ask_version() {
   if [ $force_yes = 0 ]; then
     return $install_master
   else
-    echo "Chose which build to install, (if you are not sure select 1)"
+    echo "Choose which build to install, (if you are not sure select 1)"
     while true
       do
         echo "1. Use the latest stable release"
