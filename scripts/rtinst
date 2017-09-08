@@ -53,6 +53,7 @@ portdefault=1
 skip_rt=1
 sshport=''
 rudevflag=1
+rurelease=master
 passfile='/etc/nginx/.htpasswd'
 package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl $geoipver $phpver-mcrypt $phpver-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
 Install_list=""
@@ -723,23 +724,15 @@ if [ -d "/var/www/rutorrent" ]; then
   rm -r /var/www/rutorrent
 fi
 
-if [ "$relno" = "14" ]; then
-  rudevflag=1
+if [ $rudevflag = 1 ]; then
+   rurelease=$(git ls-remote -t https://github.com/Novik/ruTorrent v\* | cut -d/ -f3 | sort -V | tail -1)
 fi
 
- if [ $rudevflag = 1 ]; then
-   echo "Installing Rutorrent (stable)" | tee -a $logfile
-   wget -q https://github.com/Novik/ruTorrent/archive/v3.8.tar.gz | tee -a $logfile
-   tar -xzf v3.8.tar.gz
-   mv -f ruTorrent-3.8 rutorrent
-   rm v3.8.tar.gz
- else
-   echo "Installing Rutorrent (latest build)" | tee -a $logfile
-   wget -q https://github.com/Novik/ruTorrent/archive/master.tar.gz | tee -a $logfile
-   tar -xzf master.tar.gz
-   mv -f ruTorrent-master rutorrent
-   rm master.tar.gz
- fi
+echo "Installing Rutorrent ($rurelease)" | tee -a $logfile
+wget -q https://github.com/Novik/ruTorrent/archive/$rurelease.tar.gz | tee -a $logfile
+tar -xzf $rurelease.tar.gz
+mv $(tar -tzf $rurelease.tar.gz | head -1) rutorrent
+rm $rurelease.tar.gz
 
 echo "Configuring Rutorrent" | tee -a $logfile
 rm rutorrent/conf/config.php

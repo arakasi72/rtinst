@@ -14,18 +14,44 @@ newvers=$(curl -s https://raw.githubusercontent.com/Novik/ruTorrent/master/js/we
 oldvers=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
 
 ruflag=0
+rurelease=$(git ls-remote -t https://github.com/Novik/ruTorrent v\* | cut -d/ -f3 | sort -V | tail -1)
+force_yes=1
+restore_old=1
+install_master=1
 
 ask_option() {
- while true
-    do
-      echo "1. Restore rutorrent_old"
-      echo "2. Upgrade to latest version"
-      read -p "Select 1 or 2: " answer
-      case $answer in [1]* ) return 0 ;;
-                      [2]* ) return 1 ;;
+  if [ $force_yes = 0 ]; then
+    return $restore_old
+  else
+    while true
+      do
+        echo "1. Restore rutorrent_old"
+        echo "2. Upgrade to latest version"
+        read -p "Select 1 or 2: " answer
+        case $answer in [1]* ) return 0 ;;
+                        [2]* ) return 1 ;;
       esac
     done
+  fi
 }
+
+ask_version() {
+  if [ $force_yes = 0 ]; then
+    return $install_master
+  else
+    echo "Choose which build to install, (if you are not sure select 1)"
+    while true
+      do
+        echo "1. Use the latest stable release"
+        echo "2. Use the most recent master build"
+        read -p "Select 1 or 2: " answer
+        case $answer in [1]* ) return 1 ;;
+                        [2]* ) return 0 ;;
+      esac
+    done
+  fi
+}
+
 
 check_user() {
 while true
@@ -43,6 +69,21 @@ if [ "$(id -u)" != "0" ]; then
   echo "Must be run from root or using sudo" && exit 1
 fi
 
+# get options
+OPTS=$(getopt -n "$0" -o myo --long "rutorrent-master,force-yes,restore-old" -- "$@")
+
+eval set -- "$OPTS"
+
+while true; do
+  case "$1" in
+    -m | --rutorrent-master ) install_master=0; shift;;
+    -y | --force-yes ) force_yes=0; shift;;
+    -o | --restore-old ) restore_old=0; shift;;
+    -- ) shift; break ;;
+     * ) break ;;
+  esac
+done
+
 #check rutorrent folder exists
 if ! [ -d '/var/www/rutorrent' ]; then
 echo 'Could not find /var/www/rutorrent, exiting script'
@@ -57,7 +98,14 @@ else
   echo "   Latest version: "$newvers
 fi
 
-if ! ( check_user ); then
+if [ $restore_old = 0 ] && ! [ -d $HOME'/rutorrent_old' ]; then
+  echo "No backup available to do a restore"
+  exit
+fi
+
+if [ $force_yes = 0 ] || ( check_user ); then
+  echo
+else
   exit
 fi
 
@@ -68,7 +116,7 @@ echo 'Detected '$HOME'/rutorrent_old'
     echo "Restoring Old version of rutorrent"
     echo "WARNING: The current rutorrent will be overwitten by older backup"
     ruflag=1
-    if ( check_user ); then
+    if [ $force_yes = 0 ] || ( check_user ); then
       echo "Restoring"
       rm -r /var/www/rutorrent
       mv -f $HOME/rutorrent_old /var/www/rutorrent
@@ -81,8 +129,8 @@ echo 'Detected '$HOME'/rutorrent_old'
   else
     echo "Rutorrent will be upgraded"
     echo "WARNING: rutorrent_old will be deleted"
-	echo "If you wish to retain this older version you should exit this script, and rename or move it"
-    if ( check_user ); then
+    echo "If you wish to retain this older version you should exit this script, and rename or move it"
+    if [ $force_yes = 0 ] || ( check_user ); then
       ruflag=0
     else
       exit
@@ -92,9 +140,13 @@ fi
 
 if [ $ruflag = 0 ]; then
 
+  if ( ask_version ); then
+    rurelease=master
+  fi
+
   if [ -d $HOME'/rutorrent_old' ]; then
     rm -r $HOME/rutorrent_old
-	echo "rutorrent_old has been deleted"
+    echo "rutorrent_old has been deleted"
   fi
 
   echo
@@ -105,11 +157,11 @@ if [ $ruflag = 0 ]; then
   echo
 
   mv -f /var/www/rutorrent $HOME/rutorrent_old
-  echo "Installing Rutorrent "$newvers
-  wget -q https://github.com/Novik/ruTorrent/archive/master.tar.gz
-  tar -xzf master.tar.gz
-  mv -f ruTorrent-master /var/www/rutorrent
-  rm master.tar.gz
+  echo "Installing Rutorrent ($rurelease)"
+  wget -q https://github.com/Novik/ruTorrent/archive/$rurelease.tar.gz
+  tar -xzf $rurelease.tar.gz
+  mv -f $(tar -tzf $rurelease.tar.gz | head -1) /var/www/rutorrent
+  rm $rurelease.tar.gz
 
   git clone -q https://github.com/autodl-community/autodl-rutorrent.git /var/www/rutorrent/plugins/autodl-irssi
 
@@ -119,4 +171,6 @@ if [ $ruflag = 0 ]; then
   cp -r $HOME/rutorrent_old/share /var/www/rutorrent/share >> /dev/null 2>&1
   echo "Setting permissions, Starting services"
   chown -R www-data:www-data /var/www
+  echo
+  echo "Installation of RuTorrent complete"
 fi
