@@ -78,7 +78,7 @@ while true; do
   case "$1" in
     -m | --rutorrent-master ) install_master=0; shift;;
     -y | --force-yes ) force_yes=0; shift;;
-    -o | --restore-old ) restore_old=0; shift; shift;;
+    -o | --restore-old ) restore_old=0; shift;;
     -- ) shift; break ;;
      * ) break ;;
   esac
