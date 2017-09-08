@@ -44,7 +44,7 @@ ask_version() {
 check_user() {
 while true
   do
-    read answer
+    read -p "Do you wish to continue? " answer
     case $answer in [Yy]* ) return 0 ;;
                     [Nn]* ) return 1 ;;
                         * ) echo "Enter y or n";;
@@ -71,7 +71,6 @@ else
   echo "   Latest version: "$newvers
 fi
 
-echo -n "Do you wish to continue? "
 if ! ( check_user ); then
   exit
 fi
@@ -83,7 +82,6 @@ echo 'Detected '$HOME'/rutorrent_old'
     echo "Restoring Old version of rutorrent"
     echo "WARNING: The current rutorrent will be overwitten by older backup"
     ruflag=1
-    echo -n "Do you wish to continue? "
     if ( check_user ); then
       echo "Restoring"
       rm -r /var/www/rutorrent
@@ -98,7 +96,6 @@ echo 'Detected '$HOME'/rutorrent_old'
     echo "Rutorrent will be upgraded"
     echo "WARNING: rutorrent_old will be deleted"
     echo "If you wish to retain this older version you should exit this script, and rename or move it"
-    echo -n "Do you wish to continue? "
     if ( check_user ); then
       ruflag=0
     else
@@ -108,14 +105,14 @@ echo 'Detected '$HOME'/rutorrent_old'
 fi
 
 if [ $ruflag = 0 ]; then
-  
+
   if ( ask_version ); then
     rurelease=$(git ls-remote -t https://github.com/Novik/ruTorrent v\* | cut -d/ -f3 | sort -V | tail -1)
   fi
-  
+
   if [ -d $HOME'/rutorrent_old' ]; then
     rm -r $HOME/rutorrent_old
-	echo "rutorrent_old has been deleted"
+    echo "rutorrent_old has been deleted"
   fi
 
   echo
