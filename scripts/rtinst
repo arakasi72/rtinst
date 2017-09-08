@@ -724,10 +724,6 @@ if [ -d "/var/www/rutorrent" ]; then
   rm -r /var/www/rutorrent
 fi
 
-if [ "$relno" = "14" ]; then
-  rudevflag=1
-fi
-
 if [ $rudevflag = 1 ]; then
    rurelease=$(git ls-remote -t https://github.com/Novik/ruTorrent v\* | cut -d/ -f3 | sort -V | tail -1)
 fi
