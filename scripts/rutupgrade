@@ -15,6 +15,9 @@ oldvers=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
 
 ruflag=0
 rurelease=master
+force_yes=1
+restore_old=1
+install_master=1
 
 ask_option() {
  while true
@@ -71,7 +74,9 @@ else
   echo "   Latest version: "$newvers
 fi
 
-if ! ( check_user ); then
+if [ $force_yes = 0 ] || ( check_user ); then
+  echo
+else
   exit
 fi
 
@@ -82,7 +87,7 @@ echo 'Detected '$HOME'/rutorrent_old'
     echo "Restoring Old version of rutorrent"
     echo "WARNING: The current rutorrent will be overwitten by older backup"
     ruflag=1
-    if ( check_user ); then
+    if [ $force_yes = 0 ] || ( check_user ); then
       echo "Restoring"
       rm -r /var/www/rutorrent
       mv -f $HOME/rutorrent_old /var/www/rutorrent
@@ -96,7 +101,7 @@ echo 'Detected '$HOME'/rutorrent_old'
     echo "Rutorrent will be upgraded"
     echo "WARNING: rutorrent_old will be deleted"
     echo "If you wish to retain this older version you should exit this script, and rename or move it"
-    if ( check_user ); then
+    if [ $force_yes = 0 ] || ( check_user ); then
       ruflag=0
     else
       exit
