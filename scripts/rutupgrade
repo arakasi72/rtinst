@@ -14,7 +14,7 @@ newvers=$(curl -s https://raw.githubusercontent.com/Novik/ruTorrent/master/js/we
 oldvers=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
 
 ruflag=0
-rurelease=master
+rurelease=$(git ls-remote -t https://github.com/Novik/ruTorrent v\* | cut -d/ -f3 | sort -V | tail -1)
 force_yes=1
 restore_old=1
 install_master=1
@@ -24,29 +24,34 @@ ask_option() {
     return $restore_old
   else
     while true
-    do
-      echo "1. Restore rutorrent_old"
-      echo "2. Upgrade to latest version"
-      read -p "Select 1 or 2: " answer
-      case $answer in [1]* ) return 0 ;;
-                      [2]* ) return 1 ;;
+      do
+        echo "1. Restore rutorrent_old"
+        echo "2. Upgrade to latest version"
+        read -p "Select 1 or 2: " answer
+        case $answer in [1]* ) return 0 ;;
+                        [2]* ) return 1 ;;
       esac
     done
   fi
 }
 
 ask_version() {
-  echo "Chose which build to install, (if you are not sure select 1)"
-  while true
-    do
-      echo "1. Use the latest stable release"
-      echo "2. Use the most recent master build"
-      read -p "Select 1 or 2: " answer
-      case $answer in [1]* ) return 0 ;;
-                      [2]* ) return 1 ;;
+  if [ $force_yes = 0 ]; then
+    return $install_master
+  else
+    echo "Chose which build to install, (if you are not sure select 1)"
+    while true
+      do
+        echo "1. Use the latest stable release"
+        echo "2. Use the most recent master build"
+        read -p "Select 1 or 2: " answer
+        case $answer in [1]* ) return 1 ;;
+                        [2]* ) return 0 ;;
       esac
     done
+  fi
 }
+
 
 check_user() {
 while true
@@ -63,6 +68,21 @@ while true
 if [ "$(id -u)" != "0" ]; then
   echo "Must be run from root or using sudo" && exit 1
 fi
+
+# get options
+OPTS=$(getopt -n "$0" -o myo --long "rutorrent-master,force-yes,restore-old" -- "$@")
+
+eval set -- "$OPTS"
+
+while true; do
+  case "$1" in
+    -m | --rutorrent-master ) install_master=0; shift;;
+    -y | --force-yes ) force_yes=0; shift;;
+    -o | --restore-old ) restore_old=0; shift; shift;;
+    -- ) shift; break ;;
+     * ) break ;;
+  esac
+done
 
 #check rutorrent folder exists
 if ! [ -d '/var/www/rutorrent' ]; then
@@ -116,7 +136,7 @@ fi
 if [ $ruflag = 0 ]; then
 
   if ( ask_version ); then
-    rurelease=$(git ls-remote -t https://github.com/Novik/ruTorrent v\* | cut -d/ -f3 | sort -V | tail -1)
+    rurelease=master
   fi
 
   if [ -d $HOME'/rutorrent_old' ]; then
