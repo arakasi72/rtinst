@@ -20,7 +20,10 @@ restore_old=1
 install_master=1
 
 ask_option() {
- while true
+  if [ $force_yes = 0 ]; then
+    return $restore_old
+  else
+    while true
     do
       echo "1. Restore rutorrent_old"
       echo "2. Upgrade to latest version"
@@ -29,6 +32,7 @@ ask_option() {
                       [2]* ) return 1 ;;
       esac
     done
+  fi
 }
 
 ask_version() {
