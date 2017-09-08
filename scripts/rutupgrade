@@ -140,4 +140,6 @@ if [ $ruflag = 0 ]; then
   cp -r $HOME/rutorrent_old/share /var/www/rutorrent/share >> /dev/null 2>&1
   echo "Setting permissions, Starting services"
   chown -R www-data:www-data /var/www
+  echo
+  echo "Installation of RuTorrent complete"
 fi
