@@ -98,6 +98,11 @@ else
   echo "   Latest version: "$newvers
 fi
 
+if [ $restore_old = 0 ] && ! [ -d $HOME'/rutorrent_old' ]; then
+  echo "No backup available to do a restore"
+  exit
+fi
+
 if [ $force_yes = 0 ] || ( check_user ); then
   echo
 else
