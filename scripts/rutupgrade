@@ -91,11 +91,12 @@ exit
 fi
 
 #check versions
-if [ '$newvers' = '$oldvers' ]; then
-  echo "You have the latest version: "$newvers
-else
-  echo "Installed version: "$oldvers
-  echo "   Latest version: "$newvers
+echo "Installed version: "$oldvers
+echo "   Latest version: "$newvers
+
+if [ -d $HOME'/rutorrent_old' ]; then
+  echo
+  echo "A previous backup is available to restore"
 fi
 
 if [ $restore_old = 0 ] && ! [ -d $HOME'/rutorrent_old' ]; then
