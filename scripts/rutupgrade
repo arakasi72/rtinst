@@ -97,6 +97,7 @@ echo "   Latest version: "$newvers
 if [ -d $HOME'/rutorrent_old' ]; then
   echo
   echo "A previous backup is available to restore"
+  echo
 fi
 
 if [ $restore_old = 0 ] && ! [ -d $HOME'/rutorrent_old' ]; then
