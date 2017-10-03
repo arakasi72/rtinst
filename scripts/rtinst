@@ -60,6 +60,7 @@ Install_list=""
 unixpass=""
 passflag=0
 forceyes=1
+selfsign=1
 rut_add_users=1
 
 ###############################
@@ -227,7 +228,7 @@ else
 fi
 
 # get options
-OPTS=$(getopt -n "$0" -o dltrmyu:p:w: --long "dload,log,ssh-default,rutorrent-stable,rutorrent-master,force-yes,user:,password:,webpass:" -- "$@")
+OPTS=$(getopt -n "$0" -o dltrmysu:p:w: --long "dload,log,ssh-default,rutorrent-stable,rutorrent-master,force-yes,self-signed,user:,password:,webpass:" -- "$@")
 
 eval set -- "$OPTS"
 
@@ -239,6 +240,7 @@ while true; do
     -r | --rutorrent-stable ) rudevflag=1; shift;;
     -m | --rutorrent-master ) rudevflag=0; shift;;
     -y | --force-yes ) forceyes=0; shift;;
+    -s | --self-signed ) selfsign=0; shift;;
     -u | --user ) user="$2"; shift; shift;;
     -p | --password ) unixpass="$2"; shift; shift;;
     -w | --webpass ) webpass="$2"; shift; shift;;
