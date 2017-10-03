@@ -11,6 +11,7 @@
 
 forceyes=1
 headless=1
+selfsign=1
 
 #function to check if string is valid format for an ip address
 valid_ip()
@@ -71,12 +72,13 @@ fi
 # options -y and -d take away the user interaction so can be called from another script
 # option -y will force the creation of new certificates
 # option -d will not unless it determines they are needed
-while getopts ":yd" optname
+while getopts ":yds" optname
   do
     case $optname in
       "y" ) forceyes=0 ;;
       "d" ) headless=0 ;;
-        * ) echo "-y or -d only options allowed" && exit ;;
+      "s" ) selfsign=0 ;;
+        * ) echo "-y, -d, and -s only options allowed" && exit ;;
     esac
   done
 
