@@ -323,7 +323,6 @@ unzip -o autodl-irssi.zip >> /dev/null 2>&1
 rm autodl-irssi.zip
 cp autodl-irssi.pl autorun/
 mkdir -p $home/.autodl
-touch $home/.autodl/autodl.cfg && touch $home/.autodl/autodl2.cfg
 
 echo "<?php" > /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 echo >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
@@ -333,9 +332,21 @@ echo >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 echo "?>" >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 
 cd $home/.autodl
-echo "[options]" > autodl2.cfg
-echo "gui-server-port = $adlport" >> autodl2.cfg
-echo "gui-server-password = $adlpass" >> autodl2.cfg
+
+if [ -f "autodl.cfg" ]; then
+  if (grep -sq gui-server-port autodl.cfg) && (grep -sq gui-server-password autodl.cfg); then
+    sed -i "/gui-server-port/ c\gui-server-port = $adlport" autodl.cfg
+    sed -i "/gui-server-password/ c\gui-server-password = $adlpass" autodl.cfg
+  else
+    sed -i '/gui-server-port/ d' autodl.cfg
+    sed -i '/gui-server-password/ d' autodl.cfg
+    sed -i "1s/^/[options]\ngui-server-port = $adlport\ngui-server-password = $adlpass\n\n/" autodl.cfg
+  fi
+else
+  echo "[options]" > autodl.cfg
+  echo "gui-server-port = $adlport" >> autodl.cfg
+  echo "gui-server-password = $adlpass" >> autodl.cfg
+fi
 
 chown -R $user:$user $home
 chown -R www-data:www-data /var/www/rutorrent
