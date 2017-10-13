@@ -792,7 +792,7 @@ echo "?>" >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 
 cd $home/.autodl
 
-if [ ! -z $(grep "gui-server-port" autodl.cfg) ]; then
+if (grep -sq gui-server-port autodl.cfg) && (grep -sq gui-server-password autodl.cfg); then
   sed -i "/gui-server-port/ c\gui-server-port = $adlport" autodl.cfg
   sed -i "/gui-server-assword/ c\gui-server-password = $adlpass" autodl.cfg
 else
