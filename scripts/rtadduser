@@ -323,7 +323,6 @@ unzip -o autodl-irssi.zip >> /dev/null 2>&1
 rm autodl-irssi.zip
 cp autodl-irssi.pl autorun/
 mkdir -p $home/.autodl
-touch $home/.autodl/autodl.cfg && touch $home/.autodl/autodl2.cfg
 
 echo "<?php" > /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 echo >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
@@ -333,9 +332,9 @@ echo >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 echo "?>" >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 
 cd $home/.autodl
-echo "[options]" > autodl2.cfg
-echo "gui-server-port = $adlport" >> autodl2.cfg
-echo "gui-server-password = $adlpass" >> autodl2.cfg
+echo "[options]" > autodl.cfg
+echo "gui-server-port = $adlport" >> autodl.cfg
+echo "gui-server-password = $adlpass" >> autodl.cfg
 
 chown -R $user:$user $home
 chown -R www-data:www-data /var/www/rutorrent
