@@ -791,9 +791,15 @@ echo >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 echo "?>" >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 
 cd $home/.autodl
-echo "[options]" > autodl.cfg
-echo "gui-server-port = $adlport" >> autodl.cfg
-echo "gui-server-password = $adlpass" >> autodl.cfg
+
+if [ ! -z $(grep "gui-server-port" "autodl.cfg") ] && [ ! -z $(grep "gui-server-password" "autodl.cfg") ]; then
+  sed -i "/gui-server-port/ c\gui-server-port = $adlport" autodl.cfg
+  sed -i "/gui-server-assword/ c\gui-server-password = $adlpass" autodl.cfg
+else
+  echo "[options]" > autodl.cfg
+  echo "gui-server-port = $adlport" >> autodl.cfg
+  echo "gui-server-password = $adlpass" >> autodl.cfg
+fi
 
 ###############################
 ### FINAL TASKS ###
