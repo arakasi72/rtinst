@@ -792,9 +792,9 @@ echo >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 echo "?>" >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 
 cd $home/.autodl
-echo "[options]" > autodl2.cfg
-echo "gui-server-port = $adlport" >> autodl2.cfg
-echo "gui-server-password = $adlpass" >> autodl2.cfg
+echo "[options]" > autodl.cfg
+echo "gui-server-port = $adlport" >> autodl.cfg
+echo "gui-server-password = $adlpass" >> autodl.cfg
 
 ###############################
 ### FINAL TASKS ###
