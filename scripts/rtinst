@@ -775,7 +775,6 @@ unzip -qq -o autodl-irssi.zip | tee -a $logfile
 rm autodl-irssi.zip
 cp autodl-irssi.pl autorun/
 mkdir -p $home/.autodl
-# touch $home/.autodl/autodl.cfg && touch $home/.autodl/autodl2.cfg
 
 cd /var/www/rutorrent/plugins
 git clone -q https://github.com/autodl-community/autodl-rutorrent.git autodl-irssi | tee -a $home/rtinst.info
@@ -792,9 +791,9 @@ echo >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 echo "?>" >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 
 cd $home/.autodl
-echo "[options]" > autodl2.cfg
-echo "gui-server-port = $adlport" >> autodl2.cfg
-echo "gui-server-password = $adlpass" >> autodl2.cfg
+echo "[options]" > autodl.cfg
+echo "gui-server-port = $adlport" >> autodl.cfg
+echo "gui-server-password = $adlpass" >> autodl.cfg
 
 ###############################
 ### FINAL TASKS ###
