@@ -55,7 +55,7 @@ sshport=''
 rudevflag=1
 rurelease=master
 passfile='/etc/nginx/.htpasswd'
-package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl $geoipver $phpver-mcrypt $phpver-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
+package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl $geoipver $phpver-mcrypt $phpver-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo python-software-properties software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl rar zip unzip"
 Install_list=""
 unixpass=""
 passflag=0
@@ -749,6 +749,38 @@ echo "\$scgi_port = 5000;" >> /var/www/rutorrent/conf/users/$user/config.php
 echo "\$XMLRPCMountPoint = \"/RPC2\";" >> /var/www/rutorrent/conf/users/$user/config.php
 echo >> /var/www/rutorrent/conf/users/$user/config.php
 echo "?>" >> /var/www/rutorrent/conf/users/$user/config.php
+
+echo "Configuring Rutorrent filemanager plugin" | tee -a $logfile
+mkdir -p /var/www/rutorrent/plugins/filemanager
+svn co https://github.com/nelu/rutorrent-thirdparty-plugins/trunk/filemanager /var/www/rutorrent/plugins/filemanager
+rm /var/www/rutorrent/plugins/filemanager/conf.php
+
+cat > /var/www/rutorrent/plugins/filemanager/conf.php << EOF
+<?php
+
+\$fm['tempdir'] = '/tmp';                // path were to store temporary data ; must be writable
+\$fm['mkdperm'] = 755;           // default permission to set to new created directories
+
+// set with fullpath to binary or leave empty
+\$pathToExternals['rar'] = '$(which rar)';
+\$pathToExternals['zip'] = '$(which zip)';
+\$pathToExternals['unzip'] = '$(which unzip)';
+\$pathToExternals['tar'] = '$(which tar)';
+\$pathToExternals['bzip2'] = '$(which bzip2)';
+
+// archive mangling, see archiver man page before editing
+
+\$fm['archive']['types'] = array('rar', 'zip', 'tar', 'gzip', 'bzip2');
+
+\$fm['archive']['compress'][0] = range(0, 5);
+\$fm['archive']['compress'][1] = array('-0', '-1', '-9');
+\$fm['archive']['compress'][2] = \$fm['archive']['compress'][3] = \$fm['archive']['compress'][4] = array(0);
+
+?>
+EOF
+
+chown -R www-data:www-data /var/www/rutorrent/plugins/filemanager
+chmod -R 775 /var/www/rutorrent/plugins/filemanager/scripts
 
 cp -f /etc/rtinst/conf/ru.ini /var/www/rutorrent/conf/plugins.ini
 if [ $osname = "Raspbian" ]; then
