@@ -791,7 +791,7 @@ echo >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 echo "?>" >> /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi/conf.php
 
 cd $home/.autodl
-rm autodl2.cfg
+rm -f autodl2.cfg
 
 if [ -f "autodl.cfg" ]; then
   if (grep -sq gui-server-port autodl.cfg) && (grep -sq gui-server-password autodl.cfg); then
