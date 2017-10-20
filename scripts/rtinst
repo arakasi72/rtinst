@@ -42,6 +42,11 @@ else
   geoipver=php5-geoip
 fi
 
+if [ $(lsb_release -sr) = "17.10" ]; then
+  phpver=php7.1
+  phploc=/etc/php/7.1
+fi
+
 export serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
 export logfile="/dev/null"
 webpass=''
