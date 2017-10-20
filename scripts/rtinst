@@ -459,8 +459,8 @@ if ! [ $? = 0 ]; then
   echo "Problem installing packages. Check log and rerun once it is resolved" && exit
 fi
 
-if [ "$phpver" = "php7.0" ]; then
-  apt-get -qq install php7.0-mbstring >> $logfile 2>&1
+if [[ $phpver =~ php7.[0-9] ]]; then
+  apt-get -qq install $phpver-mbstring >> $logfile 2>&1
 fi
 
 #install unrar package
