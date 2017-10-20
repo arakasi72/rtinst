@@ -459,8 +459,8 @@ if ! [ $? = 0 ]; then
   echo "Problem installing packages. Check log and rerun once it is resolved" && exit
 fi
 
-if [ "$phpver" = "php7.0" ]; then
-  apt-get -qq install php7.0-mbstring >> $logfile 2>&1
+if [[ $phpver =~ php7.[0-9] ]]; then
+  apt-get -qq install $phpver-mbstring >> $logfile 2>&1
 fi
 
 #install unrar package
@@ -672,6 +672,8 @@ echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/
 
 if [ "$phpver" = "php7.0" ]; then
   echo "          fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;" >> /etc/nginx/conf.d/php
+elif [ "$phpver" = "php7.1" ]; then
+  echo "          fastcgi_pass unix:/var/run/php/php7.1-fpm.sock;" >> /etc/nginx/conf.d/php
 else
   echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
 fi
@@ -805,7 +807,8 @@ if [ -f "autodl.cfg" ]; then
   else
     sed -i '/gui-server-port/ d' autodl.cfg
     sed -i '/gui-server-password/ d' autodl.cfg
-    sed -i "1s/^/[options]\ngui-server-port = $adlport\ngui-server-password = $adlpass\n\n/" autodl.cfg
+    echo >> autodl.cfg
+    sed -i "1s/^/[options]\ngui-server-port = $adlport\ngui-server-password = $adlpass\n/" autodl.cfg
   fi
 else
   echo "[options]" > autodl.cfg
