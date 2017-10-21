@@ -340,7 +340,8 @@ if [ -f "autodl.cfg" ]; then
   else
     sed -i '/gui-server-port/ d' autodl.cfg
     sed -i '/gui-server-password/ d' autodl.cfg
-    sed -i "1s/^/[options]\ngui-server-port = $adlport\ngui-server-password = $adlpass\n\n/" autodl.cfg
+    echo >> autodl.cfg
+    sed -i "1s/^/[options]\ngui-server-port = $adlport\ngui-server-password = $adlpass\n/" autodl.cfg
   fi
 else
   echo "[options]" > autodl.cfg
