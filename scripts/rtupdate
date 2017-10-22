@@ -14,8 +14,13 @@ osname=$(lsb_release -si)
 relno=$(lsb_release -sr | cut -d. -f1)
 sourcedir='http://rtorrent.net/downloads/'
 xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
+rtdevrel=1
 
-if [ $relno = 9 ]; then
+if [ $relno = 9 ] || [ $(lsb_release -sr) = 17.10 ]; then
+  rtdevrel=0
+fi
+
+if [ $rtdevrel = 0 ]; then
   sourcedir='https://github.com/rakshasa/'
 fi
 
@@ -119,10 +124,10 @@ if [ -z $passed_rtvers ]; then
   fi
 
 # checks if the OS is debian 9, and forces the version to 0.9.6 of it is
-  if [ $relno -eq 9 ]; then
+  if [ $rtdevrel = 0 ]; then
     libvers='0.13.6'
     rtvers='0.9.6'
-    echo "Debian 9 is only supported by libtorrent-0.13.6/rtorrent-0.9.6"
+    echo "Debian 9 and Ubuntu 17.10 are only supported by libtorrent-0.13.6/rtorrent-0.9.6"
   else
     list_version
   fi
@@ -146,10 +151,10 @@ else
   fi
 
   # checks if the OS is debian 9, and forces the version to 0.9.6 of it is
-  if [ $relno -eq 9 ]; then
+  if [ $rtdevrel = 0 ]; then
     libvers='0.13.6'
     rtvers='0.9.6'
-    echo "Debian 9 is only supported by libtorrent-0.13.6/rtorrent-0.9.6"
+    echo "Debian 9 and Ubuntu 17.10 are only supported by libtorrent-0.13.6/rtorrent-0.9.6"
   fi
 
 fi
@@ -173,7 +178,7 @@ rm -rf xmlrpc libtorrent* rtorrent*
 echo "Fetching source files"
 
 
-if [ $relno -eq 9 ]; then
+if [ $rtdevrel = 0 ]; then
   git clone -q -b feature-bind --single-branch https://github.com/rakshasa/libtorrent.git libtorrent-$libvers
   git clone -q -b feature-bind --single-branch https://github.com/rakshasa/rtorrent.git rtorrent-$rtvers
 else
