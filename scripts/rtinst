@@ -264,6 +264,8 @@ fi
 os_repo=0
 major_repo=0
 
+sed  -i "s/http:\/\/ftp\.debian\.org\/debian\s/http:\/\/ftp\.debian\.org\/debian\/ /g" /etc/apt/sources.list
+
 echo
 echo "Checking the web sites we will need are accessible"
 echo  "Checking $osname mirrors"
