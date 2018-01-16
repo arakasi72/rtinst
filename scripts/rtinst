@@ -438,7 +438,7 @@ echo "Upgrading packages" | tee -a $logfile
 export DEBIAN_FRONTEND=noninteractive
 apt-get -qq upgrade >> $logfile 2>&1
 if ! [ $? = 0 ]; then
-  echo "Problem upgrading packages. Run 'apt-get -qq upgrade' successfully and rerun the script" && exit
+  echo "Problem upgrading packages. Run 'apt-get upgrade' successfully and rerun the script" && exit
 fi
 
 apt-get clean && apt-get autoclean >> $logfile 2>&1
