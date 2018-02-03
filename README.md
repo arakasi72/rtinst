@@ -28,7 +28,7 @@ It has been tested with clean installs of:
 	Ubuntu 14
 	Ubuntu 15
 	Ubuntu 16
-	Ubuntu 17 - NOT CURRENTLY WORKING
+	Ubuntu 17
 	Debian 7 "Wheezy" (unsupported)
 	Debian 8 "Jessie"
 	Debian 9 "Stretch"
