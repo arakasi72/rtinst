@@ -13,7 +13,7 @@ PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 osname=$(lsb_release -si)
 relno=$(lsb_release -sr | cut -d. -f1)
 sourcedir='http://rtorrent.net/downloads/'
-xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable'
+xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable/'
 rtdevrel=1
 
 if [ $relno = 9 ] || [ $(lsb_release -sr) = 17.10 ]; then
