@@ -13,6 +13,7 @@ PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 osname=$(lsb_release -si)
 relno=$(lsb_release -sr | cut -d. -f1)
 sourcedir='http://rtorrent.net/downloads/'
+xmlrpc_url="https://github.com/mirror/xmlrpc-c"
 #xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable/'
 xmlrpcloc='https://github.com/mirror/xmlrpc-c/trunk/stable'
 rtdevrel=1
@@ -92,7 +93,7 @@ xmlrpc_repo=0
 rt_repo=0
 echo
 echo "Checking File Repositories"
-#echo -n "xmlrpc-c: "; check_url $xmlrpcloc && echo "OK" || { echo "FAIL"; xmlrpc_repo=1; }
+echo -n "xmlrpc-c: "; check_url $xmlrpc_url && echo "OK" || { echo "FAIL"; xmlrpc_repo=1; }
 echo -n "rtorrent: "; check_url $sourcedir && echo "OK" || { echo "FAIL"; rt_repo=1; }
 
 if [ $rt_repo = 1 ]; then
