@@ -19,6 +19,7 @@ rtorrentrel=''
 
 #url's of the major components
 rt_url="http://rtorrent.net/downloads/"
+xmlrpc_url="https://github.com/mirror/xmlrpc-c"
 #xmlrpcloc="https://svn.code.sf.net/p/xmlrpc-c/code/stable/"
 xmlrpcloc="https://github.com/mirror/xmlrpc-c/trunk/stable/"
 ru_url="https://github.com/Novik/ruTorrent/"
@@ -278,7 +279,7 @@ done
 echo
 echo "Checking major 3rd party components"
 echo -n "Rtorrent: "; check_url $rt_url && echo "OK" || { echo "FAIL"; major_repo=1; }
-#echo -n "xmlrpc-c: "; check_url $xmlrpc_url && echo "OK" || { echo "FAIL"; major_repo=1; }
+echo -n "xmlrpc-c: "; check_url $xmlrpc_url && echo "OK" || { echo "FAIL"; major_repo=1; }
 echo -n "RuTorrent: ";check_url $ru_url && echo "OK" || { echo "FAIL"; major_repo=1; }
 echo -n "Autodl-irssi: "; check_url $adl_url && echo "OK" || { echo "FAIL"; major_repo=1; }
 
