@@ -278,7 +278,7 @@ done
 echo
 echo "Checking major 3rd party components"
 echo -n "Rtorrent: "; check_url $rt_url && echo "OK" || { echo "FAIL"; major_repo=1; }
-echo -n "xmlrpc-c: "; check_url $xmlrpc_url && echo "OK" || { echo "FAIL"; major_repo=1; }
+#echo -n "xmlrpc-c: "; check_url $xmlrpc_url && echo "OK" || { echo "FAIL"; major_repo=1; }
 echo -n "RuTorrent: ";check_url $ru_url && echo "OK" || { echo "FAIL"; major_repo=1; }
 echo -n "Autodl-irssi: "; check_url $adl_url && echo "OK" || { echo "FAIL"; major_repo=1; }
 
