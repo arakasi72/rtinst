@@ -19,9 +19,10 @@ rtorrentrel=''
 
 #url's of the major components
 rt_url="http://rtorrent.net/downloads/"
-xmlrpc_url="https://github.com/mirror/xmlrpc-c"
-#xmlrpcloc="https://svn.code.sf.net/p/xmlrpc-c/code/stable/"
-xmlrpcloc="https://github.com/mirror/xmlrpc-c/trunk/stable/"
+xmlrpc_url="https://svn.code.sf.net/p/xmlrpc-c/code/stable/"
+#xmlrpc_url="https://github.com/mirror/xmlrpc-c"
+xmlrpcloc="https://svn.code.sf.net/p/xmlrpc-c/code/stable/"
+#xmlrpcloc="https://github.com/mirror/xmlrpc-c/trunk/stable/"
 ru_url="https://github.com/Novik/ruTorrent/"
 adl_url="https://github.com/autodl-community/"
 
