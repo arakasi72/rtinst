@@ -17,7 +17,7 @@ sourcedir='http://rtorrent.net/downloads/'
 xmlrpc_url='https://svn.code.sf.net/p/xmlrpc-c/code/stable/'
 xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable/'
 
-xmlrpc_url_alt="https://github.com/mirror/xmlrpc-c"
+xmlrpc_url_alt='https://github.com/mirror/xmlrpc-c'
 xmlrpcloc_alt='https://github.com/mirror/xmlrpc-c/trunk/stable'
 
 rtdevrel=1
