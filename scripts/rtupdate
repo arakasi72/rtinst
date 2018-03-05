@@ -103,7 +103,7 @@ echo -n "xmlrpc-c: "; check_url $xmlrpc_url && echo "OK" ||  xmlrpc_repo=1
 if [[ $xmlrpc_repo = 1 ]]; then
   xmlrpc_url=$xmlrpc_url_alt
   xmlrpcloc=$xmlrpcloc_alt
-  check_url $xmlrpc_url && { echo "BAK";  xmlrpc_repo=0; } || { echo "FAIL"; xmlrpc_repo=1; }
+  check_url $xmlrpc_url && { echo "OK";  xmlrpc_repo=0; } || { echo "FAIL"; xmlrpc_repo=1; }
 fi
 
 echo -n "rtorrent: "; check_url $sourcedir && echo "OK" || { echo "FAIL"; rt_repo=1; }
