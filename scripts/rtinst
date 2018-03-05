@@ -484,9 +484,15 @@ if [ $osname = "Debian" ] && ! installed unrar; then
   do
     attempts=$(( $attempts + 1 ))
     if [ "$(uname -m)" = "x86_64" ]; then
-      curl -s --connect-timeout 10 http://www.rarlab.com/rar/rarlinux-x64-5.4.0.tar.gz | tar xz 2>/dev/null
+      #curl -s --connect-timeout 10 http://www.rarlab.com/rar/rarlinux-x64-5.4.0.tar.gz | tar xz 2>/dev/null
+      wget http://www.rarlab.com/rar/rarlinux-x64-5.4.0.tar.gz >> $logfile 2>&1
+      tar xvzf rarlinux-x64-5.4.0.tar.gz >> $logfile 2>&1
+      rm rarlinux-x64-5.4.0.tar.gz
     elif [ "$(uname -m)" = "x86_32" ]; then
-      curl -s --connect-timeout 10 http://www.rarlab.com/rar/rarlinux-5.4.0.tar.gz | tar xz 2>/dev/null
+      #curl -s --connect-timeout 10 http://www.rarlab.com/rar/rarlinux-5.4.0.tar.gz | tar xz 2>/dev/null
+      wget http://www.rarlab.com/rar/rarlinux-5.4.0.tar.gz >> $logfile 2>&1
+      tar xvzf rarlinux-5.4.0.tar.gz >> $logfile 2>&1
+      rm rarlinux-5.4.0.tar.gz
     fi
   done
   if [ -d rar ]; then
