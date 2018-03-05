@@ -15,7 +15,7 @@ relno=$(lsb_release -sr | cut -d. -f1)
 sourcedir='http://rtorrent.net/downloads/'
 
 #xmlrpc_url='https://svn.code.sf.net/p/xmlrpc-c/code/stable/'
-#xmlrpcloc='https://svn.code.sf.net/p/xmlrpc-c/code/stable/'
+#xmlrpcloc='svn://svn.code.sf.net/p/xmlrpc-c/code/stable/'
 
 xmlrpc_url='https://github.com/mirror/xmlrpc-c'
 xmlrpcloc='https://github.com/mirror/xmlrpc-c/trunk/stable'
