@@ -48,6 +48,7 @@ fi
 if [ $(lsb_release -sr) = "17.10" ]; then
   phpver=php7.1
   phploc=/etc/php/7.1
+  geoipver=php-geoip
 fi
 
 export serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
