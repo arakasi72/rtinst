@@ -619,12 +619,10 @@ sed -i 's/^\s*listen_ipv6/#listen_ipv6/g' /etc/vsftpd.conf
 
 grep ^listen_port /etc/vsftpd.conf > /dev/null || echo "listen_port=$ftpport" >> /etc/vsftpd.conf
 
-revncm=$(shopt -p nocasematch)
-shopt -s nocasematch
-if [[ $LANG = *"utf8"* ]]; then
+if [[ $LANG =~ .*[Uu][Tt][Ff]-?8.* ]]; then
   grep -Pq "utf8_filesystem=" /etc/vsftpd.conf && sed -i '/^\(\s\|#\)*utf8_filesystem=/ c\utf8_filesystem=YES' /etc/vsftpd.conf ||  echo "utf8_filesystem=YES" >> /etc/vsftpd.conf
 fi
-$revncm
+
 
 grep -Pq "use_sendfile=" /etc/vsftpd.conf && sed -i '/^\(\s\|#\)*use_sendfile=/ c\use_sendfile=NO' /etc/vsftpd.conf ||  echo "use_sendfile=NO" >> /etc/vsftpd.conf
 grep -Pq "^\s*ssl_enable" /etc/vsftpd.conf && sed -i '/^\s*ssl_enable/ c\ssl_enable=YES' /etc/vsftpd.conf ||  echo "ssl_enable=YES" >> /etc/vsftpd.conf
