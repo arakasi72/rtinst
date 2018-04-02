@@ -619,6 +619,7 @@ sed -i 's/^\s*listen_ipv6/#listen_ipv6/g' /etc/vsftpd.conf
 
 grep ^listen_port /etc/vsftpd.conf > /dev/null || echo "listen_port=$ftpport" >> /etc/vsftpd.conf
 
+grep -Pq "^\s*use_sendfile" /etc/vsftpd.conf && sed -i '/^\s*use_sendfile/ c\use_sendfile=NO' /etc/vsftpd.conf ||  echo "use_sendfile=NO" >> /etc/vsftpd.conf
 grep -Pq "^\s*ssl_enable" /etc/vsftpd.conf && sed -i '/^\s*ssl_enable/ c\ssl_enable=YES' /etc/vsftpd.conf ||  echo "ssl_enable=YES" >> /etc/vsftpd.conf
 grep -Pq "^\s*chroot_local_user" /etc/vsftpd.conf &&  sed -i '/^\s*chroot_local_user/ c\chroot_local_user=YES' /etc/vsftpd.conf || echo "chroot_local_user=YES" >> /etc/vsftpd.conf
 grep -Pq "^\s*allow_writeable_chroot" /etc/vsftpd.conf &&  sed -i '/^\s*allow_writeable_chroot/ c\allow_writeable_chroot=YES' /etc/vsftpd.conf || echo "allow_writeable_chroot=YES" >> /etc/vsftpd.conf
