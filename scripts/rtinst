@@ -35,17 +35,18 @@ fullrel=$(lsb_release -sd)
 osname=$(lsb_release -si)
 relno=$(lsb_release -sr | cut -d. -f1)
 
+phpver=php5
+phploc=/etc/php5
+geoipver=php5-geoip
+
+
 if [ "$relno" = "16" ] || [ "$relno" = "17" ] || [ "$relno" = "9" ]; then
   phpver=php7.0
   phploc=/etc/php/7.0
   geoipver=php-geoip
-else
-  phpver=php5
-  phploc=/etc/php5
-  geoipver=php5-geoip
 fi
 
-if [ $(lsb_release -sr) = "17.10" ]; then
+if [ $(lsb_release -sr) = "17.10" ] || [ "$relno" = "18" ]; then
   phpver=php7.1
   phploc=/etc/php/7.1
   geoipver=php-geoip
