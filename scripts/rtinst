@@ -38,7 +38,7 @@ relno=$(lsb_release -sr | cut -d. -f1)
 phpver=php5
 phploc=/etc/php5
 geoipver=php5-geoip
-
+libcver=libcurl3
 
 if [ "$relno" = "16" ] || [ "$relno" = "17" ] || [ "$relno" = "9" ]; then
   phpver=php7.0
@@ -56,6 +56,7 @@ if [ "$relno" = "18" ]; then
   phpver=php7.2
   phploc=/etc/php/7.2
   geoipver=php-geoip
+  libcver=libcurl4
 fi
 
 export serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
@@ -71,7 +72,7 @@ sshport=''
 rudevflag=1
 rurelease=master
 passfile='/etc/nginx/.htpasswd'
-package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev libcurl3 libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl $geoipver $phpver-mcrypt $phpver-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
+package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev $libcver libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl $geoipver $phpver-mcrypt $phpver-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
 Install_list=""
 unixpass=""
 passflag=0
