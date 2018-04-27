@@ -702,7 +702,11 @@ cp -f /etc/rtinst/conf/nginxsitedl /etc/nginx/sites-available/dload-loc
 echo "location ~ \.php$ {" > /etc/nginx/conf.d/php
 echo "          fastcgi_split_path_info ^(.+\.php)(/.+)$;" >> /etc/nginx/conf.d/php
 
-echo "          fastcgi_pass unix:/var/run/php/$phpver-fpm.sock;" >> /etc/nginx/conf.d/php
+if [ "$phpver" = "php5" ]; then
+  echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
+else
+  echo "          fastcgi_pass unix:/var/run/php/$phpver-fpm.sock;" >> /etc/nginx/conf.d/php
+fi
 
 echo "          fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;" >> /etc/nginx/conf.d/php
 echo "          fastcgi_index index.php;" >> /etc/nginx/conf.d/php
