@@ -29,6 +29,7 @@ It has been tested with clean installs of:
 	Ubuntu 15
 	Ubuntu 16
 	Ubuntu 17
+	Ubuntu 18
 	Debian 7 "Wheezy" (unsupported)
 	Debian 8 "Jessie"
 	Debian 9 "Stretch"
