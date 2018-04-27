@@ -705,6 +705,8 @@ if [ "$phpver" = "php7.0" ]; then
   echo "          fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;" >> /etc/nginx/conf.d/php
 elif [ "$phpver" = "php7.1" ]; then
   echo "          fastcgi_pass unix:/var/run/php/php7.1-fpm.sock;" >> /etc/nginx/conf.d/php
+elif [ "$phpver" = "php7.2" ]; then
+  echo "          fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;" >> /etc/nginx/conf.d/php
 else
   echo "          fastcgi_pass unix:/var/run/php5-fpm.sock;" >> /etc/nginx/conf.d/php
 fi
