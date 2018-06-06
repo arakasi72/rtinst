@@ -141,7 +141,7 @@ if [ -z $passed_rtvers ]; then
   if [ $rtdevrel = 0 ]; then
     libvers='0.13.6'
     rtvers='0.9.6'
-    echo "Debian 9 and Ubuntu 17.10 are only supported by libtorrent-0.13.6/rtorrent-0.9.6"
+    echo "Debian 9, and Ubuntu 17.10 and later, are only supported by libtorrent-0.13.6/rtorrent-0.9.6"
   else
     list_version
   fi
@@ -168,7 +168,7 @@ else
   if [ $rtdevrel = 0 ]; then
     libvers='0.13.6'
     rtvers='0.9.6'
-    echo "Debian 9 and Ubuntu 17.10 are only supported by libtorrent-0.13.6/rtorrent-0.9.6"
+    echo "Debian 9, and Ubuntu 17.10 and later, are only supported by libtorrent-0.13.6/rtorrent-0.9.6"
   fi
 
 fi
