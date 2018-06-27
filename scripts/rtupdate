@@ -22,9 +22,9 @@ xmlrpcloc_alt='https://github.com/mirror/xmlrpc-c/trunk/stable'
 
 rtdevrel=1
 
-if [ $relno = 9 ] || [ $(lsb_release -sr) = 17.10 ] || [ $relno = 18 ]; then
-  rtdevrel=0
-fi
+#if [ $relno = 9 ] || [ $(lsb_release -sr) = 17.10 ] || [ $relno = 18 ]; then
+#  rtdevrel=0
+#fi
 
 if [ $rtdevrel = 0 ]; then
   sourcedir='https://github.com/rakshasa/'
