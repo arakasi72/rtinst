@@ -31,6 +31,18 @@ if [ "$(id -u)" != "0" ]; then
   exit 1
 fi
 
+# kill apt-daily.service if running 
+if [[ $(systemctl list-units --all apt-daily.service | fgrep -c apt-daily.service) -gt 0 ]]; then
+  systemctl stop apt-daily.service
+  systemctl kill --kill-who=all apt-daily.service
+
+# wait until `apt-get updated` has been killed
+  while ! (systemctl list-units --all apt-daily.service | fgrep -q dead)
+    do
+      sleep 1;
+    done
+fi
+
 if [ $(dpkg-query -W -f='${Status}' git 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
 echo "Installing git"
 apt-get -yqq install git 2>&1 >> /dev/null
