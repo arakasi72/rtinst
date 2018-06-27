@@ -15,7 +15,7 @@
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 # if left blank will install latest version of rtorrent, or set to a specific release E.G. '0.9.6' to install that release
-rtorrentrel='0.9.6'
+rtorrentrel=''
 
 #url's of the major components
 rt_url="http://rtorrent.net/downloads/"
@@ -448,6 +448,19 @@ echo
 echo "No more user input required, you can complete unattended"
 echo "It will take approx 10 minutes for the script to complete"
 echo
+
+# kill apt-daily.service if running 
+if [[ $(systemctl list-units --all apt-daily.service | fgrep -c apt-daily.service) -gt 0 ]]; then
+  systemctl stop apt-daily.service
+  systemctl kill --kill-who=all apt-daily.service
+
+# wait until `apt-get updated` has been killed
+  while ! (systemctl list-units --all apt-daily.service | fgrep -q dead)
+    do
+      sleep 1;
+    done
+
+fi
 
 #update amd upgrade system
 echo "Updating package lists" | tee $logfile
