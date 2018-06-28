@@ -168,7 +168,7 @@ else
   if [ $rtdevrel = 0 ]; then
     libvers='0.13.7'
     rtvers='0.9.7'
-    echo "Debian 9, and Ubuntu 17.10 and later, are only supported by libtorrent-0.13.6/rtorrent-0.9.7"
+    echo "Debian 9, and Ubuntu 17.10 and later, are only supported by libtorrent-0.13.7/rtorrent-0.9.7"
   fi
 
 fi
