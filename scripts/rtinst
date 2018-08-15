@@ -20,7 +20,7 @@ rtorrentrel=''
 #url's of the major components
 rt_url="http://rtorrent.net/downloads/"
 
-xmlrpc_url="https://svn.code.sf.net/p/xmlrpc-c/code/stable/"
+xmlrpc_url="https://svn.code.sf.net/p/xmlrpc-c/code/advanced/"
 xmlrpc_url_alt="https://github.com/mirror/xmlrpc-c"
 
 ru_url="https://github.com/Novik/ruTorrent/"
