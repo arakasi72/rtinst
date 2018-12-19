@@ -59,7 +59,7 @@ if [ "$relno" = "18" ]; then
   libcver=libcurl4
 fi
 
-export serverip=$(curl ifconfig.ca)
+export serverip=$(wget -qO- ipecho.net/plain)
 export logfile="/dev/null"
 webpass=''
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
