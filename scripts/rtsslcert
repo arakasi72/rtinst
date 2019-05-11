@@ -114,7 +114,7 @@ if [ -z $serverip ]; then
   fi
 
   echo "IP set to "$serverip
-
+  echo
 fi
 
 serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
