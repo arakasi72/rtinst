@@ -8,7 +8,6 @@
 #
 #########################################################################################
 
-serverip=''
 forceyes=1
 headless=1
 selfsign=1
@@ -95,8 +94,8 @@ if [ $# -gt 0 ]; then
 fi
 
 if [ -z $serverip ]; then
-  serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
-else
+  serveripa=$(ip route get 8.8.8.8 | awk 'NR==1 {print $7}')
+  serveripb=$(wget -qO- ipecho.net/plain)
   if [ "$serveripa" = "$serveripb" ]; then
     serverip=$serveripa
   else
