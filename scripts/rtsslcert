@@ -8,7 +8,6 @@
 #
 #########################################################################################
 
-
 forceyes=1
 headless=1
 selfsign=1
@@ -95,11 +94,27 @@ if [ $# -gt 0 ]; then
 fi
 
 if [ -z $serverip ]; then
-  serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
-elif ! valid_ip $serverip; then
-  echo "$serverip is not a valid IP address"
-  serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
-  echo "will use $serverip instead"
+  serveripa=$(ip route get 8.8.8.8 | awk 'NR==1 {print $7}')
+  serveripb=$(wget -qO- ipecho.net/plain)
+  if [ "$serveripa" = "$serveripb" ]; then
+    serverip=$serveripa
+  else
+    echo "Select the IP address to use:"
+    echo "1.) "$serveripa
+    echo "2.) "$serveripb
+
+    while true
+      do
+        read answer
+        case $answer in [1] ) serverip=$serveripa && break ;;
+                        [2] ) serverip=$serveripb && break ;;
+                          * ) echo "Enter 1 or 2";;
+      esac
+    done
+  fi
+
+  echo "IP set to "$serverip
+  echo
 fi
 
 serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
