@@ -63,22 +63,20 @@ serveripa=$(ip route get 8.8.8.8 | awk 'NR==1 {print $7}')
 serveripb=$(wget -qO- ipecho.net/plain)
 
 if [ "$serveripa" = "$serveripb" ]; then
-export serverip=$serveripa
+  export serverip=$serveripa
 else
-echo "Select the IP address to use:"
-echo "1.) "$serveripa
-echo "2.) "$serveripb
+  echo "Select the IP address to use:"
+  echo "1.) "$serveripa
+  echo "2.) "$serveripb
 
-while true
-  do
-    read answer
-    case $answer in [1] ) export serverip=$serveripa && break ;;
-                    [2] ) export serverip=$serveripb && break ;;
+  while true
+    do
+      read answer
+      case $answer in [1] ) export serverip=$serveripa && break ;;
+                      [2] ) export serverip=$serveripb && break ;;
                         * ) echo "Enter 1 or 2";;
     esac
   done
-
-
 fi
 
 echo "IP set to "$serverip
