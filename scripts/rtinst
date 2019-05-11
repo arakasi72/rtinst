@@ -335,7 +335,7 @@ fi
 echo
 
 # check IP Address
-# [ $forceyes = 1 ] && enter_ip
+[ $forceyes = 1 ] && enter_ip
 
 echo "Your server's IP is set to $serverip"
 
