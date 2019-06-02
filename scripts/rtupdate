@@ -225,7 +225,7 @@ make -s install >> $logfile 2>&1
 cd ../rtorrent-$rtvers
 echo "Installing rtorrent" | tee -a $logfile
 ./autogen.sh >> $logfile 2>&1
-./configure --prefix=/usr --with-xmlrpc-c --enable-ipv6 >> $logfile 2>&1
+./configure --prefix=/usr --with-xmlrpc-c >> $logfile 2>&1
 make -j$(nproc) >> $logfile 2>&1
 make -s install >> $logfile 2>&1
 ldconfig >> $logfile 2>&1
