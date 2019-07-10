@@ -15,7 +15,7 @@
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 # if left blank will install latest version of rtorrent, or set to a specific release E.G. '0.9.6' to install that release
-rtorrentrel='0.9.6'
+rtorrentrel='0.9.7'
 
 #url's of the major components
 rt_url="http://rtorrent.net/downloads/"
@@ -55,6 +55,13 @@ fi
 if [ "$relno" = "18" ]; then
   phpver=php7.2
   phploc=/etc/php/7.2
+  geoipver=php-geoip
+  libcver=libcurl4
+fi
+
+if [ "$relno" = "10" ]; then
+  phpver=php7.3
+  phploc=/etc/php/7.3
   geoipver=php-geoip
   libcver=libcurl4
 fi
