@@ -33,6 +33,7 @@ It has been tested with clean installs of:
 	Debian 7 "Wheezy" (unsupported)
 	Debian 8 "Jessie"
 	Debian 9 "Stretch"
+	Debian 10 "Buster"
 
 Services that will be installed and configured are
 
