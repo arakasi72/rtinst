@@ -139,8 +139,8 @@ if [ -z $passed_rtvers ]; then
 
 # checks if the OS is debian 9, and forces the version to 0.9.7 of it is
   if [ $rtdevrel = 0 ]; then
-    libvers='0.13.8'
-    rtvers='0.9.8'
+    libvers='0.13.7'
+    rtvers='0.9.7'
     echo "Debian 9, and Ubuntu 17.10 and later, are only supported by libtorrent-0.13.7/rtorrent-0.9.7 or later"
   else
     list_version
@@ -166,8 +166,8 @@ else
 
   # checks if the OS is debian 9, and forces the version to 0.9.7 of it is
   if [ $rtdevrel = 0 ]; then
-    libvers='0.13.8'
-    rtvers='0.9.8'
+    libvers='0.13.7'
+    rtvers='0.9.7'
     echo "Debian 9, and Ubuntu 17.10 and later, are only supported by libtorrent-0.13.7/rtorrent-0.9.7 or later"
   fi
 
