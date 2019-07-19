@@ -26,9 +26,9 @@ if [ $relno = 9 ] || [ $relno = 10 ] || [ $(lsb_release -sr) = 17.10 ] || [ $rel
   rtdevrel=0
 fi
 
-if [ $rtdevrel = 0 ]; then
-  sourcedir='https://github.com/rakshasa/'
-fi
+#if [ $rtdevrel = 0 ]; then
+#  sourcedir='https://github.com/rakshasa/'
+#fi
 
 listsize=6
 duoversion=''
@@ -166,9 +166,9 @@ else
 
   # checks if the OS is debian 9, and forces the version to 0.9.7 of it is
   if [ $rtdevrel = 0 ]; then
-    libvers='0.13.7'
-    rtvers='0.9.7'
-    echo "Debian 9, and Ubuntu 17.10 and later, are only supported by libtorrent-0.13.7/rtorrent-0.9.7"
+    libvers='0.13.8'
+    rtvers='0.9.8'
+    echo "Debian 9, and Ubuntu 17.10 and later, are only supported by libtorrent-0.13.7/rtorrent-0.9.7 or later"
   fi
 
 fi
