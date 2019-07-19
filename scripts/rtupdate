@@ -199,13 +199,13 @@ rm -rf xmlrpc libtorrent* rtorrent*
 echo "Fetching source files"
 
 
-#if [ $rtdevrel = 0 ]; then
-#  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/libtorrent.git libtorrent-$libvers
-#  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/rtorrent.git rtorrent-$rtvers
-#else
+if [ $rtdevrel = 0 ]; then
+  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/libtorrent.git libtorrent-$libvers
+  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/rtorrent.git rtorrent-$rtvers
+else
   curl -# http://rtorrent.net/downloads/libtorrent-$libvers.tar.gz | tar xz
   curl -# http://rtorrent.net/downloads/rtorrent-$rtvers.tar.gz | tar xz
-#fi
+fi
 
 if [ $xmlrpc_repo = 0 ]; then
   svn co $xmlrpcloc xmlrpc  >> $logfile 2>&1
