@@ -15,7 +15,7 @@
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 # if left blank will install latest version of rtorrent, or set to a specific release E.G. '0.9.6' to install that release
-rtorrentrel='0.9.8'
+rtorrentrel='0.9.6'
 
 #url's of the major components
 rt_url="http://rtorrent.net/downloads/"
