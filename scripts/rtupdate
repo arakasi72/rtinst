@@ -26,9 +26,9 @@ if [ $relno = 9 ] || [ $relno = 10 ] || [ $(lsb_release -sr) = 17.10 ] || [ $rel
   rtdevrel=0
 fi
 
-if [ $rtdevrel = 0 ]; then
-  sourcedir='https://github.com/rakshasa/'
-fi
+#if [ $rtdevrel = 0 ]; then
+#  sourcedir='https://github.com/rakshasa/'
+#fi
 
 listsize=6
 duoversion=''
@@ -139,13 +139,15 @@ if [ -z $passed_rtvers ]; then
 
 # checks if the OS is debian 9, and forces the version to 0.9.7 of it is
   if [ $rtdevrel = 0 ]; then
-    libvers='0.13.7'
-    rtvers='0.9.7'
-    echo "Debian 9, and Ubuntu 17.10 and later, are only supported by libtorrent-0.13.7/rtorrent-0.9.7"
+    libvers='0.13.8'
+    rtvers='0.9.8'
+    echo "Debian 9, and Ubuntu 17.10 and later, are only supported by libtorrent-0.13.7/rtorrent-0.9.7 or later"
   else
     list_version
   fi
-
+  
+  list_version
+  
   echo "Install libtorrent-$libvers and rtorrent-$rtvers"
   echo "Your rtorrent config, torrents, and data will not be lost or changed"
   echo -n "Continue? "
@@ -166,9 +168,9 @@ else
 
   # checks if the OS is debian 9, and forces the version to 0.9.7 of it is
   if [ $rtdevrel = 0 ]; then
-    libvers='0.13.7'
-    rtvers='0.9.7'
-    echo "Debian 9, and Ubuntu 17.10 and later, are only supported by libtorrent-0.13.7/rtorrent-0.9.7"
+    libvers='0.13.8'
+    rtvers='0.9.8'
+    echo "Debian 9, and Ubuntu 17.10 and later, are only supported by libtorrent-0.13.7/rtorrent-0.9.7 or later"
   fi
 
 fi
@@ -192,13 +194,13 @@ rm -rf xmlrpc libtorrent* rtorrent*
 echo "Fetching source files"
 
 
-if [ $rtdevrel = 0 ]; then
-  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/libtorrent.git libtorrent-$libvers
-  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/rtorrent.git rtorrent-$rtvers
-else
+#if [ $rtdevrel = 0 ]; then
+#  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/libtorrent.git libtorrent-$libvers
+#  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/rtorrent.git rtorrent-$rtvers
+#else
   curl -# http://rtorrent.net/downloads/libtorrent-$libvers.tar.gz | tar xz
   curl -# http://rtorrent.net/downloads/rtorrent-$rtvers.tar.gz | tar xz
-fi
+#fi
 
 if [ $xmlrpc_repo = 0 ]; then
   svn co $xmlrpcloc xmlrpc  >> $logfile 2>&1
