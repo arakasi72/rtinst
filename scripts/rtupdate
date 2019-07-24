@@ -139,12 +139,10 @@ if [ -z $passed_rtvers ]; then
 
 # checks if the OS is debian 9, and forces the version to 0.9.7 of it is
   if [ $rtdevrel = 0 ]; then
-    libvers='0.13.8'
-    rtvers='0.9.8'
-    echo "Debian 9, and Ubuntu 17.10 and later, are only supported by libtorrent-0.13.7/rtorrent-0.9.7 or later"
-  else
-    list_version
+    echo "For Debian 9, and Ubuntu 17.10 and later, recommend libtorrent-0.13.7/rtorrent-0.9.7 or later"
   fi
+  
+  list_version
   
   echo "Install libtorrent-$libvers and rtorrent-$rtvers"
   echo "Your rtorrent config, torrents, and data will not be lost or changed"
