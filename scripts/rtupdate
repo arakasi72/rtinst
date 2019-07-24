@@ -146,8 +146,6 @@ if [ -z $passed_rtvers ]; then
     list_version
   fi
   
-  list_version
-  
   echo "Install libtorrent-$libvers and rtorrent-$rtvers"
   echo "Your rtorrent config, torrents, and data will not be lost or changed"
   echo -n "Continue? "
