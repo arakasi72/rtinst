@@ -256,7 +256,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # determine system
-if ([ "$osname" = "Ubuntu" ] && [ $relno -ge 16 ]) || ([ "$osname" = "Debian" ] && [ $relno -ge 9 ])  || ([ "$osname" = "Raspbian" ] && [ $relno -ge 8 ]); then
+if ([ "$osname" = "Ubuntu" ] && [ $relno -ge 16 ]) || ([ "$osname" = "Debian" ] && [ $relno -ge 9 ])  || ([ "$osname" = "Raspbian" ] && [ $relno -ge 9 ]); then
   echo $fullrel
 else
  echo $fullrel
