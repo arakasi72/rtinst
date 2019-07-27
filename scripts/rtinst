@@ -263,11 +263,11 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # determine system
-if ([ "$osname" = "Ubuntu" ] && [ $relno -ge 14 ]) || ([ "$osname" = "Debian" ] && [ $relno -ge 8 ])  || ([ "$osname" = "Raspbian" ] && [ $relno -ge 8 ]); then
+if ([ "$osname" = "Ubuntu" ] && [ $relno -ge 16 ]) || ([ "$osname" = "Debian" ] && [ $relno -ge 9 ])  || ([ "$osname" = "Raspbian" ] && [ $relno -ge 8 ]); then
   echo $fullrel
 else
  echo $fullrel
- echo "Only Ubuntu release 14 and later, and Debian and Raspbian release 8 and later, are supported"
+ echo "Only Ubuntu release 16 and later, and Debian and Raspbian release 9 and later, are supported"
  echo "Your system does not appear to be supported"
  echo "Check https://github.com/arakasi72/rtinst/wiki/Installing-on-Older-OS to see if it is supported by an earlier rtinst release"
  exit
@@ -562,19 +562,7 @@ fi
 #install ffmpeg
 if ! [ $osname = "Raspbian" ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
   echo "Installing ffmpeg"
-  if [ $relno = 14 ]; then
-    apt-add-repository -y ppa:mc3man/trusty-media >> $logfile 2>&1
-    apt-get -qq update >> $logfile 2>&1
-    apt-get -qq install ffmpeg >> $logfile 2>&1
-  elif [ $relno = 8 ]; then
-    grep "deb http://www.deb-multimedia.org jessie main" /etc/apt/sources.list >> /dev/null || echo "deb http://www.deb-multimedia.org jessie main" >> /etc/apt/sources.list
-    apt-get -qq update >> $logfile 2>&1
-    apt-get -qq --force-yes install deb-multimedia-keyring >> $logfile 2>&1
-    apt-get -qq update >> $logfile 2>&1
-    apt-get -qq --force-yes install ffmpeg >> $logfile 2>&1
-  else
-    apt-get -qq install ffmpeg >> $logfile 2>&1
-  fi
+  apt-get -qq install ffmpeg >> $logfile 2>&1
 fi
 
 echo "Completed installation of required packages        "
