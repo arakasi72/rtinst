@@ -35,34 +35,27 @@ fullrel=$(lsb_release -sd)
 osname=$(lsb_release -si)
 relno=$(lsb_release -sr | cut -d. -f1)
 
-phpver=php5
-phploc=/etc/php5
-geoipver=php5-geoip
-libcver=libcurl3
-
 if [ "$relno" = "16" ] || [ "$relno" = "17" ] || [ "$relno" = "9" ]; then
   phpver=php7.0
   phploc=/etc/php/7.0
-  geoipver=php-geoip
+  libcver=libcurl3
 fi
 
 if [ $(lsb_release -sr) = "17.10" ]; then
   phpver=php7.1
   phploc=/etc/php/7.1
-  geoipver=php-geoip
+  libcver=libcurl3
 fi
 
 if [ "$relno" = "18" ] || [ "$relno" = "19" ]; then
   phpver=php7.2
   phploc=/etc/php/7.2
-  geoipver=php-geoip
   libcver=libcurl4
 fi
 
 if [ "$relno" = "10" ]; then
   phpver=php7.3
   phploc=/etc/php/7.3
-  geoipver=php-geoip
   libcver=libcurl4
 fi
 
@@ -99,9 +92,9 @@ portdefault=1
 skip_rt=1
 sshport=''
 rudevflag=1
-rurelease=master
+rurelease=masterlibterm-readline-gnu-pe
 passfile='/etc/nginx/.htpasswd'
-package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl cfv dtach htop irssi libcloog-ppl-dev libcppunit-dev $libcver libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl $geoipver $phpver-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
+package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl dtach htop irssi libcppunit-dev $libcver libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl php-geoip $phpver-xmlrpc python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
 Install_list=""
 unixpass=""
 passflag=0
@@ -263,11 +256,11 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # determine system
-if ([ "$osname" = "Ubuntu" ] && [ $relno -ge 14 ]) || ([ "$osname" = "Debian" ] && [ $relno -ge 8 ])  || ([ "$osname" = "Raspbian" ] && [ $relno -ge 8 ]); then
+if ([ "$osname" = "Ubuntu" ] && [ $relno -ge 16 ]) || ([ "$osname" = "Debian" ] && [ $relno -ge 9 ])  || ([ "$osname" = "Raspbian" ] && [ $relno -ge 9 ]); then
   echo $fullrel
 else
  echo $fullrel
- echo "Only Ubuntu release 14 and later, and Debian and Raspbian release 8 and later, are supported"
+ echo "Only Ubuntu release 16 and later, and Debian and Raspbian release 9 and later, are supported"
  echo "Your system does not appear to be supported"
  echo "Check https://github.com/arakasi72/rtinst/wiki/Installing-on-Older-OS to see if it is supported by an earlier rtinst release"
  exit
@@ -562,19 +555,7 @@ fi
 #install ffmpeg
 if ! [ $osname = "Raspbian" ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
   echo "Installing ffmpeg"
-  if [ $relno = 14 ]; then
-    apt-add-repository -y ppa:mc3man/trusty-media >> $logfile 2>&1
-    apt-get -qq update >> $logfile 2>&1
-    apt-get -qq install ffmpeg >> $logfile 2>&1
-  elif [ $relno = 8 ]; then
-    grep "deb http://www.deb-multimedia.org jessie main" /etc/apt/sources.list >> /dev/null || echo "deb http://www.deb-multimedia.org jessie main" >> /etc/apt/sources.list
-    apt-get -qq update >> $logfile 2>&1
-    apt-get -qq --force-yes install deb-multimedia-keyring >> $logfile 2>&1
-    apt-get -qq update >> $logfile 2>&1
-    apt-get -qq --force-yes install ffmpeg >> $logfile 2>&1
-  else
-    apt-get -qq install ffmpeg >> $logfile 2>&1
-  fi
+  apt-get -qq install ffmpeg >> $logfile 2>&1
 fi
 
 echo "Completed installation of required packages        "

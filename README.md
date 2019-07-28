@@ -25,13 +25,14 @@ It has been tested with clean installs of:
 
 	Ubuntu 12 (unsupported)
 	Ubuntu 13 (unsupported)
-	Ubuntu 14
-	Ubuntu 15
+	Ubuntu 14 (unsupported)
+	Ubuntu 15 (unsupported)
 	Ubuntu 16
 	Ubuntu 17
 	Ubuntu 18
+	Ubuntu 19
 	Debian 7 "Wheezy" (unsupported)
-	Debian 8 "Jessie"
+	Debian 8 "Jessie" (unsupported)
 	Debian 9 "Stretch"
 	Debian 10 "Buster"
 
