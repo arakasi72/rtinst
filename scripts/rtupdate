@@ -22,13 +22,13 @@ xmlrpcloc_alt='https://github.com/mirror/xmlrpc-c/trunk/advanced'
 
 rtdevrel=1
 
-if [ $relno = 9 ] || [ $relno = 10 ] || [ $(lsb_release -sr) = 17.10 ] || [ $relno -ge 18 ]; then
+if [ $(lsb_release -sr) = 17.10 ]; then
   rtdevrel=0
 fi
 
-#if [ $rtdevrel = 0 ]; then
-#  sourcedir='https://github.com/rakshasa/'
-#fi
+if ([ "$osname" = "Debian" ] || [ "$osname" = "Raspbian" ] && [ $relno -ge 9 ]) || ([ "$osname" = "Ubuntu" ] && [ $relno -ge 18 ]); then
+  rtdevrel=0
+fi
 
 listsize=6
 duoversion=''
