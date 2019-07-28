@@ -52,7 +52,7 @@ if [ $(lsb_release -sr) = "17.10" ]; then
   geoipver=php-geoip
 fi
 
-if [ "$relno" = "18" ]; then
+if [ "$relno" = "18" ] || [ "$relno" = "19" ]; then
   phpver=php7.2
   phploc=/etc/php/7.2
   geoipver=php-geoip
