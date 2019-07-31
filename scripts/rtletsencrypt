@@ -50,20 +50,15 @@ if [ -z $serverdn ]; then
 fi
 
 #Installing Certbot
-echo "Installing certbot..."
-
 if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installed") = 0 ]; then
   echo "Installing certbot"
+
+  if [ "$osname" = "Ubuntu" ]; then
+    apt-get update
+    add-apt-repository universe
+    add-apt-repository ppa:certbot/certbot
+    apt-get update
+    apt-get install certbot python-certbot-nginx
+  fi
 fi
-
-exit
-
-if [ "$osname" = "Ubuntu" ]; then
-  apt-get update
-  add-apt-repository universe
-  add-apt-repository ppa:certbot/certbot
-  apt-get update
-  apt-get install certbot python-certbot-nginx
-fi
-
 
