@@ -338,6 +338,7 @@ echo
 [ $forceyes = 1 ] && enter_ip
 
 echo "Your server's IP is set to $serverip"
+export serverip
 
 # Determine domain name using server ip address
 export serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
