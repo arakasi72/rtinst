@@ -44,5 +44,11 @@ fi
 echo "IP: $serverip"
 echo "DN: $serverdn"
 
+if [ -z $serverdn ]; then
+  echo "Unable to determine domain cannot setup Lets Encypt"
+  exit 1
+fi
+
 #Installing Certbot
+echo "Installing certbot..."
 
