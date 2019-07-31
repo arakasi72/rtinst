@@ -64,7 +64,7 @@ if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installe
 fi
 
 #Generating Certificates
-certbot -q --nginx --register-unsafely-without-email certonly -d $serverdn
+certbot -q --nginx --register-unsafely-without-email certonly -d $serverdn >> $logfile 2>&1
 
 if [ $? = 1 ]; then
   echo "unable to generate certificates"
