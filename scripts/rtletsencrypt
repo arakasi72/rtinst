@@ -8,3 +8,44 @@
 #
 #########################################################################################
 
+
+
+osname=$(lsb_release -si)
+[ -z $logfile ] && logfile="/dev/null"
+
+
+#check it is being run as root
+if [ "$(id -u)" != "0" ]; then
+  echo "Must be run from root or using sudo" && exit 1
+  fi
+
+if [ -z $serverip ]; then
+  serveripa=$(ip route get 8.8.8.8 | awk 'NR==1 {print $7}')
+  serveripb=$(wget -qO- ipecho.net/plain)
+  if [ "$serveripa" = "$serveripb" ]; then
+    serverip=$serveripa
+  else
+    echo "Select the IP address to use:"
+    echo "1.) "$serveripa
+    echo "2.) "$serveripb
+
+    while true
+      do
+        read answer
+        case $answer in [1] ) serverip=$serveripa && break ;;
+                        [2] ) serverip=$serveripb && break ;;
+                          * ) echo "Enter 1 or 2";;
+      esac
+    done
+  fi
+
+  echo "IP set to "$serverip
+  serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
+  echo
+fi
+
+echo "IP: $serverip"
+echo "DN: $serverdn"
+
+#Installing Certbot
+
