@@ -64,3 +64,10 @@ if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installe
   fi
 fi
 
+#Generating Certificates
+certbot -q --nginx --register-unsafely-without-email certonly -d $serverdn
+echo $?
+
+
+
+
