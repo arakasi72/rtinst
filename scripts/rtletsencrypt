@@ -9,7 +9,7 @@
 #########################################################################################
 
 
-
+headless=0
 osname=$(lsb_release -si)
 [ -z $logfile ] && logfile="/dev/null"
 if [ -z $serverip ]; then
