@@ -12,7 +12,7 @@
 
 osname=$(lsb_release -si)
 [ -z $logfile ] && logfile="/dev/null"
-if [ -z $serverdn ]; then
+if [ -z $serverip ]; then
   headless=1
 fi
 
