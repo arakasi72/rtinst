@@ -46,7 +46,7 @@ if [ $headless = 1 ]; then
 fi
 
 if [ -z $serverdn ]; then
-  echo "Unable to determine domain cannot setup Lets Encypt"
+  echo "Unable to determine domain name cannot setup Lets Encypt"
   exit 1
 fi
 
