@@ -340,7 +340,7 @@ echo
 echo "Your server's IP is set to $serverip"
 
 # Determine domain name using server ip address
-serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
+export serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
 if [ -z "$serverdn" ]; then
   echo "Unable to determine domain"
 else
@@ -625,7 +625,13 @@ echo "SSH port set to $sshport"
 ###############################
 
 # calls the script rtsslcert to generate the ssl certificated for vsftpd and nginx
-rtsslcert -d
+if rtletsencrypt ; then
+  leflag=0
+  echo "Lets Encrypt Certificates installed"
+else
+  rtsslcert -d
+  echo "Self signed certificats installed"
+fi
 
 ###############################
 ### INSTALL FTP ###
