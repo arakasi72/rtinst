@@ -66,7 +66,17 @@ fi
 
 #Generating Certificates
 certbot -q --nginx --register-unsafely-without-email certonly -d $serverdn
-echo $?
+
+if [ $? = 1 ]; then
+  echo "unable to generate certificates"
+  exit 1
+fi
+
+echo "Certificates Generated"
+
+if [ $headless = 0 ]; then
+  exit 0
+fi
 
 
 
