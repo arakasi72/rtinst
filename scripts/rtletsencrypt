@@ -60,6 +60,8 @@ if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installe
     add-apt-repository -y ppa:certbot/certbot >> $logfile 2>&1
     apt-get -q update >> $logfile 2>&1
     apt-get install -y certbot python-certbot-nginx >> $logfile 2>&1
+  else
+    apt-get install -y certbot python-certbot-nginx -t stretch-backports >> $logfile 2>&1
   fi
 fi
 
