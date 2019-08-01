@@ -67,6 +67,12 @@ if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installe
   fi
 fi
 
+if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installed") = 0 ]; then
+  echo "Install Failed"
+  exit 1
+fi
+
+
 #Generating Certificates
 certbot -q --nginx --register-unsafely-without-email certonly -d $serverdn >> $logfile 2>&1
 
