@@ -405,7 +405,7 @@ else
     adduser --gecos "" $user
   else
     adduser --gecos "" $user --disabled-password
-    echo "$user:$unixpass" | sudo chpasswd
+    echo "$user:$unixpass" | chpasswd
   fi
 fi
 
