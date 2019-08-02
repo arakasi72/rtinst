@@ -66,7 +66,7 @@ if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installe
     apt-get install -y certbot python-certbot-nginx -t stretch-backports >> $logfile 2>&1
   fi
 else
-  echo "certbot alreadt installed"
+  echo "certbot already installed"
 fi
 
 if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installed") = 0 ]; then
