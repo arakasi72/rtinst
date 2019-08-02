@@ -63,7 +63,7 @@ serveripa=$(ip route get 8.8.8.8 | awk 'NR==1 {print $7}')
 serveripb=$(wget -qO- ipecho.net/plain)
 
 if [ "$serveripa" = "$serveripb" ]; then
-  export serverip=$serveripa
+  serverip=$serveripa
 else
   echo "Select the IP address to use:"
   echo "1.) "$serveripa
@@ -72,8 +72,8 @@ else
   while true
     do
       read answer
-      case $answer in [1] ) export serverip=$serveripa && break ;;
-                      [2] ) export serverip=$serveripb && break ;;
+      case $answer in [1] ) serverip=$serveripa && break ;;
+                      [2] ) serverip=$serveripb && break ;;
                         * ) echo "Enter 1 or 2";;
     esac
   done
@@ -338,9 +338,10 @@ echo
 [ $forceyes = 1 ] && enter_ip
 
 echo "Your server's IP is set to $serverip"
+export serverip
 
 # Determine domain name using server ip address
-serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
+export serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
 if [ -z "$serverdn" ]; then
   echo "Unable to determine domain"
 else
@@ -404,7 +405,7 @@ else
     adduser --gecos "" $user
   else
     adduser --gecos "" $user --disabled-password
-    echo "$user:$unixpass" | sudo chpasswd
+    echo "$user:$unixpass" | chpasswd
   fi
 fi
 
@@ -625,7 +626,14 @@ echo "SSH port set to $sshport"
 ###############################
 
 # calls the script rtsslcert to generate the ssl certificated for vsftpd and nginx
-rtsslcert -d
+if rtletsencrypt ; then
+  leflag=0
+  echo "Lets Encrypt Certificates installed"
+else
+  rtsslcert -d
+  leflag=1
+  echo "Self signed certificats installed"
+fi
 
 ###############################
 ### INSTALL FTP ###
@@ -667,6 +675,11 @@ grep -Pq "^\s*ssl_sslv3" /etc/vsftpd.conf &&  sed -i '/^\s*ssl_sslv3/ c\ssl_sslv
 grep -Pq "^\s*ssl_tlsv1" /etc/vsftpd.conf &&  sed -i '/^\s*ssl_tlsv1/ c\ssl_tlsv1=YES' /etc/vsftpd.conf || echo "ssl_tlsv1=YES" >> /etc/vsftpd.conf
 grep -Pq "^\s*require_ssl_reuse" /etc/vsftpd.conf &&  sed -i '/^\s*require_ssl_reuse/ c\require_ssl_reuse=NO' /etc/vsftpd.conf || echo "require_ssl_reuse=NO" >> /etc/vsftpd.conf
 grep -Pq "^\s*ssl_ciphers" /etc/vsftpd.conf &&  sed -i '/^\s*ssl_ciphers/ c\ssl_ciphers=HIGH' /etc/vsftpd.conf || echo "ssl_ciphers=HIGH" >> /etc/vsftpd.conf
+
+if [ $leflag = 0 ]; then
+  sed -i "/^\(\s\|#\)*rsa_cert_file/ c\rsa_cert_file=/etc/letsencrypt/live/$serverdn/fullchain.pem" /etc/vsftpd.conf
+  sed -i "/^\(\s\|#\)*rsa_private_key_file/ c\rsa_private_key_file=/etc/letsencrypt/live/$serverdn/privkey.pem" /etc/vsftpd.conf
+fi
 
 service vsftpd restart 1>> $logfile
 
@@ -739,6 +752,12 @@ echo "}" >> /etc/nginx/conf.d/php
 echo "location ~* \.(jpg|jpeg|gif|css|png|js|woff|ttf|svg|eot)$ {" > /etc/nginx/conf.d/cache
 echo "        expires 30d;" >> /etc/nginx/conf.d/cache
 echo "}" >> /etc/nginx/conf.d/cache
+
+if [ $leflag = 0 ]; then
+  sed -i "/^\(\s\|#\)*server_name/ c\        server_name $serverdn;" /etc/nginx/sites-available/default
+  sed -i "/ssl_certificate / c\        ssl_certificate /etc/letsencrypt/live/$serverdn/fullchain.pem;" /etc/nginx/sites-available/default
+  sed -i "/ssl_certificate_key / c\        ssl_certificate_key /etc/letsencrypt/live/$serverdn/privkey.pem;" /etc/nginx/sites-available/default
+fi
 
 service nginx restart && service $phpver-fpm restart
 
@@ -957,7 +976,7 @@ if [ -z $ru_current ]; then
   echo "   RuTorrent was not installed" | tee -a $home/rtinst.info
 else
   echo "   RuTorrent $ru_current installed" | tee -a $home/rtinst.info
-  echo "   rutorrent can be accessed at https://$serverip/rutorrent" | tee -a $home/rtinst.info
+  echo "   rutorrent can be accessed at https://$serverdn/rutorrent" | tee -a $home/rtinst.info
   if [ $passflag = 1 ]; then
     echo "   rutorrent password set to $webpass" | tee -a $home/rtinst.info
   elif [ $passflag = 2 ]; then
@@ -967,7 +986,7 @@ else
   fi
   echo "   to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
   echo | tee -a $home/rtinst.info
-  echo "   If enabled, access https downloads at https://$serverip/download/$user" | tee -a $home/rtinst.info
+  echo "   If enabled, access https downloads at https://$serverdn/download/$user" | tee -a $home/rtinst.info
 fi
 
 echo | tee -a $home/rtinst.info

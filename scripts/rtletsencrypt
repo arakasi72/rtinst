@@ -1,0 +1,109 @@
+#!/bin/bash
+
+#########################################################################################
+#
+#  Copyright (c) 2015 arakasi72 (https://github.com/arakasi72)
+#
+#  --> Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+#
+#########################################################################################
+
+
+headless=0
+osname=$(lsb_release -si)
+[ -z $logfile ] && logfile="/dev/null"
+if [ -z $serverip ]; then
+  headless=1
+fi
+
+#check it is being run as root
+if [ "$(id -u)" != "0" ]; then
+  echo "Must be run from root or using sudo" && exit 1
+fi
+
+if [ $headless = 1 ]; then
+  serveripa=$(ip route get 8.8.8.8 | awk 'NR==1 {print $7}')
+  serveripb=$(wget -qO- ipecho.net/plain)
+  if [ "$serveripa" = "$serveripb" ]; then
+    serverip=$serveripa
+  else
+    echo "Select the IP address to use:"
+    echo "1.) "$serveripa
+    echo "2.) "$serveripb
+
+    while true
+      do
+        read answer
+        case $answer in [1] ) serverip=$serveripa && break ;;
+                        [2] ) serverip=$serveripb && break ;;
+                          * ) echo "Enter 1 or 2";;
+      esac
+    done
+  fi
+  serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
+fi
+
+echo "IP: $serverip"
+echo "DN: $serverdn"
+
+if [ -z $serverdn ]; then
+  echo "Unable to determine domain name cannot setup Lets Encypt"
+  exit 1
+fi
+
+#Installing Certbot
+if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installed") = 0 ]; then
+  echo "Installing certbot"
+
+  if [ "$osname" = "Ubuntu" ]; then
+    apt-get -q update >> $logfile 2>&1
+    add-apt-repository -y universe >> $logfile 2>&1
+    add-apt-repository -y ppa:certbot/certbot >> $logfile 2>&1
+    apt-get -q update >> $logfile 2>&1
+    apt-get install -y certbot python-certbot-nginx >> $logfile 2>&1
+  else
+    grep "^deb http\:\/\/deb\.debian\.org\/debian stretch-backports main" /etc/apt/sources.list > /dev/null || echo "deb http://deb.debian.org/debian stretch-backports main" >> /etc/apt/sources.list
+    apt-get -q update >> $logfile 2>&1
+    apt-get install -y certbot python-certbot-nginx -t stretch-backports >> $logfile 2>&1
+  fi
+else
+  echo "certbot already installed"
+fi
+
+if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installed") = 0 ]; then
+  echo "Install Failed"
+  exit 1
+fi
+
+
+#Generating Certificates
+certbot -q --nginx --register-unsafely-without-email --agree-tos certonly -d $serverdn >> $logfile 2>&1
+
+if [ $? = 1 ]; then
+  echo "unable to generate certificates"
+  exit 1
+fi
+
+echo "Certificates Generated"
+
+if [ $headless = 0 ]; then
+  exit 0
+fi
+
+if [ -d "/etc/letsencrypt/live/$serverdn" ]; then
+  echo "Replacing certificates in nginx and vsftpd"
+  
+  sed -i "/^\(\s\|#\)*server_name/ c\        server_name $serverdn;" /etc/nginx/sites-available/default
+  sed -i "/ssl_certificate / c\        ssl_certificate /etc/letsencrypt/live/$serverdn/fullchain.pem;" /etc/nginx/sites-available/default
+  sed -i "/ssl_certificate_key / c\        ssl_certificate_key /etc/letsencrypt/live/$serverdn/privkey.pem;" /etc/nginx/sites-available/default
+  
+  service nginx restart
+  
+  sed -i "/^\(\s\|#\)*rsa_cert_file/ c\rsa_cert_file=/etc/letsencrypt/live/$serverdn/fullchain.pem" /etc/vsftpd.conf
+  sed -i "/^\(\s\|#\)*rsa_private_key_file/ c\rsa_private_key_file=/etc/letsencrypt/live/$serverdn/privkey.pem" /etc/vsftpd.conf
+  
+  service vsftpd restart
+fi
+
+
+
