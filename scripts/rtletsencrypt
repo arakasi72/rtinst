@@ -41,9 +41,10 @@ if [ $headless = 1 ]; then
     done
   fi
   serverdn=$(perl -MSocket -le "print((gethostbyaddr(inet_aton('$serverip'), AF_INET))[0])")
-  echo "IP: $serverip"
-  echo "DN: $serverdn"
 fi
+
+echo "IP: $serverip"
+echo "DN: $serverdn"
 
 if [ -z $serverdn ]; then
   echo "Unable to determine domain name cannot setup Lets Encypt"
