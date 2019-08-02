@@ -76,7 +76,7 @@ fi
 
 
 #Generating Certificates
-certbot -q --nginx --register-unsafely-without-email certonly -d $serverdn >> $logfile 2>&1
+certbot -q --nginx --register-unsafely-without-email --agree-tos certonly -d $serverdn >> $logfile 2>&1
 
 if [ $? = 1 ]; then
   echo "unable to generate certificates"
@@ -90,7 +90,7 @@ if [ $headless = 0 ]; then
 fi
 
 if [ -d "/etc/letsencrypt/live/$serverdn" ]; then
-  echo "Replaceing certificates in nginx and vsftpd"
+  echo "Replacing certificates in nginx and vsftpd"
 
   sed -i "/ssl_certificate / c\        ssl_certificate /etc/letsencrypt/live/$serverdn/fullchain.pem;" /etc/nginx/sites-available/default
   sed -i "/ssl_certificate_key / c\        ssl_certificate_key /etc/letsencrypt/live/$serverdn/privkey.pem;" /etc/nginx/sites-available/default
