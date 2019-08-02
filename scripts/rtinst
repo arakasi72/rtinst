@@ -976,7 +976,13 @@ if [ -z $ru_current ]; then
   echo "   RuTorrent was not installed" | tee -a $home/rtinst.info
 else
   echo "   RuTorrent $ru_current installed" | tee -a $home/rtinst.info
-  echo "   rutorrent can be accessed at https://$serverdn/rutorrent" | tee -a $home/rtinst.info
+  
+  if [ $leflag = 0 ]; then
+    echo "   rutorrent can be accessed at https://$serverdn/rutorrent" | tee -a $home/rtinst.info
+  else
+    echo "   rutorrent can be accessed at https://$serverip/rutorrent" | tee -a $home/rtinst.info
+  fi
+  
   if [ $passflag = 1 ]; then
     echo "   rutorrent password set to $webpass" | tee -a $home/rtinst.info
   elif [ $passflag = 2 ]; then
@@ -986,7 +992,12 @@ else
   fi
   echo "   to change rutorrent password enter: rtpass" | tee -a $home/rtinst.info
   echo | tee -a $home/rtinst.info
-  echo "   If enabled, access https downloads at https://$serverdn/download/$user" | tee -a $home/rtinst.info
+  
+  if [ $leflag = 0 ]; then
+    echo "   If enabled, access https downloads at https://$serverdn/download/$user" | tee -a $home/rtinst.info
+  else
+    echo "   If enabled, access https downloads at https://$serverip/download/$user" | tee -a $home/rtinst.info
+  fi
 fi
 
 echo | tee -a $home/rtinst.info
