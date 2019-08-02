@@ -1,5 +1,7 @@
 ## rtinst
 
+### Note: Now installs Lets Encrypt SSL certificates
+
 #### 30 Second Guide
 
 Ubuntu and Debian Seedbox Installation
