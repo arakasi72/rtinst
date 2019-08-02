@@ -91,7 +91,8 @@ fi
 
 if [ -d "/etc/letsencrypt/live/$serverdn" ]; then
   echo "Replacing certificates in nginx and vsftpd"
-
+  
+  sed -i "/^\(\s\|#\)*server_name/ c\        server_name $serverdn;" /etc/nginx/sites-available/default
   sed -i "/ssl_certificate / c\        ssl_certificate /etc/letsencrypt/live/$serverdn/fullchain.pem;" /etc/nginx/sites-available/default
   sed -i "/ssl_certificate_key / c\        ssl_certificate_key /etc/letsencrypt/live/$serverdn/privkey.pem;" /etc/nginx/sites-available/default
   
