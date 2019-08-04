@@ -1,5 +1,6 @@
 server {
         listen 80;
+        listen [::]:80;
         #server_name <Domain Name>;
         root /var/www;
         
@@ -35,7 +36,10 @@ server {
 }
 
 server {
-        listen 443 ssl;
+        listen 443 ssl http2 default_server;
+        listen [::]:443 ssl http2 default_server;
+        #server_name <Domain Name>;
+
         #server_name <Domain Name>; 
         root /var/www;
         index index.html index.php index.htm;
