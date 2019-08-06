@@ -398,14 +398,6 @@ fi
 su $user -c '/usr/local/bin/rt restart'
 su $user -c '/usr/local/bin/rt -i restart'
 
-dload_line=$(grep "include /etc/nginx/conf.d/rtdload;" /etc/nginx/sites-available/default)
-dload_hash=$(echo $dload_line | sed 's/[^#]*//g')
-if [ ! -z "$dload_line" -a -z "$dload_hash" ]; then
-dload_flag=0
-else
-dload_flag=1
-fi
-
 echo "$user setup complete"
 echo "SCGI Port: $newscgi"
 echo "RPC Mount: $newrpc"
