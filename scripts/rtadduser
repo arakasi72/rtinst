@@ -220,7 +220,6 @@ if [ -z "$user" ]; then
         user=''
       fi
     done
-  fi
 else
   if ! [[ $user =~ ^[a-z][-a-z0-9_]{2,31}$ ]]; then
     echo "$user is not a valid user name please enter again"
