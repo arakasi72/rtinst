@@ -33,6 +33,28 @@ user_list=*
 ### FUNCTIONS ###
 ###############################
 
+#function to determin if unix user name is valid
+valid_name(){
+    until [[ $user =~ ^[a-z][-a-z0-9_]{2,31}$ ]]
+      do
+        echo "Enter user name (lowercase, numbers, dash and underscore):"
+        read user
+      done
+}
+
+# function to ask user for y/n response
+ask_user(){
+local answer
+while true
+  do
+    read answer
+    case $answer in [Yy]* ) return 0 ;;
+                    [Nn]* ) return 1 ;;
+                        * ) echo "Enter y or n";;
+    esac
+  done
+}
+
 genpasswd() {
 local genln=$1
 [ -z "$genln" ] && genln=8
@@ -183,33 +205,43 @@ fi
 ###############################
 
 if [ -z "$user" ]; then
-  echo "Enter the name of the user to add"
+  echo "Enter the name of the user to install to"
+  echo "This will be your primary user"
   echo "It can be an existing user or a new user"
   echo
-
   confirm_name=1
   while [ $confirm_name = 1 ]
     do
-      read -p "Enter user name: " answer
-      addname=$answer
-      check_name=1
-      if [ "$addname" = "root" ]; then
-        echo "Cannot create root"
-        exit
+      valid_name
+      echo -n "Confirm that user name is $user y/n? "
+      if ask_user; then
+        confirm_name=0
+      else
+        user=''
       fi
-
-      while [ $check_name = 1 ]
-        do
-          read -p "Is $addname correct? " answer
-          case $answer in [Yy]* ) confirm_name=0 && check_name=0  ;;
-                          [Nn]* ) confirm_name=1 && check_name=0  ;;
-                              * ) echo "Enter y or n";;
-          esac
-        done
     done
-
-  user=$addname
+  fi
+else
+  if ! [[ $user =~ ^[a-z][-a-z0-9_]{2,31}$ ]]; then
+    echo "$user is not a valid user name please enter again"
+    confirm_name=1
+    while [ $confirm_name = 1 ]
+      do
+        valid_name
+        echo -n "Confirm that user name is $user y/n? "
+        if ask_user; then
+          confirm_name=0
+        else
+          user=''
+        fi
+      done
+  fi
 fi
+
+echo "User name is $user"
+
+###REMOVE
+exit
 
 if id -u $user >/dev/null 2>&1; then
   echo "$user already exists"
