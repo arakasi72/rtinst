@@ -133,6 +133,18 @@ else
 fi
 }
 
+#function to determin if unix user name is valid
+valid_name(){
+    until [[ $user =~ ^[a-z][-a-z0-9_]{2,31}$ ]]
+      do
+        echo "Enter user name (lowercase, numbers, dash and underscore):"
+        read user
+      done
+}
+
+
+
+
 #function to generate random password
 genpasswd() {
 local genln=$1
@@ -379,24 +391,38 @@ if [ -z "$user" ]; then
     echo "This will be your primary user"
     echo "It can be an existing user or a new user"
     echo
-
     confirm_name=1
     while [ $confirm_name = 1 ]
       do
-        read -p "Enter user name: " answer
-        addname=$answer
-        echo -n "Confirm that user name is $answer y/n? "
+        valid_name
+        echo -n "Confirm that user name is $user y/n? "
         if ask_user; then
           confirm_name=0
+        else
+          user=''
         fi
       done
-
-    user=$addname
-
   else
     user=$SUDO_USER
   fi
+else
+  if ! [[ $user =~ ^[a-z][-a-z0-9_]{2,31}$ ]]; then
+    echo "$user is not a valid user name please enter again"
+    confirm_name=1
+    while [ $confirm_name = 1 ]
+      do
+        valid_name
+        echo -n "Confirm that user name is $user y/n? "
+        if ask_user; then
+          confirm_name=0
+        else
+          user=''
+        fi
+      done
+  fi
 fi
+
+echo "User name is $user"
 
 if id -u $user >/dev/null 2>&1; then
   echo "$user already exists"
@@ -407,7 +433,18 @@ else
     adduser --gecos "" $user --disabled-password
     echo "$user:$unixpass" | chpasswd
   fi
+  
+  if id -u $user >/dev/null 2>&1; then
+    echo "$user successfully created"
+    exit 0
+  else
+    echo "create user failed - exiting process"
+    exit 1
+  fi
+  
 fi
+
+
 
 home=$(eval echo "~$user")
 
