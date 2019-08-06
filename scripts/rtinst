@@ -436,7 +436,6 @@ else
   
   if id -u $user >/dev/null 2>&1; then
     echo "$user successfully created"
-    exit 0
   else
     echo "create user failed - exiting process"
     exit 1
@@ -444,7 +443,8 @@ else
   
 fi
 
-
+####REMOVE
+exit
 
 home=$(eval echo "~$user")
 
