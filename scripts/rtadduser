@@ -205,8 +205,7 @@ fi
 ###############################
 
 if [ -z "$user" ]; then
-  echo "Enter the name of the user to install to"
-  echo "This will be your primary user"
+  echo "Enter the name of the user"
   echo "It can be an existing user or a new user"
   echo
   confirm_name=1
