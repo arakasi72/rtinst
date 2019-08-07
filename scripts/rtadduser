@@ -22,8 +22,9 @@ sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
 ftpport=$(grep 'listen_port=' /etc/vsftpd.conf | sed 's/[^0-9]*//g')
 cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
 cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
-serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
+serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $7}')
 check_ssh=1
+rtdstatus=$(rtdload)
 
 #get user list
 cd /var/www/rutorrent/conf/users
@@ -32,6 +33,28 @@ user_list=*
 ###############################
 ### FUNCTIONS ###
 ###############################
+
+#function to determin if unix user name is valid
+valid_name(){
+    until [[ $user =~ ^[a-z][-a-z0-9_]{2,31}$ ]]
+      do
+        echo "Enter user name (lowercase, numbers, dash and underscore):"
+        read user
+      done
+}
+
+# function to ask user for y/n response
+ask_user(){
+local answer
+while true
+  do
+    read answer
+    case $answer in [Yy]* ) return 0 ;;
+                    [Nn]* ) return 1 ;;
+                        * ) echo "Enter y or n";;
+    esac
+  done
+}
 
 genpasswd() {
 local genln=$1
@@ -183,33 +206,38 @@ fi
 ###############################
 
 if [ -z "$user" ]; then
-  echo "Enter the name of the user to add"
+  echo "Enter the name of the user"
   echo "It can be an existing user or a new user"
   echo
-
   confirm_name=1
   while [ $confirm_name = 1 ]
     do
-      read -p "Enter user name: " answer
-      addname=$answer
-      check_name=1
-      if [ "$addname" = "root" ]; then
-        echo "Cannot create root"
-        exit
+      valid_name
+      echo -n "Confirm that user name is $user y/n? "
+      if ask_user; then
+        confirm_name=0
+      else
+        user=''
       fi
-
-      while [ $check_name = 1 ]
-        do
-          read -p "Is $addname correct? " answer
-          case $answer in [Yy]* ) confirm_name=0 && check_name=0  ;;
-                          [Nn]* ) confirm_name=1 && check_name=0  ;;
-                              * ) echo "Enter y or n";;
-          esac
-        done
     done
-
-  user=$addname
+else
+  if ! [[ $user =~ ^[a-z][-a-z0-9_]{2,31}$ ]]; then
+    echo "$user is not a valid user name please enter again"
+    confirm_name=1
+    while [ $confirm_name = 1 ]
+      do
+        valid_name
+        echo -n "Confirm that user name is $user y/n? "
+        if ask_user; then
+          confirm_name=0
+        else
+          user=''
+        fi
+      done
+  fi
 fi
+
+echo "User name is $user"
 
 if id -u $user >/dev/null 2>&1; then
   echo "$user already exists"
@@ -219,6 +247,13 @@ else
   else
     adduser --gecos "" $user --disabled-password
     echo "$user:$unixpass" | sudo chpasswd
+  fi
+
+  if id -u $user >/dev/null 2>&1; then
+    echo "$user successfully created"
+  else
+    echo "create user failed - exiting process"
+    exit 1
   fi
 fi
 
@@ -363,14 +398,6 @@ fi
 su $user -c '/usr/local/bin/rt restart'
 su $user -c '/usr/local/bin/rt -i restart'
 
-dload_line=$(grep "include /etc/nginx/conf.d/rtdload;" /etc/nginx/sites-available/default)
-dload_hash=$(echo $dload_line | sed 's/[^#]*//g')
-if [ ! -z "$dload_line" -a -z "$dload_hash" ]; then
-dload_flag=0
-else
-dload_flag=1
-fi
-
 echo "$user setup complete"
 echo "SCGI Port: $newscgi"
 echo "RPC Mount: $newrpc"
@@ -391,7 +418,7 @@ echo
 fi
 echo "ftp client should be set to explicit ftp over tls using port $ftpport" | tee -a $home/rtinst.info
 echo
-if [ $dload_flag = 0 ]; then
+if [ "$rtdstatus" = "enabled" ]; then
 echo "https downloads can be accessed at https://$serverip/download/$user" | tee -a $home/rtinst.info
 echo
 fi
