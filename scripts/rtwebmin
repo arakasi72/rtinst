@@ -9,7 +9,7 @@
 ######################################################################
 
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
-serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $NF}')
+serverip=$(ip route get 8.8.8.8 | awk 'NR==1 {print $7}')
 
 if [ "$(id -u)" != "0" ]; then
   echo "Must be run as root, directly or with sudo"
