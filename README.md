@@ -25,16 +25,16 @@ It takes about 10 minutes to run, depending on your server setup. After you have
 
 It has been tested with clean installs of: 
 
-	Ubuntu 12 (unsupported)
-	Ubuntu 13 (unsupported)
-	Ubuntu 14 (unsupported)
-	Ubuntu 15 (unsupported)
+	Ubuntu 12 (old release)
+	Ubuntu 13 (old release)
+	Ubuntu 14 (old release)
+	Ubuntu 15 (old release)
 	Ubuntu 16
 	Ubuntu 17
 	Ubuntu 18
 	Ubuntu 19
-	Debian 7 "Wheezy" (unsupported)
-	Debian 8 "Jessie" (unsupported)
+	Debian 7 "Wheezy" (old release)
+	Debian 8 "Jessie" (old release)
 	Debian 9 "Stretch"
 	Debian 10 "Buster"
 
