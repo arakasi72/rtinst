@@ -563,13 +563,13 @@ if [ $osname = "Debian" ] && ! installed unrar; then
   do
     attempts=$(( $attempts + 1 ))
     if [ "$(uname -m)" = "x86_64" ]; then
-      wget http://www.rarlab.com/rar/rarlinux-x64-5.5.0.tar.gz >> $logfile 2>&1
-      tar xvzf rarlinux-x64-5.5.0.tar.gz >> $logfile 2>&1
-      rm rarlinux-x64-5.5.0.tar.gz
+      wget http://www.rarlab.com/rar/rarlinux-x64-5.7.1.tar.gz >> $logfile 2>&1
+      tar xvzf rarlinux-x64-5.7.1.tar.gz >> $logfile 2>&1
+      rm rarlinux-x64-5.7.1.tar.gz
     elif [ "$(uname -m)" = "x86_32" ]; then
-      wget http://www.rarlab.com/rar/rarlinux-5.5.0.tar.gz >> $logfile 2>&1
-      tar xvzf rarlinux-5.5.0.tar.gz >> $logfile 2>&1
-      rm rarlinux-5.5.0.tar.gz
+      wget http://www.rarlab.com/rar/rarlinux-5.7.1.tar.gz >> $logfile 2>&1
+      tar xvzf rarlinux-5.7.1.tar.gz >> $logfile 2>&1
+      rm rarlinux-5.7.1.tar.gz
     fi
   done
   if [ -d rar ]; then
