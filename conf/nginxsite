@@ -14,7 +14,7 @@ server {
         deny all;
 
         location @denied {
-               return 301 https://$server_name$request_uri;
+               return 301 https://$host$request_uri;
         }
         
         location / {
@@ -45,10 +45,6 @@ server {
         index index.html index.php index.htm;
 
         client_max_body_size 40m;
-        
-        if ($host != $server_name) {
-          return 301 https://$server_name$request_uri;
-        }
         
         ssl_certificate /etc/ssl/ruweb.crt;
         ssl_certificate_key /etc/ssl/private/ruweb.key;
