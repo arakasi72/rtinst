@@ -41,7 +41,7 @@ if [ "$relno" = "16" ] || [ "$relno" = "17" ] || [ "$relno" = "9" ]; then
   libcver=libcurl3
 fi
 
-if [ $(lsb_release -sr) = "17.10" ]; then
+if [ "$(lsb_release -sr)" = "17.10" ]; then
   phpver=php7.1
   phploc=/etc/php/7.1
   libcver=libcurl3
