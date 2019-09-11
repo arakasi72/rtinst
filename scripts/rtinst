@@ -556,6 +556,11 @@ for package_name in $package_list
     fi
   done
 
+# Installs a package needed to prevent arm64 architectures from "WARNING: Unable to start rtorrent"
+if [ "$(uname --m)" == "aarch64" ] || [ "$(dpkg --print-architecture)" == "arm64" ] ; then
+    sudo apt-get install libxmlrpc-core-c3-dev
+fi
+
 test -z "$install_list" || apt-get -qq install $install_list >> $logfile 2>&1
 if ! [ $? = 0 ]; then
   echo "Problem installing packages. Check log and rerun once it is resolved" && exit
