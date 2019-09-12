@@ -35,6 +35,17 @@ fullrel=$(lsb_release -sd)
 osname=$(lsb_release -si)
 relno=$(lsb_release -sr | cut -d. -f1)
 
+# Fallback if lsb_release -si returns nothing
+if [ "$osname" = "" ]; then
+  osname=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
+  osname=${osname^}
+fi
+
+# Fallback if lsb_release -sr returns nothing
+if [ "$relno" = "" ]; then
+  relno=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"')
+fi
+
 if [ "$relno" = "16" ] || [ "$relno" = "17" ] || [ "$relno" = "9" ]; then
   phpver=php7.0
   phploc=/etc/php/7.0
@@ -544,6 +555,11 @@ for package_name in $package_list
       echo $package_name" not found, skipping"
     fi
   done
+
+# Installs a package needed to prevent arm64 architectures from "WARNING: Unable to start rtorrent"
+if [ "$(uname --m)" == "aarch64" ] || [ "$(dpkg --print-architecture)" == "arm64" ] ; then
+    sudo apt-get install libxmlrpc-core-c3-dev
+fi
 
 test -z "$install_list" || apt-get -qq install $install_list >> $logfile 2>&1
 if ! [ $? = 0 ]; then
