@@ -65,7 +65,7 @@ if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installe
     deb_name=$(lsb_release --codename --short)
     grep "^deb http\:\/\/deb\.debian\.org\/debian $deb_name-backports main" /etc/apt/sources.list > /dev/null || echo "deb http://deb.debian.org/debian $deb_name-backports main" >> /etc/apt/sources.list
     apt-get -q update >> $logfile 2>&1
-    apt-get install -y certbot python-certbot-nginx -t stretch-backports >> $logfile 2>&1
+    apt-get install -y certbot python-certbot-nginx -t $deb_name-backports >> $logfile 2>&1
   fi
 else
   echo "certbot already installed"
