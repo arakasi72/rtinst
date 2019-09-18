@@ -32,8 +32,6 @@ Current release has been tested with clean installs of:
 	Debian 9 "Stretch"
 	Debian 10 "Buster"
 
-Older systems no longer supported, but works with 
-
 Services that will be installed and configured are
 
 	1. vsftpd - ftp server
