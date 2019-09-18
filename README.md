@@ -23,20 +23,16 @@ It takes about 10 minutes to run, depending on your server setup. After you have
 **IMPORTANT: NOTE THE NEW SSH PORT AND MAKE SURE YOU CAN SSH INTO YOUR SERVER BEFORE CLOSING THE EXISTING SESSION**
 
 
-It has been tested with clean installs of: 
+Current release has been tested with clean installs of: 
 
-	Ubuntu 12 (old release)
-	Ubuntu 13 (old release)
-	Ubuntu 14 (old release)
-	Ubuntu 15 (old release)
 	Ubuntu 16
 	Ubuntu 17
 	Ubuntu 18
 	Ubuntu 19
-	Debian 7 "Wheezy" (old release)
-	Debian 8 "Jessie" (old release)
 	Debian 9 "Stretch"
 	Debian 10 "Buster"
+
+Older systems no longer supported, but works with 
 
 Services that will be installed and configured are
 
@@ -52,7 +48,13 @@ Services that will be installed and configured are
 
 [Additional information on all the features](https://github.com/arakasi72/rtinst/wiki/Guide)
 
-For older unssuported OS listed above see the [Older OS Installation Guide](https://github.com/arakasi72/rtinst/wiki/Installing-on-Older-OS)
+For older unssuported OS [Older OS Installation Guide](https://github.com/arakasi72/rtinst/wiki/Installing-on-Older-OS). These include:
+	Ubuntu 12 (old release)
+	Ubuntu 13 (old release)
+	Ubuntu 14 (old release)
+	Ubuntu 15 (old release)
+	Debian 7 "Wheezy" (old release)
+	Debian 8 "Jessie" (old release)
 
 To see latest updates to the script go to [Change Log](https://github.com/arakasi72/rtinst/wiki/Change-Log)
 
