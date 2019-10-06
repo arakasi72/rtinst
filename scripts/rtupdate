@@ -12,6 +12,7 @@ PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 osname=$(lsb_release -si)
 relno=$(lsb_release -sr | cut -d. -f1)
+fullrelno=$(lsb_release -sr)
 
 # Fallback if lsb_release -si returns nothing
 if [ "$osname" = "" ]; then
@@ -21,8 +22,13 @@ fi
 
 # Fallback if lsb_release -sr returns nothing
 if [ "$relno" = "" ]; then
-  relno=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"')
+  relno=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"' | cut -d. -f1)
 fi
+
+if [ "$fullrelno" = "" ]; then
+  fullrelno=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"')
+fi
+
 
 sourcedir='http://rtorrent.net/downloads/'
 
@@ -34,7 +40,7 @@ xmlrpcloc_alt='https://github.com/mirror/xmlrpc-c/trunk/advanced'
 
 rtdevrel=1
 
-if [ "$relno" = "17.10" ]; then
+if [ "$fullrelno" = "17.10" ]; then
   rtdevrel=0
 fi
 
