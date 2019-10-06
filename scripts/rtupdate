@@ -34,7 +34,7 @@ xmlrpcloc_alt='https://github.com/mirror/xmlrpc-c/trunk/advanced'
 
 rtdevrel=1
 
-if [ $(lsb_release -sr) = 17.10 ]; then
+if [ "$relno" = "17.10" ]; then
   rtdevrel=0
 fi
 
