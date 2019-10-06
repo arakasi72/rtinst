@@ -12,6 +12,18 @@ PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 osname=$(lsb_release -si)
 relno=$(lsb_release -sr | cut -d. -f1)
+
+# Fallback if lsb_release -si returns nothing
+if [ "$osname" = "" ]; then
+  osname=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
+  osname=${osname^}
+fi
+
+# Fallback if lsb_release -sr returns nothing
+if [ "$relno" = "" ]; then
+  relno=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"')
+fi
+
 sourcedir='http://rtorrent.net/downloads/'
 
 xmlrpc_url='https://svn.code.sf.net/p/xmlrpc-c/code/advanced/'
@@ -22,7 +34,7 @@ xmlrpcloc_alt='https://github.com/mirror/xmlrpc-c/trunk/advanced'
 
 rtdevrel=1
 
-if [ $(lsb_release -sr) = 17.10 ]; then
+if [ "$relno" = "17.10" ]; then
   rtdevrel=0
 fi
 
