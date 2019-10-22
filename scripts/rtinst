@@ -165,11 +165,12 @@ tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
 
 #function executed if the script finishes early
 early_exit() {
+local rt_ee_version
 echo "Installation is incomplete. Run rtinst again to complete"
 echo
 if hash rtorrent >> /dev/null 2>&1; then
-  rt_current=$(rtorrent -h | grep -om 1 "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
-  echo "rtorrent $rt_current installed"
+  rt_ee_version=$(rtorrent -h | grep -om 1 "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
+  echo "rtorrent $rt_ee_version installed"
 else
   echo "rtorrent was not installed"
 fi
