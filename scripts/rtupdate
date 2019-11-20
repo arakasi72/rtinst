@@ -75,7 +75,7 @@ hash $1 2>/dev/null
 
 #function to check if a web site is reachable
 check_url() {
-  if [[ `wget -S --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then return 0; else return 1; fi
+  if [[ `wget -S -T 3 --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then return 0; else return 1; fi
 }
 
 # function to create a list of versions to install
