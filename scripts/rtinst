@@ -238,7 +238,7 @@ if [ "$relno" = "10" ] || [ "$(lsb_release -sr)" = "19.10" ]; then
 fi
 
 serveripa=$(ip route get 8.8.8.8 | awk 'NR==1 {print $7}')
-serveripb=$(wget -qO- ipecho.net/plain)
+serveripb=$(wget -qO- --timeout=3 ipecho.net/plain)
 
 if [ "$serveripa" = "$serveripb" ]; then
   serverip=$serveripa
