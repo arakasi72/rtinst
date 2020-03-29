@@ -904,12 +904,19 @@ fi
 ###############################
 
 echo "Installing autodl-irssi" | tee -a $logfile
+
+#install jq
+if [ $(dpkg-query -W -f='${Status}' jq 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+  echo "Installing jq"
+  apt-get -yqq install jq 2>&1 >> $logfile 2>&1
+fi
+
 adlport=$(random 36001 36100)
 adlpass=$(genpasswd $(random 12 16))
 
 mkdir -p $home/.irssi/scripts/autorun
 cd $home/.irssi/scripts
-curl -sL http://git.io/vlcND | grep -Po '(?<="browser_download_url": ")(.*-v[\d.]+.zip)' | xargs wget --quiet -O autodl-irssi.zip
+curl -sL http://git.io/vlcND | jq ".assets[].browser_download_url" | xargs wget --quiet -O autodl-irssi.zip
 unzip -qq -o autodl-irssi.zip | tee -a $logfile
 rm autodl-irssi.zip
 cp autodl-irssi.pl autorun/

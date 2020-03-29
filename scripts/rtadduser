@@ -350,10 +350,17 @@ echo "?>" >> /var/www/rutorrent/conf/users/$user/config.php
 ###############################
 ### AUTODL-IRSSI ###
 ###############################
+
+#install jq
+if [ $(dpkg-query -W -f='${Status}' jq 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+  echo "Installing jq"
+  apt-get -yqq install jq 2>&1 >> /dev/null 2>&1
+fi
+
 mkdir /var/www/rutorrent/conf/users/$user/plugins/autodl-irssi
 mkdir -p $home/.irssi/scripts/autorun
 cd $home/.irssi/scripts
-curl -sL http://git.io/vlcND | grep -Po '(?<="browser_download_url": ")(.*-v[\d.]+.zip)' | xargs wget --quiet -O autodl-irssi.zip
+curl -sL http://git.io/vlcND | jq ".assets[].browser_download_url" | xargs wget --quiet -O autodl-irssi.zip
 unzip -o autodl-irssi.zip >> /dev/null 2>&1
 rm autodl-irssi.zip
 cp autodl-irssi.pl autorun/
