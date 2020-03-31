@@ -909,7 +909,7 @@ adlpass=$(genpasswd $(random 12 16))
 
 mkdir -p $home/.irssi/scripts/autorun
 cd $home/.irssi/scripts
-curl -sL http://git.io/vlcND | sed -n 's/.*browser_download_url...\(.*zip\)".*/\1/p' | xargs wget --quiet -O autodl-irssi.zip
+curl -sL http://git.io/vlcND | sed -n 's/.*browser_download_url": \?"\(.*zip\)".*/\1/p' | xargs wget --quiet -O autodl-irssi.zip
 unzip -qq -o autodl-irssi.zip | tee -a $logfile
 rm autodl-irssi.zip
 cp autodl-irssi.pl autorun/
