@@ -8,99 +8,6 @@
 #
 #########################################################################################
 
-###############################
-### SET VARIABLES ###
-###############################
-
-PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
-
-# if left blank will install latest version of rtorrent, or set to a specific release E.G. '0.9.6' to install that release
-rtorrentrel='0.9.6'
-
-#url's of the major components
-rt_url="http://rtorrent.net/downloads/"
-
-xmlrpc_url="https://svn.code.sf.net/p/xmlrpc-c/code/advanced/"
-xmlrpc_url_alt="https://github.com/mirror/xmlrpc-c"
-
-ru_url="https://github.com/Novik/ruTorrent/"
-adl_url="https://github.com/autodl-community/"
-
-if [ $(dpkg-query -W -f='${Status}' lsb-release 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-echo "Installing lsb-release"
-apt-get -yqq install lsb-release 2>&1 >> /dev/null
-fi
-
-fullrel=$(lsb_release -sd)
-osname=$(lsb_release -si)
-relno=$(lsb_release -sr | cut -d. -f1)
-
-if [ "$relno" = "16" ] || [ "$relno" = "17" ] || [ "$relno" = "9" ]; then
-  phpver=php7.0
-  phploc=/etc/php/7.0
-  libcver=libcurl3
-fi
-
-if [ "$(lsb_release -sr)" = "17.10" ]; then
-  phpver=php7.1
-  phploc=/etc/php/7.1
-  libcver=libcurl3
-fi
-
-if [ "$relno" = "18" ] || [ "$relno" = "19" ]; then
-  phpver=php7.2
-  phploc=/etc/php/7.2
-  libcver=libcurl4
-fi
-
-if [ "$relno" = "10" ]; then
-  phpver=php7.3
-  phploc=/etc/php/7.3
-  libcver=libcurl4
-fi
-
-serveripa=$(ip route get 8.8.8.8 | awk 'NR==1 {print $7}')
-serveripb=$(wget -qO- ipecho.net/plain)
-
-if [ "$serveripa" = "$serveripb" ]; then
-  serverip=$serveripa
-else
-  echo "Select the IP address to use:"
-  echo "1.) "$serveripa
-  echo "2.) "$serveripb
-
-  while true
-    do
-      read answer
-      case $answer in [1] ) serverip=$serveripa && break ;;
-                      [2] ) serverip=$serveripb && break ;;
-                        * ) echo "Enter 1 or 2";;
-    esac
-  done
-fi
-
-echo "IP set to "$serverip
-
-
-export logfile="/dev/null"
-webpass=''
-cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
-cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
-dlflag=1
-portdefault=1
-
-skip_rt=1
-sshport=''
-rudevflag=1
-rurelease=master
-passfile='/etc/nginx/.htpasswd'
-package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl dtach htop irssi libcppunit-dev $libcver libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl php-geoip $phpver-xmlrpc $phpver-xml python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
-Install_list=""
-unixpass=""
-passflag=0
-forceyes=1
-selfsign=1
-rut_add_users=1
 
 ###############################
 ### FUNCTIONS ###
@@ -108,7 +15,7 @@ rut_add_users=1
 
 #function to check if a web site is reachable
 check_url() {
-  if [[ `wget -S --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then return 0; else return 1; fi
+  if [[ `wget -S -T 3 --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then return 0; else return 1; fi
 }
 
 # checks if an application is installed
@@ -154,11 +61,12 @@ tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
 
 #function executed if the script finishes early
 early_exit() {
+local rt_ee_version
 echo "Installation is incomplete. Run rtinst again to complete"
 echo
 if hash rtorrent >> /dev/null 2>&1; then
-  rt_current=$(rtorrent -h | grep -om 1 "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
-  echo "rtorrent $rt_current installed"
+  rt_ee_version=$(rtorrent -h | grep -om 1 "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
+  echo "rtorrent $rt_ee_version installed"
 else
   echo "rtorrent was not installed"
 fi
@@ -242,21 +150,140 @@ while true
 
 # function to enter IP address
 enter_ip() {
+local ip_address=$1
+
+exec 3>&1 >/dev/tty
+
 while true
   do
-    if valid_ip $serverip ; then
-      echo "Your Server IP is $serverip"
+    if valid_ip $ip_address ; then
+      echo "Your Server IP is $ip_address"
       echo -n "Is this correct y/n? "
-      ask_user && return 0
+      ask_user && break
     else
       echo "Invalid IP address, please try again"
     fi
 
     echo "enter your server's IP address"
     echo "e.g. 213.0.113.113"
-    read serverip
+    read ip_address
   done
+
+exec >&3-
+
+echo $ip_address
 }
+
+
+###############################
+### SET VARIABLES ###
+###############################
+
+PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
+
+# if left blank will install latest version of rtorrent, or set to a specific release E.G. '0.9.6' to install that release
+rtorrentrel='0.9.6'
+
+#url's of the major components
+rt_url="http://rtorrent.net/downloads/"
+
+xmlrpc_url="https://svn.code.sf.net/p/xmlrpc-c/code/advanced/"
+xmlrpc_url_alt="https://github.com/mirror/xmlrpc-c"
+
+ru_url="https://github.com/Novik/ruTorrent/"
+adl_url="https://github.com/autodl-community/"
+
+if [ $(dpkg-query -W -f='${Status}' lsb-release 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
+echo "Installing lsb-release"
+apt-get -yqq install lsb-release 2>&1 >> /dev/null
+fi
+
+fullrel=$(lsb_release -sd)
+osname=$(lsb_release -si)
+relno=$(lsb_release -sr | cut -d. -f1)
+
+# Fallback if lsb_release -si returns nothing
+if [ "$osname" = "" ]; then
+  osname=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
+  osname=${osname^}
+fi
+
+# Fallback if lsb_release -sr returns nothing
+if [ "$relno" = "" ]; then
+  relno=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"')
+fi
+
+if [ "$relno" = "16" ] || [ "$relno" = "17" ] || [ "$relno" = "9" ]; then
+  phpver=php7.0
+  phploc=/etc/php/7.0
+  libcver=libcurl3
+fi
+
+if [ "$(lsb_release -sr)" = "17.10" ]; then
+  phpver=php7.1
+  phploc=/etc/php/7.1
+  libcver=libcurl3
+fi
+
+if [ "$relno" = "18" ] || [ "$relno" = "19" ]; then
+  phpver=php7.2
+  phploc=/etc/php/7.2
+  libcver=libcurl4
+fi
+
+if [ "$relno" = "10" ] || [ "$(lsb_release -sr)" = "19.10" ]; then
+  phpver=php7.3
+  phploc=/etc/php/7.3
+  libcver=libcurl4
+fi
+
+serveripa=$(ip route get 8.8.8.8 | awk 'NR==1 {print $7}')
+serveripb=$(wget -qO- --timeout=3 ipecho.net/plain)
+serveripc=$(wget -qO- --timeout=3 ipinfo.io/ip)
+
+if [ "$serveripa" = "$serveripb" ] || [ "$serveripa" = "$serveripc" ]; then
+  serverip=$serveripa
+else
+  echo "Select the IP address to use:"
+  echo "1.) "$serveripa
+  echo "2.) "$serveripb
+  echo "3.) "$serveripc
+
+  while true
+    do
+      read answer
+      case $answer in [1] ) serverip=$serveripa && break ;;
+                      [2] ) serverip=$serveripb && break ;;
+                      [3] ) serverip=$serveripc && break ;;
+                        * ) echo "Enter 1, 2 or 3";;
+    esac
+  done
+fi
+
+echo "IP set to "$serverip
+
+
+export logfile="/dev/null"
+webpass=''
+cronline1="@reboot sleep 10; /usr/local/bin/rtcheck irssi rtorrent"
+cronline2="*/10 * * * * /usr/local/bin/rtcheck irssi rtorrent"
+dlflag=1
+portdefault=1
+
+skip_rt=1
+sshport=''
+rudevflag=1
+rurelease=master
+passfile='/etc/nginx/.htpasswd'
+package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl dtach htop irssi libcppunit-dev $libcver libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl php-geoip $phpver-xmlrpc $phpver-xml python-scgi screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
+Install_list=""
+unixpass=""
+passflag=0
+forceyes=1
+selfsign=1
+rut_add_users=1
+
+
 
 ###############################
 ### INITIAL SYSTEM CHECKS ###
@@ -347,7 +374,7 @@ fi
 echo
 
 # check IP Address
-[ $forceyes = 1 ] && enter_ip
+[ $forceyes = 1 ] && serverip=$(enter_ip $serverip)
 
 echo "Your server's IP is set to $serverip"
 export serverip
@@ -510,13 +537,7 @@ echo
 if [[ $(systemctl list-units --all apt-daily.service | fgrep -c apt-daily.service) -gt 0 ]]; then
   systemctl stop apt-daily.service >> $logfile 2>&1
   systemctl kill --kill-who=all apt-daily.service >> $logfile 2>&1
-
-# wait until `apt-get updated` has been killed
-  while ! (systemctl list-units --all apt-daily.service | fgrep -q dead)
-    do
-      sleep 1;
-    done
-
+  sleep 5
 fi
 
 #update amd upgrade system
@@ -534,6 +555,7 @@ apt-get clean && apt-get autoclean >> $logfile 2>&1
 
 #install the packsges needed
 echo "Installing required packages" | tee -a $logfile
+apt-get install libtool -y >> $logfile 2>&1
 for package_name in $package_list
   do
     if [ $(apt-cache show -q=0 $package_name 2>&1 | grep -c "No packages found") -eq 0 ]; then
@@ -544,6 +566,11 @@ for package_name in $package_list
       echo $package_name" not found, skipping"
     fi
   done
+
+# Installs a package needed to prevent arm64 architectures from "WARNING: Unable to start rtorrent"
+if [ "$(uname --m)" == "aarch64" ] || [ "$(dpkg --print-architecture)" == "arm64" ] ; then
+    sudo apt-get install libxmlrpc-core-c3-dev -y >> $logfile 2>&1
+fi
 
 test -z "$install_list" || apt-get -qq install $install_list >> $logfile 2>&1
 if ! [ $? = 0 ]; then
@@ -885,7 +912,7 @@ adlpass=$(genpasswd $(random 12 16))
 
 mkdir -p $home/.irssi/scripts/autorun
 cd $home/.irssi/scripts
-curl -sL http://git.io/vlcND | grep -Po '(?<="browser_download_url": ")(.*-v[\d.]+.zip)' | xargs wget --quiet -O autodl-irssi.zip
+curl -sL http://git.io/vlcND | sed -n 's/.*browser_download_url": \?"\(.*zip\)".*/\1/p' | xargs wget --quiet -O autodl-irssi.zip
 unzip -qq -o autodl-irssi.zip | tee -a $logfile
 rm autodl-irssi.zip
 cp autodl-irssi.pl autorun/
