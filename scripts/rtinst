@@ -202,8 +202,8 @@ fullrel=$(lsb_release -sd)
 osname=$(lsb_release -si)
 relno=$(lsb_release -sr | cut -d. -f1)
 
-# Fallback if lsb_release -si returns nothing
-if [ "$osname" = "" ]; then
+# Fallback if lsb_release -si returns anything else than Ubuntu, Debian or Raspbian
+if [ ! "$osname" = "ubuntu" ] && [ ! "$osname" = "debian" ] && [ ! "$osname" = "raspbian" ]; then
   osname=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
   osname=${osname^}
 fi
