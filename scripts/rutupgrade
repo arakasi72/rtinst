@@ -14,7 +14,7 @@ newvers=$(curl -s https://raw.githubusercontent.com/Novik/ruTorrent/master/js/we
 oldvers=$(grep -m 1 version: /var/www/rutorrent/js/webui.js | cut -d \" -f2)
 
 ruflag=0
-rurelease=$(git ls-remote -t https://github.com/Novik/ruTorrent v\* | cut -d/ -f3 | sort -V | tail -1)
+rurelease=$(curl -s "https://api.github.com/repos/Novik/ruTorrent/releases/latest" | awk -F '"' '/tag_name/{print $4}')
 force_yes=1
 restore_old=1
 install_master=1
