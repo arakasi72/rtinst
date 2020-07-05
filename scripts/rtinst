@@ -872,7 +872,7 @@ if [ -d "/var/www/rutorrent" ]; then
 fi
 
 if [ $rudevflag = 1 ]; then
-   rurelease=$(git ls-remote -t https://github.com/Novik/ruTorrent v\* | cut -d/ -f3 | sort -V | tail -1)
+   rurelease=$(curl -s "https://api.github.com/repos/Novik/ruTorrent/releases/latest" | awk -F '"' '/tag_name/{print $4}')
 fi
 
 echo "Installing Rutorrent ($rurelease)" | tee -a $logfile
