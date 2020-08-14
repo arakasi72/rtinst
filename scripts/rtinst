@@ -237,7 +237,7 @@ if [ "$relno" = "10" ] || [ "$(lsb_release -sr)" = "19.10" ]; then
   libcver=libcurl4
 fi
 
-if [ "$relno" = "20" ] || [ "$(lsb_release -sr)" = "20.04" ]; then
+if [ "$relno" = "20" ] || [ "$(lsb_release -sr)" = "20.04" ] || [ "$relno" = "11" ]; then
   phpver=php7.4
   phploc=/etc/php/7.4
   libcver=libcurl4
