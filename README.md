@@ -29,6 +29,7 @@ Current release has been tested with clean installs of:
 	Ubuntu 17
 	Ubuntu 18
 	Ubuntu 19
+	Ubuntu 20
 	Debian 9 "Stretch"
 	Debian 10 "Buster"
 
