@@ -11,6 +11,8 @@
 
 headless=0
 osname=$(lsb_release -si)
+releasename=$(lsb_release -cs)
+
 [ -z $logfile ] && logfile="/dev/null"
 if [ -z $serverip ]; then
   headless=1
@@ -59,11 +61,15 @@ if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installe
   echo "Installing certbot"
 
   if [ "$osname" = "Ubuntu" ]; then
-    apt-get -q update >> $logfile 2>&1
-    add-apt-repository -y universe >> $logfile 2>&1
-    add-apt-repository -y ppa:certbot/certbot >> $logfile 2>&1
-    apt-get -q update >> $logfile 2>&1
-    apt-get install -y certbot python-certbot-nginx >> $logfile 2>&1
+    # Verify if current distribution (release name, ex. focal) has available PPA packages
+    wget -qO- http://ppa.launchpad.net/certbot/certbot/ubuntu/dists/ | grep -q "$releasename" && USE_PPA=y
+    if [ "$USE_PPA" = "y" ]; then
+      apt-get -q update >> $logfile 2>&1
+      add-apt-repository -y universe >> $logfile 2>&1
+      add-apt-repository -y ppa:certbot/certbot >> $logfile 2>&1
+    fi
+      apt-get -q update >> $logfile 2>&1
+      apt-get install -y certbot python-certbot-nginx >> $logfile 2>&1
   else
     deb_name=$(lsb_release --codename --short)
     grep "^deb http\:\/\/deb\.debian\.org\/debian $deb_name-backports main" /etc/apt/sources.list > /dev/null || echo "deb http://deb.debian.org/debian $deb_name-backports main" >> /etc/apt/sources.list
