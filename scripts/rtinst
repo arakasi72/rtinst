@@ -194,8 +194,8 @@ ru_url="https://github.com/Novik/ruTorrent/"
 adl_url="https://github.com/autodl-community/"
 
 if [ $(dpkg-query -W -f='${Status}' lsb-release 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
-echo "Installing lsb-release"
-apt-get -yqq install lsb-release 2>&1 >> /dev/null
+  echo "Installing lsb-release"
+  apt-get -yqq install lsb-release 2>&1 >> /dev/null
 fi
 
 fullrel=$(lsb_release -sd)
@@ -281,7 +281,7 @@ sshport=''
 rudevflag=1
 rurelease=master
 passfile='/etc/nginx/.htpasswd'
-package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl dtach htop irssi libcppunit-dev $libcver libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl php-geoip $phpver-xmlrpc $phpver-xml $phpver-zip screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo software-properties-common aptitude $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
+package_list="sudo nano autoconf build-essential ca-certificates comerr-dev curl dtach htop irssi libcppunit-dev $libcver libncurses5-dev libterm-readline-gnu-perl libsigc++-2.0-dev libperl-dev libtool libxml2-dev ncurses-base ncurses-term ntp patch pkg-config $phpver-fpm $phpver $phpver-cli $phpver-dev $phpver-curl php-geoip $phpver-xmlrpc $phpver-xml $phpver-zip screen subversion texinfo unzip zlib1g-dev libcurl4-openssl-dev mediainfo software-properties-common $phpver-json nginx-full apache2-utils git libarchive-zip-perl libnet-ssleay-perl libhtml-parser-perl libxml-libxml-perl libjson-perl libjson-xs-perl libxml-libxslt-perl libjson-rpc-perl libarchive-zip-perl"
 Install_list=""
 unixpass=""
 passflag=0
@@ -550,18 +550,21 @@ fi
 echo "Updating package lists" | tee $logfile
 apt-get -qq update | tee -a $logfile
 
+# Installing Aptitude
+apt-get -qqy install aptitude
+
 echo "Upgrading packages" | tee -a $logfile
 export DEBIAN_FRONTEND=noninteractive
-apt-get -qq upgrade >> $logfile 2>&1
+aptitude -q=5 upgrade >> $logfile 2>&1
 if ! [ $? = 0 ]; then
-  echo "Problem upgrading packages. Run 'apt-get upgrade' successfully and rerun the script" && exit
+  echo "Problem upgrading packages. Run 'aptitude upgrade' successfully and rerun the script" && exit
 fi
 
-apt-get clean && apt-get autoclean >> $logfile 2>&1
+aptitude clean && aptitude autoclean >> $logfile 2>&1
 
-#install the packsges needed
+#install the packages needed
 echo "Installing required packages" | tee -a $logfile
-apt-get install libtool -y >> $logfile 2>&1
+aptitude -q=5 -y install libtool >> $logfile 2>&1
 for package_name in $package_list
   do
     if [ $(apt-cache show -q=0 $package_name 2>&1 | grep -c "No packages found") -eq 0 ]; then
@@ -575,16 +578,16 @@ for package_name in $package_list
 
 # Installs a package needed to prevent arm64 architectures from "WARNING: Unable to start rtorrent"
 if [ "$(uname --m)" == "aarch64" ] || [ "$(dpkg --print-architecture)" == "arm64" ] ; then
-    sudo apt-get install libxmlrpc-core-c3-dev -y >> $logfile 2>&1
+    aptitude -q=5 -y install libxmlrpc-core-c3-dev >> $logfile 2>&1
 fi
 
-test -z "$install_list" || apt-get -qq install $install_list >> $logfile 2>&1
+test -z "$install_list" || aptitude -q=5 -y install $install_list >> $logfile 2>&1
 if ! [ $? = 0 ]; then
   echo "Problem installing packages. Check log and rerun once it is resolved" && exit
 fi
 
 if [[ $phpver =~ php7.[0-9] ]]; then
-  apt-get -qq install $phpver-mbstring >> $logfile 2>&1
+  aptitude -q=5 -y install $phpver-mbstring >> $logfile 2>&1
 fi
 
 #install unrar package
@@ -611,7 +614,7 @@ if [ $osname = "Debian" ] && ! installed unrar; then
     rm -r $home/rar
   fi
 elif [ $osname = "Ubuntu" ]; then
-  apt-get -qq install unrar >> $logfile 2>&1
+  aptitude -q=5 -y install unrar >> $logfile 2>&1
 fi
 
 if installed unrar; then
@@ -623,7 +626,7 @@ fi
 #install ffmpeg
 if ! [ $osname = "Raspbian" ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/dev/null | grep -c "ok installed") = 0 ]; then
   echo "Installing ffmpeg"
-  apt-get -qq install ffmpeg >> $logfile 2>&1
+  aptitude -q=5 -y install ffmpeg >> $logfile 2>&1
 fi
 
 echo "Completed installation of required packages        "
@@ -710,7 +713,7 @@ ftpport=$(random 41005 48995)
 
 if [ $(dpkg-query -W -f='${Status}' "vsftpd" 2>/dev/null | grep -c "ok installed") -eq 0 ]; then
   echo "Installing vsftpd" | tee -a $logfile
-  apt-get -y install vsftpd >> $logfile 2>&1
+  aptitude -q=5 -y install vsftpd >> $logfile 2>&1
 fi
 
 sed -i '/^\(\s\|#\)*anonymous_enable/ c\anonymous_enable=NO' /etc/vsftpd.conf
