@@ -555,7 +555,7 @@ apt-get -qqy install aptitude
 
 echo "Upgrading packages" | tee -a $logfile
 export DEBIAN_FRONTEND=noninteractive
-aptitude -q=5 upgrade >> $logfile 2>&1
+aptitude -q=5 -y upgrade >> $logfile 2>&1
 if ! [ $? = 0 ]; then
   echo "Problem upgrading packages. Run 'aptitude upgrade' successfully and rerun the script" && exit
 fi
