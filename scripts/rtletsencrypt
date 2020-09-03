@@ -56,31 +56,30 @@ if [ -z $serverdn ]; then
   exit 1
 fi
 
-#Installing Certbot
-if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installed") = 0 ]; then
-  echo "Installing certbot"
+# Remove apt version of Certbot if installed
+if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installed") = 1 ]; then
+  echo "Removing apt version of Certbot"
+  aptitude -q=5 -y remove certbot python*-certbot-nginx >> $logfile 2>&1
+fi
 
-  if [ "$osname" = "Ubuntu" ]; then
-    # Verify if current distribution (release name, ex. focal) has available PPA packages
-    wget -qO- http://ppa.launchpad.net/certbot/certbot/ubuntu/dists/ | grep -q "$releasename" && USE_PPA=y
-    if [ "$USE_PPA" = "y" ]; then
-      aptitude -q=5 update >> $logfile 2>&1
-      add-apt-repository -y universe >> $logfile 2>&1
-      add-apt-repository -y ppa:certbot/certbot >> $logfile 2>&1
-    fi
-      aptitude -q=5 update >> $logfile 2>&1
-      aptitude -q=5 -y install certbot python-certbot-nginx >> $logfile 2>&1
-  else
-    deb_name=$(lsb_release --codename --short)
-    grep "^deb http\:\/\/deb\.debian\.org\/debian $deb_name-backports main" /etc/apt/sources.list > /dev/null || echo "deb http://deb.debian.org/debian $deb_name-backports main" >> /etc/apt/sources.list
-    aptitude -q=5 update >> $logfile 2>&1
-    aptitude -q=5 -y install certbot python-certbot-nginx -t $deb_name-backports >> $logfile 2>&1
-  fi
+# Install Snapd service if not installed
+if [ $(dpkg-query -W -f='${Status}' "snapd" 2>/dev/null | grep -c "ok installed") = 0 ]; then
+    echo "Installing snapd service"
+    aptitude -q=5 -y install snapd >> $logfile 2>&1
+fi
+
+# Install the core snap in order to get the latest snapd for Debian
+if [ $osname = "Debian" ]; then snap install core >> $logfile 2>&1 && snap refresh core; fi
+
+# Installing Certbot
+if [ $(snap list | grep -c "certbot") = 0 ]; then
+  echo "Installing certbot"
+  snap -y install --classic certbot >> $logfile 2>&1
 else
   echo "certbot already installed"
 fi
 
-if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installed") = 0 ]; then
+if [ $(snap list | grep -c "certbot") = 0 ]; then
   echo "Install Failed"
   exit 1
 fi
