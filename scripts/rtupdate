@@ -218,16 +218,19 @@ echo "Fetching source files"
 
 if [ $xmlrpc_repo = 0 ]; then
   svn co $xmlrpcloc xmlrpc  >> $logfile 2>&1
+  if [ ! -e xmlrpc-c ]; then 
+    git clone $xmlrpc_url_alt xmlrpc >> $logfile 2>&1
+    cd xmlrpc/stable
+  else cd xmlrpc; fi
 
-  cd xmlrpc
   echo "Installing xmlrpc" | tee -a $logfile
   ./configure --prefix=/usr --disable-cplusplus >> $logfile 2>&1
   make -j$(nproc) >> $logfile 2>&1
   make -s install >> $logfile 2>&1
-  cd ..
+  cd $home/source
 fi
 
-cd libtorrent-$libvers
+cd libtorrent*
 echo "Installing libtorrent" | tee -a $logfile
 ./autogen.sh >> $logfile 2>&1
 if [ $osname = "Raspbian" ]; then
@@ -238,7 +241,7 @@ fi
 make -j$(nproc) >> $logfile 2>&1
 make -s install >> $logfile 2>&1
 
-cd ../rtorrent-$rtvers
+cd ../rtorrent*
 echo "Installing rtorrent" | tee -a $logfile
 ./autogen.sh >> $logfile 2>&1
 ./configure --prefix=/usr --with-xmlrpc-c --enable-ipv6 >> $logfile 2>&1
@@ -246,8 +249,6 @@ make -j$(nproc) >> $logfile 2>&1
 make -s install >> $logfile 2>&1
 ldconfig >> $logfile 2>&1
 
- echo "$libvers/$rtvers installed"
- echo
 
 if [ -d /var/www/rutorrent/conf/users ]; then
   cd /var/www/rutorrent/conf/users
