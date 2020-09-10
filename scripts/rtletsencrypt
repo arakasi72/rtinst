@@ -62,14 +62,10 @@ if [ $(dpkg-query -W -f='${Status}' "certbot" 2>/dev/null | grep -c "ok installe
   aptitude -q=5 -y remove certbot python*-certbot-nginx >> $logfile 2>&1
 fi
 
-# Install Snapd service if not installed
-if [ $(dpkg-query -W -f='${Status}' "snapd" 2>/dev/null | grep -c "ok installed") = 0 ]; then
-    echo "Installing snapd service"
-    aptitude -q=5 -y install snapd >> $logfile 2>&1
-fi
-
+# Install Snapd service
+aptitude -q=5 -y install snapd >> $logfile 2>&1
 # Install the core snap in order to get the latest snapd for Debian
-if [ $osname = "Debian" ]; then snap install core >> $logfile 2>&1 && snap refresh core; fi
+if [ $osname = "Debian" ]; then snap install core >> $logfile 2>&1; snap refresh core; fi
 
 # Installing Certbot
 if [ $(snap list | grep -c "certbot") = 0 ]; then
