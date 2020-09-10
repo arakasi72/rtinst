@@ -218,7 +218,7 @@ echo "Fetching source files"
 
 if [ $xmlrpc_repo = 0 ]; then
   svn co $xmlrpcloc xmlrpc  >> $logfile 2>&1
-  if [ ! -e xmlrpc-c ]; then 
+  if [ ! -e xmlrpc ]; then 
     git clone $xmlrpc_url_alt xmlrpc >> $logfile 2>&1
     cd xmlrpc/stable
   else cd xmlrpc; fi
