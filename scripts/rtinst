@@ -203,7 +203,7 @@ osname=$(lsb_release -si)
 relno=$(lsb_release -sr | cut -d. -f1)
 
 # Fallback if lsb_release -si returns anything else than Ubuntu, Debian or Raspbian
-if [ ! "$osname" = "ubuntu" ] && [ ! "$osname" = "debian" ] && [ ! "$osname" = "raspbian" ]; then
+if [ ! "$osname" = "ubuntu" ] && [ ! "$osname" = "debian" ] && [ ! "$osname" = "raspbian" ] && [ ! "$osname" = "Linuxmint" ]; then
   osname=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
   osname=${osname^}
 fi
@@ -301,11 +301,11 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # determine system
-if ([ "$osname" = "Ubuntu" ] && [ $relno -ge 16 ]) || ([ "$osname" = "Debian" ] && [ $relno -ge 9 ])  || ([ "$osname" = "Raspbian" ] && [ $relno -ge 9 ]); then
+if ([ "$osname" = "Ubuntu" ] && [ $relno -ge 16 ]) || ([ "$osname" = "Debian" ] && [ $relno -ge 9 ])  || ([ "$osname" = "Raspbian" ] && [ $relno -ge 9 ]) || ([ "$osname" = "Linuxmint" ] && [ $relno -ge 16 ]); then
   echo $fullrel
 else
  echo $fullrel
- echo "Only Ubuntu release 16 and later, and Debian and Raspbian release 9 and later, are supported"
+ echo "Only Ubuntu and Linux Mint release 16 and later, and Debian and Raspbian release 9 and later, are supported"
  echo "Your system does not appear to be supported"
  echo "Check https://github.com/arakasi72/rtinst/wiki/Installing-on-Older-OS to see if it is supported by an earlier rtinst release"
  exit
@@ -613,7 +613,7 @@ if [ $osname = "Debian" ] && ! installed unrar; then
     cp $home/rar/unrar /bin/unrar
     rm -r $home/rar
   fi
-elif [ $osname = "Ubuntu" ]; then
+elif [ $osname = "Ubuntu" || $osname = "Linuxmint" ]; then
   aptitude -q=5 -y install unrar >> $logfile 2>&1
 fi
 

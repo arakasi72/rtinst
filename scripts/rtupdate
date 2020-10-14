@@ -44,7 +44,7 @@ if [ "$fullrelno" = "17.10" ]; then
   rtdevrel=0
 fi
 
-if ([ "$osname" = "Debian" ] || [ "$osname" = "Raspbian" ] && [ $relno -ge 9 ]) || ([ "$osname" = "Ubuntu" ] && [ $relno -ge 18 ]); then
+if ([ "$osname" = "Debian" ] || [ "$osname" = "Raspbian" ] && [ $relno -ge 9 ]) || ([ "$osname" = "Ubuntu" ] && [ $relno -ge 18 ]) || ([ "$osname" = "Linuxmint" ] && [ $relno -ge 18 ]); then
   rtdevrel=0
 fi
 
@@ -157,7 +157,7 @@ if [ -z $passed_rtvers ]; then
 
 # checks if the OS is debian 9, and forces the version to 0.9.7 of it is
   if [ $rtdevrel = 0 ]; then
-    echo "For Debian 9, and Ubuntu 17.10 and later, recommend libtorrent-0.13.7/rtorrent-0.9.7 or later"
+    echo "For Debian 9, Ubuntu 17.10 or later and Linux Mint 17 or later, libtorrent-0.13.7/rtorrent-0.9.7 or later is recommended"
   fi
   
   list_version
@@ -184,7 +184,7 @@ else
   if [ $rtdevrel = 0 ]; then
     libvers='0.13.8'
     rtvers='0.9.8'
-    echo "Debian 9, and Ubuntu 17.10 and later, are only supported by libtorrent-0.13.7/rtorrent-0.9.7 or later"
+    echo "Debian 9, Ubuntu 17.10 or later and Linux Mint 17 or later are only supported by libtorrent-0.13.7/rtorrent-0.9.7 or later"
   fi
 
 fi
