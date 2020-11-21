@@ -199,11 +199,11 @@ if [ $(dpkg-query -W -f='${Status}' lsb-release 2>/dev/null | grep -c "ok instal
 fi
 
 fullrel=$(lsb_release -sd)
-osname=$(lsb_release -si)
+osname=$(lsb_release -si); osname=${osname^}
 relno=$(lsb_release -sr | cut -d. -f1)
 
 # Fallback if lsb_release -si returns anything else than Ubuntu, Debian or Raspbian
-if [ ! "$osname" = "ubuntu" ] && [ ! "$osname" = "debian" ] && [ ! "$osname" = "raspbian" ]; then
+if [ ! "$osname" = "Ubuntu" ] && [ ! "$osname" = "Debian" ] && [ ! "$osname" = "Raspbian" ]; then
   osname=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
   osname=${osname^}
 fi
