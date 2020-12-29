@@ -70,7 +70,7 @@ if [ $osname = "Debian" ]; then snap install core >> $logfile 2>&1; snap refresh
 # Installing Certbot
 if [ $(snap list | grep -c "certbot") = 0 ]; then
   echo "Installing certbot"
-  snap -y install --classic certbot >> $logfile 2>&1
+  snap install --classic certbot >> $logfile 2>&1
 else
   echo "certbot already installed"
 fi
@@ -80,6 +80,8 @@ if [ $(snap list | grep -c "certbot") = 0 ]; then
   exit 1
 fi
 
+#Prepare certbot command
+ln -s /snap/bin/certbot /usr/bin/certbot
 
 #Generating Certificates
 certbot -q --nginx --register-unsafely-without-email --agree-tos certonly -d $serverdn >> $logfile 2>&1
