@@ -629,6 +629,23 @@ if ! [ $osname = "Raspbian" ] && [ $(dpkg-query -W -f='${Status}' "ffmpeg" 2>/de
   aptitude -q=5 -y install ffmpeg >> $logfile 2>&1
 fi
 
+### INSTALL DNSMASQ ###
+echo "Installing Dnsmasq"
+
+# Disable the resolved service
+systemctl disable systemd-resolved >> $logfile 2>&1
+systemctl stop systemd-resolved >> $logfile 2>&1
+
+# Remove the symlinked resolv.conf file
+rm /etc/resolv.conf >> $logfile 2>&1
+
+# Create new resolv.conf file. Add dnsmasq and cloudflare dns server
+bash -c 'echo nameserver 127.0.0.1 >> /etc/resolv.conf'
+bash -c 'echo nameserver 1.1.1.1 >> /etc/resolv.conf'
+
+# Install dnsmasq from repository
+aptitude -q=5 -y install dnsmasq >> $logfile 2>&1
+
 echo "Completed installation of required packages        "
 
 #add user to sudo group if not already
@@ -690,6 +707,22 @@ grep "AllowGroups sudo sshuser" /etc/ssh/sshd_config > /dev/null || echo "AllowG
 service ssh restart 1>> $logfile
 sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
 echo "SSH port set to $sshport"
+
+###############################
+### CONFIGURE DNSMASQ ###
+###############################
+
+echo "Configuring Dnsmasq" | tee -a $logfile
+
+# Update configuration varriables in /etc/dnsmasq.conf
+sed -i "s/#port=5353/port=53/g" /etc/dnsmasq.conf
+sed -i "s/#domain-needed/domain-needed/g" /etc/dnsmasq.conf
+sed -i "s/#bogus-priv/bogus-priv/g" /etc/dnsmasq.conf
+sed -i "s/#strict-order/strict-order/g" /etc/dnsmasq.conf
+sed -i "s/#listen-address=/listen-address=127.0.0.1/g" /etc/dnsmasq.conf
+
+# Restart dnsmasq service when completed
+service dnsmasq restart >> $logfile 2>&1
 
 ###############################
 ### SSL CERTIFICATES ###
