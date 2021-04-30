@@ -40,7 +40,8 @@ Services that will be installed and configured are
 	3. rutorrent
 	4. Nginx (webserver)
 	5. autodl-irssi
-	6. webmin (optional see section 3.7 in main guide)
+	6. Dnsmasq (dns server)
+	7. webmin (optional see section 3.7 in main guide)
 
 
 [rtinst installation guide](https://github.com/arakasi72/rtinst/wiki/Installing-rtinst)
