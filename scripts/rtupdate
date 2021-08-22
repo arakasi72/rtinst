@@ -30,7 +30,7 @@ if [ "$fullrelno" = "" ]; then
 fi
 
 
-sourcedir='http://rtorrent.net/downloads/'
+sourcedir='https://rakshasa.github.io/rtorrent/'
 
 xmlrpc_url='https://svn.code.sf.net/p/xmlrpc-c/code/stable/'
 xmlrpcloc='svn://svn.code.sf.net/p/xmlrpc-c/code/stable/'
@@ -40,33 +40,13 @@ xmlrpcloc_alt='https://github.com/mirror/xmlrpc-c/trunk/stable'
 
 rtdevrel=1
 
-if [ "$fullrelno" = "17.10" ]; then
-  rtdevrel=0
-fi
+libvers='0.13.8'
+rtvers='0.9.8'
 
-if ([ "$osname" = "Debian" ] || [ "$osname" = "Raspbian" ] && [ $relno -ge 9 ]) || ([ "$osname" = "Ubuntu" ] && [ $relno -ge 18 ]); then
-  rtdevrel=0
-fi
-
-listsize=6
 duoversion=''
 passed_rtvers=$1
 [ -z $logfile ] && logfile="/dev/null"
 
-# get a list of the most recent releases
-rt_releases=$(wget -q -O - $sourcedir | grep -o "rtorrent-[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}\.tar.gz" | sort -uV | tail -$listsize | grep -o "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
-
-# extract the release numbers from the list of most recent releases
-for rtversion in $rt_releases
-  do
-    libversion=$(echo $rtversion | awk -F. -v OFS=. '{$2='$(( $(echo $rtversion | cut -d. -f2) + 4 ))'; print }')
-    duoversion="$duoversion $libversion/$rtversion"
-  done
-
-# get the most recent release version number
-latest_duo=$(echo $duoversion | rev | cut -d' ' -f1 | rev)
-latest_libvers=$(echo $latest_duo | cut -d/ -f1)
-latest_rtvers=$(echo $latest_duo | cut -d/ -f2)
 
 # checks if an application is installed
 installed() {
@@ -78,20 +58,6 @@ check_url() {
   if [[ `wget -S -T 3 --spider $1  2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then return 0; else return 1; fi
 }
 
-# function to create a list of versions to install
-list_version() {
-local verschoice
-while [ -z "$verschoice" ]
-do
-  echo "Please select libtorrent/rtorrent version."
-  select verschoice in ${duoversion[*]}
-  do
-    libvers=$(echo $verschoice | cut -d/ -f1)
-    rtvers=$(echo $verschoice | cut -d/ -f2)
-    break
-  done
-done
-}
 
 ask_user(){
 local answer
@@ -154,40 +120,8 @@ if [ -z $passed_rtvers ]; then
     echo "This script is for upgrading/downgrading only, not for initial install"
     exit 1
   fi
-
-# checks if the OS is debian 9, and forces the version to 0.9.7 of it is
-  if [ $rtdevrel = 0 ]; then
-    echo "For Debian 9, and Ubuntu 17.10 and later, recommend libtorrent-0.13.7/rtorrent-0.9.7 or later"
-  fi
-  
-  list_version
-  
-  echo "Install libtorrent-$libvers and rtorrent-$rtvers"
-  echo "Your rtorrent config, torrents, and data will not be lost or changed"
-  echo -n "Continue? "
-  if ! ask_user; then
-    exit
-  fi
-else
-  if [ "$passed_rtvers" = "latest" ] || [ $(wget -q -O - $sourcedir | grep -o "rtorrent-$passed_rtvers.tar.gz" | wc -l) -eq 0 ]; then
-    if [ "$passed_rtvers" != "latest" ]; then
-      echo " Could not find $passed_rtvers so using latest version instead"
-    fi
-    libvers=$latest_libvers
-    rtvers=$latest_rtvers
-  else
-    libvers=$(echo $passed_rtvers | awk -F. -v OFS=. '{$2='$(( $(echo $rtversion | cut -d. -f2) + 4 ))'; print }')
-    rtvers=$passed_rtvers
-  fi
-
-  # checks if the OS is debian 9, and forces the version to 0.9.7 of it is
-  if [ $rtdevrel = 0 ]; then
-    libvers='0.13.8'
-    rtvers='0.9.8'
-    echo "Debian 9, and Ubuntu 17.10 and later, are only supported by libtorrent-0.13.7/rtorrent-0.9.7 or later"
-  fi
-
 fi
+
 
 if [ -z "$home" ]; then
   home=$HOME
@@ -207,13 +141,12 @@ rm -rf xmlrpc libtorrent* rtorrent*
 
 echo "Fetching source files"
 
-
 #if [ $rtdevrel = 0 ]; then
 #  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/libtorrent.git libtorrent-$libvers
 #  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/rtorrent.git rtorrent-$rtvers
 #else
-  curl -# http://rtorrent.net/downloads/libtorrent-$libvers.tar.gz | tar xz
-  curl -# http://rtorrent.net/downloads/rtorrent-$rtvers.tar.gz | tar xz
+  curl - https://github.com/rakshasa/rtorrent-archive/raw/master/libtorrent-$libvers.tar.gz | tar xz
+  curl - https://github.com/rakshasa/rtorrent-archive/raw/master/libtorrent-$rtvers.tar.gz | tar xz
 #fi
 
 if [ $xmlrpc_repo = 0 ]; then
