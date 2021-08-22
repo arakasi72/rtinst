@@ -185,7 +185,7 @@ PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 rtorrentrel='0.9.8'
 
 #url's of the major components
-rt_url="http://rtorrent.net/downloads/"
+rt_url="https://rakshasa.github.io/rtorrent/"
 
 xmlrpc_url="https://svn.code.sf.net/p/xmlrpc-c/code/advanced/"
 xmlrpc_url_alt="https://github.com/mirror/xmlrpc-c"
