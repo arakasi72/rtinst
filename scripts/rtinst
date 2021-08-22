@@ -182,10 +182,10 @@ echo $ip_address
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 # if left blank will install latest version of rtorrent, or set to a specific release E.G. '0.9.6' to install that release
-rtorrentrel='0.9.6'
+rtorrentrel='0.9.8'
 
 #url's of the major components
-rt_url="http://rtorrent.net/downloads/"
+rt_url="https://rakshasa.github.io/rtorrent/"
 
 xmlrpc_url="https://svn.code.sf.net/p/xmlrpc-c/code/advanced/"
 xmlrpc_url_alt="https://github.com/mirror/xmlrpc-c"
@@ -551,7 +551,7 @@ echo "Updating package lists" | tee $logfile
 apt-get -qq update | tee -a $logfile
 
 # Installing Aptitude
-apt-get -qqy install aptitude
+apt-get -qqy install aptitude >> $logfile 2>&1
 
 echo "Upgrading packages" | tee -a $logfile
 export DEBIAN_FRONTEND=noninteractive
