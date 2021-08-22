@@ -166,7 +166,7 @@ if [ $xmlrpc_repo = 0 ]; then
   cd $home/source
 fi
 
-cd libtorrent*
+cd libtorrent-$libvers
 echo "Installing libtorrent" | tee -a $logfile
 ./autogen.sh >> $logfile 2>&1
 if [ $osname = "Raspbian" ]; then
@@ -177,7 +177,7 @@ fi
 make -j$(nproc) >> $logfile 2>&1
 make -s install >> $logfile 2>&1
 
-cd ../rtorrent*
+cd ../rtorrent-$rtvers
 echo "Installing rtorrent" | tee -a $logfile
 ./autogen.sh >> $logfile 2>&1
 ./configure --prefix=/usr --with-xmlrpc-c --enable-ipv6 >> $logfile 2>&1
