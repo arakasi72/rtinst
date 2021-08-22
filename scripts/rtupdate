@@ -115,6 +115,7 @@ if [ -z $passed_rtvers ]; then
   if ( installed rtorrent ); then
     rt_current=$(rtorrent -h | grep -om 1 "[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}")
     echo "rtorrent $rt_current detected"
+    exit 1
   else
     echo "rtorrent NOT installed"
     echo "This script is for upgrading/downgrading only, not for initial install"
@@ -147,8 +148,8 @@ echo "Fetching source files"
 #else
   curl -LOJ https://github.com/rakshasa/rtorrent-archive/raw/master/libtorrent-$libvers.tar.gz
   tar -xzf libtorrent-$libvers.tar.gz
-  curl -LOJ https://github.com/rakshasa/rtorrent-archive/raw/master/libtorrent-$rtvers.tar.gz
-  tar -xzf libtorrent-$rtvers.tar.gz
+  curl -LOJ https://github.com/rakshasa/rtorrent-archive/raw/master/rtorrent-$rtvers.tar.gz
+  tar -xzf rtorrent-$rtvers.tar.gz
 #fi
 
 if [ $xmlrpc_repo = 0 ]; then
