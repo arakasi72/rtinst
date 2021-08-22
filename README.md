@@ -47,15 +47,6 @@ Services that will be installed and configured are
 
 [Additional information on all the features](https://github.com/arakasi72/rtinst/wiki/Guide)
 
-For older unssuported OS [Older OS Installation Guide](https://github.com/arakasi72/rtinst/wiki/Installing-on-Older-OS). These include:
-	
-	Ubuntu 12 (old release)
-	Ubuntu 13 (old release)
-	Ubuntu 14 (old release)
-	Ubuntu 15 (old release)
-	Debian 7 "Wheezy" (old release)
-	Debian 8 "Jessie" (old release)
-
 To see latest updates to the script go to [Change Log](https://github.com/arakasi72/rtinst/wiki/Change-Log)
 
 -------------------------------------------------------------------------
