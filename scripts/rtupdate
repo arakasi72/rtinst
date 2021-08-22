@@ -145,8 +145,10 @@ echo "Fetching source files"
 #  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/libtorrent.git libtorrent-$libvers
 #  git clone -q -b feature-bind --single-branch https://github.com/rakshasa/rtorrent.git rtorrent-$rtvers
 #else
-  curl -# https://github.com/rakshasa/rtorrent-archive/raw/master/libtorrent-$libvers.tar.gz | tar xz
-  curl -# https://github.com/rakshasa/rtorrent-archive/raw/master/libtorrent-$rtvers.tar.gz | tar xz
+  curl -# https://github.com/rakshasa/rtorrent-archive/raw/master/libtorrent-$libvers.tar.gz
+  tar -xzf libtorrent-$libvers.tar.gz
+  curl -# https://github.com/rakshasa/rtorrent-archive/raw/master/libtorrent-$rtvers.tar.gz
+  tar -xzf libtorrent-$rtvers.tar.gz
 #fi
 
 if [ $xmlrpc_repo = 0 ]; then
