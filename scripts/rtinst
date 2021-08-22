@@ -551,7 +551,7 @@ echo "Updating package lists" | tee $logfile
 apt-get -qq update | tee -a $logfile
 
 # Installing Aptitude
-apt-get -qqy install aptitude
+apt-get -qqy install aptitude >> $logfile 2>&1
 
 echo "Upgrading packages" | tee -a $logfile
 export DEBIAN_FRONTEND=noninteractive
