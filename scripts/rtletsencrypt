@@ -81,7 +81,7 @@ if [ $(snap list | grep -c "certbot") = 0 ]; then
 fi
 
 #Prepare certbot command
-ln -s /snap/bin/certbot /usr/bin/certbot
+ln -sf /snap/bin/certbot /usr/bin/certbot
 
 #Generating Certificates
 certbot -q --nginx --register-unsafely-without-email --agree-tos certonly -d $serverdn >> $logfile 2>&1
