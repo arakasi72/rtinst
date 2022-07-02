@@ -99,6 +99,10 @@ cd
 ln -sf /etc/rtinst/scripts/* /usr/local/bin
 ln -sf /etc/rtinst/rtsetup /usr/local/bin
 
+echo "Adding PHP repositoy"
+apt-get install -yqq software-properties-common 2>&1 >> /dev/null
+add-apt-repository -y ppa:ondrej/php > /dev/null 2>&1
+
 echo "Installation complete"
 echo
 echo "You can now run rtinst and the additional supporting scripts"

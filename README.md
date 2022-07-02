@@ -2,6 +2,7 @@
 
 ### Note: Now installs Lets Encrypt SSL certificates
 
+#### Ubuntu 22.04 now supported 
 #### 30 Second Guide
 
 Ubuntu and Debian Seedbox Installation
@@ -30,6 +31,8 @@ Current release has been tested with clean installs of:
 	Ubuntu 18
 	Ubuntu 19
 	Ubuntu 20
+	Ubuntu 21
+	Ubuntu 22
 	Debian 9 "Stretch"
 	Debian 10 "Buster"
 
