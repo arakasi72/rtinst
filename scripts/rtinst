@@ -255,6 +255,16 @@ if [ "$relno" = "22" ] || [ "$(lsb_release -sr)" = "22.04" ]; then
   libcver=libcurl4
 fi
 
+# Debian bookworm support, not sure if this is compatiable w/ other distros though
+# This really needs to be more robust, why not check /etc/php for the version
+# Look at all folders in the directory, find the biggest number, use that one
+# Then for libcver, look in /usr/share/doc/ for libcurlXX
+if [ "$(lsb_release -sr)" = "12" ]; then
+  phpver=php8.2
+  phploc=/etc/php/8.2
+  libcver=libcurl4
+fi
+
 serveripa=$(ip route get 8.8.8.8 | awk 'NR==1 {print $7}')
 serveripb=$(wget -qO- --timeout=3 ipecho.net/plain)
 serveripc=$(wget -qO- --timeout=3 ipinfo.io/ip)
